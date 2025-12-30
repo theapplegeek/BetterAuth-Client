@@ -23,6 +23,11 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'redirect-to-sign-out',
+    redirectTo: '/auth/sign-out', // Your Sign Out page path
+    pathMatch: 'full',
+  },
+  {
     path: 'redirect-to-home',
     redirectTo: '/home', // Your Home page path
     pathMatch: 'full',
@@ -35,7 +40,11 @@ export const routes: Routes = [
     },
     children: [
       {
-        path: '',
+        path: 'home',
+        loadChildren: () => import('./pages/home/home.routes'),
+      },
+      {
+        path: 'admin/users',
         loadChildren: () => import('./pages/home/home.routes'),
       }
     ]

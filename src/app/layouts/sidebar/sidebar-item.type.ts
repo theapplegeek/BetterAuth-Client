@@ -1,22 +1,15 @@
-export type NavItem =
-  | {
+export type NavItem = {
   id: string;
-  type: 'link';
+  type: 'link' | 'group';
   label: string;
-  route: string | any[];
-  icon?: string; // optional (or store SVG/component ref)
-  roles?: string[];
-}
-  | {
-  id: string;
-  type: 'group';
-  label: string;
+  route?: string;
   icon?: string;
   roles?: string[];
-  children: Array<{
+  children?: Array<{
     id: string;
     label: string;
-    route: string | any[];
+    route?: string;
+    icon?: string;
     roles?: string[];
   }>;
-};
+}
