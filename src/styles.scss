@@ -1,1 +1,72 @@
 @use "tailwindcss";
+
+@theme {
+  /* =======================
+     PRIMARY – BLUE
+     ======================= */
+  --color-primary: #2563eb;
+  --color-primary-100: hsl(217, 90%, 95%);
+  --color-primary-200: hsl(217, 90%, 85%);
+  --color-primary-300: hsl(217, 90%, 75%);
+  --color-primary-400: hsl(217, 90%, 65%);
+  --color-primary-500: #2563eb;
+  --color-primary-600: hsl(217, 90%, 45%);
+  --color-primary-700: hsl(217, 90%, 35%);
+  --color-primary-800: hsl(217, 90%, 25%);
+  --color-primary-900: hsl(217, 90%, 18%);
+
+  /* =======================
+     SECONDARY – GRAY
+     ======================= */
+  --color-secondary: hsl(215, 15%, 50%);
+  --color-secondary-100: hsl(215, 15%, 95%);
+  --color-secondary-200: hsl(215, 15%, 85%);
+  --color-secondary-300: hsl(215, 15%, 70%);
+  --color-secondary-400: hsl(215, 15%, 60%);
+  --color-secondary-500: hsl(215, 15%, 50%);
+  --color-secondary-600: hsl(215, 15%, 40%);
+  --color-secondary-700: hsl(215, 15%, 30%);
+  --color-secondary-800: hsl(215, 15%, 22%);
+  --color-secondary-900: hsl(215, 15%, 15%);
+
+  /* =======================
+     WARNING – ORANGE
+     ======================= */
+  --color-warning: #f97316;
+  --color-warning-100: hsl(30, 95%, 95%);
+  --color-warning-200: hsl(30, 95%, 85%);
+  --color-warning-300: hsl(30, 95%, 75%);
+  --color-warning-400: hsl(30, 95%, 65%);
+  --color-warning-500: #f97316;
+  --color-warning-600: hsl(30, 95%, 45%);
+  --color-warning-700: hsl(30, 95%, 35%);
+  --color-warning-800: hsl(30, 95%, 25%);
+  --color-warning-900: hsl(30, 95%, 18%);
+
+  /* =======================
+     ERROR – RED
+     ======================= */
+  --color-error: #dc2626;
+  --color-error-100: hsl(0, 85%, 95%);
+  --color-error-200: hsl(0, 85%, 85%);
+  --color-error-300: hsl(0, 85%, 75%);
+  --color-error-400: hsl(0, 85%, 65%);
+  --color-error-500: #dc2626;
+  --color-error-600: hsl(0, 85%, 45%);
+  --color-error-700: hsl(0, 85%, 35%);
+  --color-error-800: hsl(0, 85%, 25%);
+  --color-error-900: hsl(0, 85%, 18%);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.cdk-dialog-container:focus,
+.cdk-dialog-container:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
