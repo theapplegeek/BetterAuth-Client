@@ -16,6 +16,7 @@ export class SidebarComponent {
   private _router: Router = inject(Router);
 
   public sidebarVisible: WritableSignal<boolean> = signal(false);
+  public desktopSidebarOpen: WritableSignal<boolean> = signal(true);
   public navItems: NavItem[] = [
     { id: 'home', type: 'link', label: 'Home', route: '/home' },
     { id: 'customer', type: 'link', label: 'Customer', route: '/customer' },
@@ -52,6 +53,10 @@ export class SidebarComponent {
 
   public changeSidebarVisibility() {
     this.sidebarVisible.update(v => !v);
+  }
+
+  public toggleDesktopSidebar() {
+    this.desktopSidebarOpen.update(v => !v);
   }
 
   public toggleGroup(label: string) {
