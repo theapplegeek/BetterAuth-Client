@@ -1,9 +1,9 @@
-import {HomeComponent} from './home.component';
 import {Routes} from '@angular/router';
+import {WikiComponent} from './wiki.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    component: WikiComponent,
   },
 ];

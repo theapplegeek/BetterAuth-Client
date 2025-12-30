@@ -34,6 +34,11 @@ export const routes: Routes = [
   },
   {
     path: '',
+    redirectTo: '/home',
+    pathMatch: 'full',
+  },
+  {
+    path: '',
     component: LayoutsComponent,
     data: {
       layout: 'sidebar'
@@ -41,11 +46,15 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
-        loadChildren: () => import('./pages/home/home.routes'),
+        loadChildren: () => import('./pages/home/home.routes').then(m => m.routes),
       },
       {
-        path: 'admin/users',
-        loadChildren: () => import('./pages/home/home.routes'),
+        path: 'customer',
+        loadChildren: () => import('./pages/customers/customers.routes').then(m => m.routes),
+      },
+      {
+        path: 'wiki',
+        loadChildren: () => import('./pages/wiki/wiki-routes').then(m => m.routes),
       }
     ]
   }
