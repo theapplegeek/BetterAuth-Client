@@ -1,7 +1,7 @@
 import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
-import {Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {NavItem} from './sidebar-item.type';
-import {ThemeService} from '../../common/services/theme.service';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {NavItem} from './models/sidebar-item.type';
+import {AuthService} from '../../common/auth/auth.service';
 
 @Component({
   selector: 'sidebar-layout',
@@ -14,8 +14,7 @@ import {ThemeService} from '../../common/services/theme.service';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  private readonly _router: Router = inject(Router);
-  private readonly _themeService: ThemeService = inject(ThemeService);
+  private readonly _authService: AuthService = inject(AuthService);
 
   public sidebarVisible: WritableSignal<boolean> = signal(false);
   public desktopSidebarOpen: WritableSignal<boolean> = signal(true);
@@ -41,7 +40,7 @@ export class SidebarComponent {
   });
 
   public signOut(): void {
-    this._router.navigate(['auth', 'sign-out']);
+    this._authService.signOut().subscribe();
   }
 
   public haveAdminRole(): boolean {

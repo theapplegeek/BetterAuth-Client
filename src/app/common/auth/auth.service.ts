@@ -20,7 +20,7 @@ export class AuthService {
   // ==========================================================================
   // Sign Up Methods
   // ==========================================================================
-  public signUp(userData: {name: string, email: string, password: string}) {
+  public signUp(userData: { name: string, email: string, password: string }) {
     return from(this._authClient.signUp.email({
       email: userData.email,
       password: userData.password,
@@ -43,6 +43,7 @@ export class AuthService {
       password: credentials.password,
     })).pipe(
       tap((res: any): void => {
+        if (res.error) throw res.error;
         const twoFactorEnabled: boolean = res.data.twoFactorRedirect;
         if (twoFactorEnabled) {
           this._router.navigate(['/redirect-to-two-factor']);
@@ -168,6 +169,22 @@ export class AuthService {
         return throwError(() => err);
       })
     );
+  }
+
+  // ==========================================================================
+  // Sign Out
+  // ==========================================================================
+  public signOut() {
+    return from(this._authClient.signOut())
+      .pipe(
+        tap((_): void => {
+          this._router.navigate(['/redirect-to-sign-in']);
+        }),
+        catchError((err: any) => {
+          // TODO: Handle better auth error
+          return throwError(() => err);
+        })
+      );
   }
 
   // ==========================================================================

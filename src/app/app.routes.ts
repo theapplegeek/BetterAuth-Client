@@ -41,6 +41,19 @@ export const routes: Routes = [
     path: '',
     component: LayoutsComponent,
     data: {
+      layout: 'empty'
+    },
+    children: [
+      {
+        path: 'auth',
+        loadChildren: () => import('./pages/auth/auth.routes').then(m => m.routes),
+      }
+    ],
+  },
+  {
+    path: '',
+    component: LayoutsComponent,
+    data: {
       layout: 'sidebar'
     },
     children: [
@@ -57,5 +70,10 @@ export const routes: Routes = [
         loadChildren: () => import('./pages/wiki/wiki-routes').then(m => m.routes),
       }
     ]
+  },
+  {
+    path: '**',
+    redirectTo: '/home',
+    pathMatch: 'full',
   }
 ];
