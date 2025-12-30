@@ -1,0 +1,163 @@
+<!-- Static sidebar for desktop -->
+<div class="absolute z-999 inset-y-0 w-72 transform transition-transform duration-300 ease-out -translate-x-full
+    lg:translate-x-0 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col"
+     [class.translate-x-0]="sidebarVisible()">
+  <!-- Sidebar component, swap this element with another sidebar if you like -->
+  <div class="flex grow h-screen flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 border-r border-white/5">
+    <div class="flex h-16 shrink-0 items-center">
+      <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company"
+           class="h-8 w-auto"/>
+    </div>
+    <nav class="flex flex-1 flex-col">
+      <ul role="list" class="flex flex-1 flex-col">
+        <li>
+          <ul role="list" class="-mx-2 space-y-1">
+            @for (item of navItems; track item.id) {
+              <!-- Link item -->
+              @if (item.type === 'link') {
+                <li>
+                  <a
+                    [routerLink]="item.route"
+                    routerLinkActive="bg-gray-800 text-white"
+                    class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                    (click)="closeSidebar()"
+                  >
+                    <!-- Optional: put an icon here -->
+                    <span>{{ item.label }}</span>
+                  </a>
+                </li>
+              }
+
+              <!-- Group (dropdown) item -->
+              @if (item.type === 'group') {
+                <li>
+                  <button
+                    type="button"
+                    class="w-full group flex items-center justify-between rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                    (click)="toggleGroup(item.id)"
+                  >
+                    <span class="flex items-center gap-x-3">
+                      <span>{{ item.label }}</span>
+                    </span>
+
+                    <!-- Chevron -->
+                    <svg
+                      class="size-4 transition-transform duration-200"
+                      [class.rotate-180]="isGroupOpen(item.id)"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+
+                  <!-- Animated dropdown (grid trick) -->
+                  <div
+                    class="grid transition-[grid-template-rows] duration-300 ease-out"
+                    [class.grid-rows-[0fr]]="!isGroupOpen(item.id)"
+                    [class.grid-rows-[1fr]]="isGroupOpen(item.id)"
+                  >
+                    <div class="overflow-hidden">
+                      <ul
+                        class="mt-1 ml-2 space-y-1 border-l border-white/10 pl-2
+                               transition-opacity duration-200 ease-out"
+                        [class.opacity-0]="!isGroupOpen(item.id)"
+                        [class.opacity-100]="isGroupOpen(item.id)"
+                      >
+                        @for (child of item.children; track child.id) {
+                          <li>
+                            <a
+                              [routerLink]="child.route"
+                              routerLinkActive="bg-gray-800 text-white"
+                              class="block rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                              (click)="closeSidebar()"
+                            >
+                              {{ child.label }}
+                            </a>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  </div>
+
+                </li>
+              }
+            }
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="absolute z-999 inset-y-0 ml-76 h-6 mt-4 text-white rounded-full"
+       [class.hidden]="!sidebarVisible()">
+    <button (click)="changeSidebarVisibility()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+@if (sidebarVisible()) {
+  <div class="lg:pl-72 lg:hidden absolute inset-y-0 w-full z-100 bg-black/60 transition-opacity duration-300"
+       (click)="changeSidebarVisibility()"></div>
+}
+
+<div class="lg:pl-72">
+  <div
+    class="sticky top-0 z-99 flex h-16 shrink-0 items-center gap-x-4 border-b border-white/5 bg-gray-900 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8">
+    <button type="button" (click)="changeSidebarVisibility()"
+            class="-m-2.5 p-2.5 text-white lg:hidden cursor-pointer">
+      <span class="sr-only">Open sidebar</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon" aria-hidden="true"
+           class="size-6">
+        <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Separator -->
+    <div aria-hidden="true" class="h-6 w-px bg-white/20 lg:hidden"></div>
+
+    <div class="flex flex-1 gap-x-4 justify-end self-stretch lg:gap-x-6">
+      <div class="flex items-center gap-x-1">
+        <div class="relative">
+          <div class="relative flex items-center text-white mr-4">
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+              </svg>
+              <span aria-hidden="true"
+                    class="ml-2 text-sm/6 font-semibold text-white capitalize">{{ username() }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Separator -->
+        <div aria-hidden="true" class="h-6 w-px bg-white/20"></div>
+
+        <div class="relative ml-2">
+          <button class="relative flex items-center" (click)="signOut()">
+            <span class="flex items-center text-red-400 hover:text-red-600">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="p-4 sm:p-6 lg:p-8">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import {LayoutsComponent} from './layouts/layouts.component';
 
 export const routes: Routes = [
   {
@@ -26,4 +27,17 @@ export const routes: Routes = [
     redirectTo: '/home', // Your Home page path
     pathMatch: 'full',
   },
+  {
+    path: '',
+    component: LayoutsComponent,
+    data: {
+      layout: 'sidebar'
+    },
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/home/home.routes'),
+      }
+    ]
+  }
 ];
