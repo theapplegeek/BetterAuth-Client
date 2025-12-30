@@ -27,6 +27,9 @@ export class AuthService {
       name: userData.name,
       callbackURL: `${window.location.origin}/redirect-to-home`,
     })).pipe(
+      tap((res: any): void => {
+        if (res.error) throw res.error;
+      }),
       catchError((err: any) => {
         // TODO: Handle better auth error
         return throwError(() => err);

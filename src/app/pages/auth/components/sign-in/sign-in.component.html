@@ -1,11 +1,11 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+<div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center px-4">
   <div class="w-full max-w-md lg:max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
     <div class="flex flex-col lg:flex-row lg:min-h-[600px]">
       <!-- Left side - Form -->
       <div class="lg:w-1/2 p-8 space-y-6">
         <!-- Logo -->
         <div class="text-center lg:text-left mb-6">
-          <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto lg:mx-0 mb-4">
+          <div class="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center mx-auto lg:mx-0 mb-4">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
@@ -61,12 +61,12 @@
         </form>
 
         @if (errorMessage() !== '') {
-          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div class="bg-error-100 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg p-4">
             <div class="flex items-center">
               <svg class="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
               </svg>
-              <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage() }}</p>
+              <p class="text-sm text-error-800 dark:text-error-200">{{ errorMessage() }}</p>
             </div>
           </div>
         }
@@ -123,7 +123,7 @@
             <button
               type="button"
               (click)="onSignInWithGoogle()"
-              class="w-full h-12 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition duration-200 flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm hover:shadow"
+              class="w-full h-12 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition duration-200 flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer shadow-sm hover:shadow"
             >
               <svg class="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
