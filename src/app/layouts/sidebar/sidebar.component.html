@@ -142,10 +142,10 @@
   - On desktop: padding responds to desktopSidebarOpen()
 ========================================================== -->
 <div
-  class="transition-[padding-left] duration-300"
+  class="transform transition-transform duration-300 ease-out"
   [class]="{
-    'lg:pl-72': desktopSidebarOpen(),
-    'lg:pl-0': !desktopSidebarOpen()
+    'lg:translate-x-72': desktopSidebarOpen(),
+    'lg:translate-x-0': !desktopSidebarOpen()
   }"
 >
   <!-- TOP BAR -->
