@@ -1,14 +1,21 @@
-import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, signal, Signal, viewChild, WritableSignal} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {NavItem} from './models/sidebar-item.type';
 import {AuthService} from '../../common/auth/auth.service';
+import {Menu, MenuContent, MenuItem, MenuTrigger} from '@angular/aria/menu';
+import {OverlayModule} from '@angular/cdk/overlay';
 
 @Component({
   selector: 'sidebar-layout',
   imports: [
     RouterLink,
     RouterLinkActive,
-    RouterOutlet
+    RouterOutlet,
+    MenuTrigger,
+    MenuItem,
+    Menu,
+    MenuContent,
+    OverlayModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
@@ -16,6 +23,8 @@ import {AuthService} from '../../common/auth/auth.service';
 export class SidebarComponent {
   private readonly _authService: AuthService = inject(AuthService);
 
+  public formatMenu = viewChild<Menu<string>>('formatMenu');
+  public categorizeMenu = viewChild<Menu<string>>('categorizeMenu');
   public sidebarVisible: WritableSignal<boolean> = signal(false);
   public desktopSidebarOpen: WritableSignal<boolean> = signal(true);
   public navItems: WritableSignal<NavItem[]> = signal<NavItem[]>([

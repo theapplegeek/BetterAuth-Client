@@ -201,41 +201,62 @@
 
       <div class="flex-1"></div>
 
-      <div class="flex flex-1 gap-x-4 justify-end self-stretch lg:gap-x-6">
-        <div class="flex items-center gap-x-1">
-          <!-- User -->
-          <div class="relative">
-            <div class="relative flex items-center mr-4">
-              <span class="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                  />
-                </svg>
-
-                <span
-                  aria-hidden="true"
-                  class="ml-2 text-sm/6 font-semibold capitalize"
-                >
-                  {{ username() }}
-                </span>
-              </span>
-            </div>
-          </div>
-
+      <div class="flex flex-1 gap-x-4 justify-end self-stretch">
+        <div class="flex items-center gap-x-2">
           <!-- Separator -->
-          <div aria-hidden="true" class="h-6 w-px bg-white/20"></div>
+          <!--<div aria-hidden="true" class="h-6 w-px bg-white/20"></div>-->
 
-          <!-- Sign out -->
+          <!-- User -->
+          <button class="flex items-center" ngMenuTrigger #origin #trigger="ngMenuTrigger" [menu]="formatMenu()">
+            <span class="icon-[heroicons--user] size-5" translate="no" aria-hidden="true"></span>
+            <span
+              aria-hidden="true"
+              class="ml-2 text-sm/6 font-semibold capitalize">
+                {{ username() }}
+            </span>
+          </button>
+          <ng-template
+            [cdkConnectedOverlayOpen]="trigger.expanded()"
+            [cdkConnectedOverlay]="{ origin, usePopover: 'inline' }"
+            [cdkConnectedOverlayPositions]="[
+              { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
+              { originX: 'start', originY: 'top',    overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
+              { originX: 'end',   originY: 'bottom', overlayX: 'end',   overlayY: 'top', offsetY: 4 },
+              { originX: 'end',   originY: 'top',    overlayX: 'end',   overlayY: 'bottom', offsetY: -4 }
+            ]"
+            [cdkConnectedOverlayPush]="true"
+            [cdkConnectedOverlayFlexibleDimensions]="true"
+            [cdkConnectedOverlayGrowAfterOpen]="true"
+            [cdkConnectedOverlayViewportMargin]="8"
+            cdkAttachPopoverAsChild>
+            <div ngMenu class="menu w-[15rem] rounded-md shadow-xl border border-gray-200/50 dark:border-white/30 p-[0.25rem] bg-white dark:bg-gray-900" #formatMenu="ngMenu">
+              <ng-template ngMenuContent>
+                <div class="flex flex-col gap-y-2">
+                  <div class="flex flex-col p-2 text-black dark:text-white">
+                    <span class="text-xs">Signed in as</span>
+                    <span class="text-md mt-1">{{ username() }}</span>
+                  </div>
+                  <div role="separator" aria-orientation="horizontal" class="border-t border-gray-200/50 dark:border-white/10"></div>
+                  <div ngMenuItem value="Settings" class="flex items-center gap-1 p-2 cursor-pointer rounded-sm border border-white dark:border-gray-900 text-black dark:text-gray-400 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800">
+                    <span class="icon-[heroicons--user] size-5" translate="no" aria-hidden="true"></span>
+                    <span class="flex flex-1 text-[1rem] opacity-[0.875rem] ml-2">Profile</span>
+                  </div>
+                  <div ngMenuItem value="Settings" class="flex items-center gap-1 p-2 cursor-pointer rounded-sm border border-white dark:border-gray-900 text-black dark:text-gray-400 dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-gray-800">
+                    <span class="icon-[heroicons--cog-8-tooth] size-5" translate="no" aria-hidden="true"></span>
+                    <span class="flex flex-1 text-[1rem] opacity-[0.875rem] ml-2">Settings</span>
+                  </div>
+                  <div role="separator" aria-orientation="horizontal" class="border-t border-gray-200/50 dark:border-white/10"></div>
+                  <div ngMenuItem value="Logout" class="flex items-center gap-1 p-2 cursor-pointer rounded-sm border border-white dark:border-gray-900 text-red-500 hover:text-red-400 hover:bg-gray-100/50 dark:hover:bg-gray-800"
+                       (click)="signOut()">
+                    <span class="icon-[heroicons--arrow-right-end-on-rectangle] size-5" translate="no" aria-hidden="true"></span>
+                    <span class="flex flex-1 text-[1rem] opacity-[0.875rem] ml-2">Logout</span>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </ng-template>
+
+          <!--&lt;!&ndash; Sign out &ndash;&gt;
           <div class="relative ml-2">
             <button
               class="relative flex items-center cursor-pointer"
@@ -259,7 +280,7 @@
                 </svg>
               </span>
             </button>
-          </div>
+          </div>-->
         </div>
       </div>
     </header>
