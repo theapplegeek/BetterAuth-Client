@@ -23,12 +23,17 @@ export class SignInComponent {
   public errorMessage: WritableSignal<string> = signal<string>('');
   public successMessage: WritableSignal<string> = signal<string>('');
   public showPasswordForm: WritableSignal<boolean> = signal<boolean>(false);
+  public magicLinkCooldown: WritableSignal<number> = signal<number>(0);
 
   public onSignInWithMagicLink(): void {
+    if (this.magicLinkCooldown() > 0) return;
+    if (this.form.controls['email'].invalid) return;
+
     this._authService.signInWithMagicLink(this.form.value.email).subscribe({
       next: (): void => {
         this.successMessage.set('Check your email for a login link!');
         this.errorMessage.set('');
+        this.startMagicLinkCooldown();
       },
       error: (err: any): void => {
         this.errorMessage.set(err.message || 'Failed to send login link');
@@ -37,7 +42,21 @@ export class SignInComponent {
     });
   }
 
+  private startMagicLinkCooldown(): void {
+    this.magicLinkCooldown.set(60);
+    const interval: number = setInterval((): void => {
+      const current: number = this.magicLinkCooldown();
+      if (current <= 1) {
+        clearInterval(interval);
+        this.magicLinkCooldown.set(0);
+      } else {
+        this.magicLinkCooldown.set(current - 1);
+      }
+    }, 1000);
+  }
+
   public onSignInWithPassword(): void {
+    if (this.form.invalid) return;
     this._authService.signInWithPassword(this.form.value)
       .subscribe({
         error: (err: any): void => {

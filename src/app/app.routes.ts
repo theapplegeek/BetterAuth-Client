@@ -1,5 +1,6 @@
-import { Routes } from '@angular/router';
+import {Router, Routes} from '@angular/router';
 import {LayoutsComponent} from './layouts/layouts.component';
+import {inject} from '@angular/core';
 
 export const routes: Routes = [
   {
@@ -14,7 +15,13 @@ export const routes: Routes = [
   },
   {
     path: 'redirect-to-reset-password',
-    redirectTo: '/auth/reset-password', // Your Reset Password (New Password Form) page path
+    redirectTo: (route) => {
+      const router = inject(Router);
+      return router.createUrlTree(
+        ['/auth/reset-password'],
+        { queryParams: route.queryParams }
+      );
+    }, // Your Reset Password (New Password Form) page path
     pathMatch: 'full',
   },
   {
