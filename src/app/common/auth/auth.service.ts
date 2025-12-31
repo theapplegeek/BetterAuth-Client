@@ -1,6 +1,6 @@
 import {inject, Injectable, signal, WritableSignal} from '@angular/core';
 import {BetterAuthClientService} from './better-auth/better-auth-client.service';
-import {catchError, from, tap, throwError} from 'rxjs';
+import {catchError, EMPTY, from, map, tap, throwError} from 'rxjs';
 import {Router} from '@angular/router';
 
 @Injectable({
@@ -27,8 +27,9 @@ export class AuthService {
       name: userData.name,
       callbackURL: `${window.location.origin}/redirect-to-home`,
     })).pipe(
-      tap((res: any): void => {
+      map((res) => {
         if (res.error) throw res.error;
+        return res.data;
       }),
       catchError((err: any) => {
         // TODO: Handle better auth error
@@ -45,13 +46,16 @@ export class AuthService {
       email: credentials.email,
       password: credentials.password,
     })).pipe(
-      tap((res: any): void => {
+      map((res) => {
         if (res.error) throw res.error;
-        const twoFactorEnabled: boolean = res.data.twoFactorRedirect;
+        return res.data;
+      }),
+      tap((res: any): void => {
+        const twoFactorEnabled: boolean = res.twoFactorRedirect ?? false;
         if (twoFactorEnabled) {
           this._router.navigate(['/redirect-to-two-factor']);
         } else {
-          this.enableTwoFactor(credentials.password);
+          this.enableTwoFactor(credentials.password).subscribe();
         }
       }),
       catchError((err: any) => {
@@ -68,8 +72,12 @@ export class AuthService {
     return from(this._authClient.twoFactor.enable({
       password: password,
     })).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
       tap((res): void => {
-        this.twoFactorEnableData.set({...res.data});
+        this.twoFactorEnableData.set({...res});
         this._router.navigate(['/redirect-to-enable-two-factor']);
       }),
       catchError((err: any) => {
@@ -83,9 +91,12 @@ export class AuthService {
     return from(this._authClient.twoFactor.verifyTotp({
       code: code,
     })).pipe(
-      tap((_): void => {
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
+      tap((): void => {
         this.getJwtToken();
-        this._router.navigate(['/redirect-to-home']);
       }),
       catchError((err: any) => {
         // TODO: Handle better auth error
@@ -98,9 +109,12 @@ export class AuthService {
     return from(this._authClient.twoFactor.verifyBackupCode({
       code: code,
     })).pipe(
-      tap((_): void => {
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
+      tap((): void => {
         this.getJwtToken();
-        this._router.navigate(['/redirect-to-home']);
       }),
       catchError((err: any) => {
         // TODO: Handle better auth error
@@ -114,14 +128,21 @@ export class AuthService {
   // ==========================================================================
   public signInWithPasskey(autoFill: boolean) {
     return from(this._authClient.signIn.passkey({
-      autoFill: autoFill,
+      autoFill: autoFill ? true : undefined,
     })).pipe(
-      tap((_): void => {
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
+      tap((): void => {
         this.getJwtToken();
         this._router.navigate(['/redirect-to-home']);
       }),
       catchError((err: any) => {
         // TODO: Handle better auth error
+        if ('code' in err && err.code === 'AUTH_CANCELLED') {
+          return EMPTY;
+        }
         return throwError(() => err);
       })
     );
@@ -137,7 +158,11 @@ export class AuthService {
       newUserCallbackURL: `${window.location.origin}/redirect-to-home`,
       errorCallbackURL: `${window.location.origin}/redirect-to-home`,
     })).pipe(
-      tap((_): void => {
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
+      tap((): void => {
         this._router.navigate(['/redirect-to-magic-link-confirmation']);
       }),
       catchError((err: any) => {
@@ -155,6 +180,10 @@ export class AuthService {
       provider: 'google',
       callbackURL: `${window.location.origin}/redirect-to-home`,
     })).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
       catchError((err: any) => {
         // TODO: Handle better auth error
         return throwError(() => err);
@@ -167,6 +196,10 @@ export class AuthService {
       provider: 'discord',
       callbackURL: `${window.location.origin}/redirect-to-home`,
     })).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
       catchError((err: any) => {
         // TODO: Handle better auth error
         return throwError(() => err);
@@ -180,7 +213,11 @@ export class AuthService {
   public signOut() {
     return from(this._authClient.signOut())
       .pipe(
-        tap((_): void => {
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        }),
+        tap((): void => {
           this._router.navigate(['/redirect-to-sign-in']);
         }),
         catchError((err: any) => {
@@ -196,8 +233,12 @@ export class AuthService {
   public getJwtToken() {
     return from(this._authClient.token())
       .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        }),
         tap((res): void => {
-          this.jwtToken.set(res.data!.token);
+          this.jwtToken.set(res.token);
         }),
         catchError((err) => {
           // TODO: Handle better auth error
@@ -214,6 +255,10 @@ export class AuthService {
       email: email,
       redirectTo: `${window.location.origin}/redirect-to-reset-password`,
     })).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
       catchError((err: any) => {
         // TODO: Handle better auth error
         return throwError(() => err);
@@ -226,7 +271,11 @@ export class AuthService {
       newPassword: newPassword,
       token: token,
     })).pipe(
-      tap((_): void => {
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data;
+      }),
+      tap((): void => {
         this._router.navigate(['/redirect-to-sign-in']);
       }),
       catchError((err: any) => {

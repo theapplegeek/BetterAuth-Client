@@ -26,7 +26,7 @@ export class SignInComponent {
     this._authService.signInWithPassword(this.form.value)
       .subscribe({
         error: (err: any): void => {
-          this.errorMessage.set(err.message);
+          this.errorMessage.set(err.message || 'Invalid email or password');
         }
       });
   }

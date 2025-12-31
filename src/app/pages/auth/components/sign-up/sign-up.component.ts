@@ -31,7 +31,7 @@ export class SignUpComponent {
         this.successMessage.set('Check your email for verify your account');
       },
       error: (err: any): void => {
-        this.errorMessage.set(err.message);
+        this.errorMessage.set(err.message || 'An error occurred while creating your account');
         this.successMessage.set('');
       }
     });
