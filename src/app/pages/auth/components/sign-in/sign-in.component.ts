@@ -16,17 +16,33 @@ export class SignInComponent {
   private readonly _authService: AuthService = inject(AuthService);
 
   public form: FormGroup = new FormGroup({
-    email: new FormControl('weibin.xu.dev@gmail.com', [Validators.required, Validators.email]),
-    password: new FormControl('Password123', [Validators.required])
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required])
   });
   public passkeyAutofillEnabled: WritableSignal<boolean> = signal<boolean>(false)
   public errorMessage: WritableSignal<string> = signal<string>('');
+  public successMessage: WritableSignal<string> = signal<string>('');
+  public showPasswordForm: WritableSignal<boolean> = signal<boolean>(false);
+
+  public onSignInWithMagicLink(): void {
+    this._authService.signInWithMagicLink(this.form.value.email).subscribe({
+      next: (): void => {
+        this.successMessage.set('Check your email for a login link!');
+        this.errorMessage.set('');
+      },
+      error: (err: any): void => {
+        this.errorMessage.set(err.message || 'Failed to send login link');
+        this.successMessage.set('');
+      }
+    });
+  }
 
   public onSignInWithPassword(): void {
     this._authService.signInWithPassword(this.form.value)
       .subscribe({
         error: (err: any): void => {
           this.errorMessage.set(err.message || 'Invalid email or password');
+          this.successMessage.set('');
         }
       });
   }
@@ -53,8 +69,16 @@ export class SignInComponent {
     this._authService.signInWithDiscord().subscribe();
   }
 
-  public onSignInWithMagicLink(): void {
-    this._router.navigate(['auth/sign-in/magic-link']);
+  public onShowPasswordForm(): void {
+    this.showPasswordForm.set(true);
+    this.successMessage.set('');
+    this.errorMessage.set('');
+  }
+
+  public onShowMagicLinkForm(): void {
+    this.showPasswordForm.set(false);
+    this.successMessage.set('');
+    this.errorMessage.set('');
   }
 
   public onSignUp(): void {

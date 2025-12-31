@@ -156,14 +156,11 @@ export class AuthService {
       email: email,
       callbackURL: `${window.location.origin}/redirect-to-home`,
       newUserCallbackURL: `${window.location.origin}/redirect-to-home`,
-      errorCallbackURL: `${window.location.origin}/redirect-to-home`,
+      errorCallbackURL: `${window.location.origin}/redirect-to-sign-in`,
     })).pipe(
       map((res) => {
         if (res.error) throw res.error;
         return res.data;
-      }),
-      tap((): void => {
-        this._router.navigate(['/redirect-to-magic-link-confirmation']);
       }),
       catchError((err: any) => {
         // TODO: Handle better auth error
