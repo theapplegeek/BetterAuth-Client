@@ -30,7 +30,8 @@
         <div role="separator" aria-orientation="horizontal"
              class="border-t border-gray-200 dark:border-white/10 mx-1"></div>
         <div ngMenuItem value="Profile"
-             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">
+             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+             (click)="openProfile()">
           <span class="icon-[heroicons--user-circle] size-5" translate="no" aria-hidden="true"></span>
           <span>Profile</span>
         </div>
@@ -87,7 +88,8 @@
           </div>
         </ng-template>
         <div ngMenuItem value="Settings"
-             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">
+             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+             (click)="openSettings()">
           <span class="icon-[heroicons--cog-8-tooth] size-5" translate="no" aria-hidden="true"></span>
           <span>Settings</span>
         </div>

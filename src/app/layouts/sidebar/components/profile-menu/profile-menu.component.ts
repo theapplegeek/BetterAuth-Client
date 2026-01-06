@@ -4,6 +4,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
 import {Theme, ThemeService} from '../../../../common/services/theme.service';
 import {AuthService} from '../../../../common/auth/auth.service';
 import {UserService} from '../../../../common/user/user.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-profile-menu',
@@ -18,6 +19,7 @@ import {UserService} from '../../../../common/user/user.service';
   styleUrl: './profile-menu.component.scss',
 })
 export class ProfileMenuComponent {
+  private readonly _router: Router = inject(Router);
   private readonly _authService: AuthService = inject(AuthService);
   private readonly _themeService: ThemeService = inject(ThemeService);
   private readonly _userService: UserService = inject(UserService);
@@ -32,6 +34,14 @@ export class ProfileMenuComponent {
 
   public setTheme(theme: Theme): void {
     this._themeService.setTheme(theme);
+  }
+
+  public openProfile(): void {
+    this._router.navigate(['profile']);
+  }
+
+  public openSettings(): void {
+    this._router.navigate(['settings']);
   }
 
   public signOut(): void {

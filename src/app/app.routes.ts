@@ -6,6 +6,11 @@ import {noAuthGuard} from './common/auth/guards/no-auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'redirect-to-sign-in',
+    redirectTo: '/auth/sign-in', // Your Sign In page path
+    pathMatch: 'full',
+  },
+  {
     path: 'redirect-to-two-factor',
     redirectTo: '/auth/sign-in/two-factor', // Your 2FA Verification page path
     pathMatch: 'full',
@@ -24,16 +29,6 @@ export const routes: Routes = [
         { queryParams: route.queryParams }
       );
     }, // Your Reset Password (New Password Form) page path
-    pathMatch: 'full',
-  },
-  {
-    path: 'redirect-to-sign-in',
-    redirectTo: '/auth/sign-in', // Your Sign In page path
-    pathMatch: 'full',
-  },
-  {
-    path: 'redirect-to-sign-out',
-    redirectTo: '/auth/sign-out', // Your Sign Out page path
     pathMatch: 'full',
   },
   {
@@ -79,6 +74,10 @@ export const routes: Routes = [
       {
         path: 'wiki',
         loadChildren: () => import('./pages/wiki/wiki-routes').then(m => m.routes),
+      },
+      {
+        path: 'settings',
+        loadChildren: () => import('./pages/settings/settings.routes').then(m => m.routes),
       }
     ]
   },
