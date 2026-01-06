@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './wiki.component.html',
   styleUrl: './wiki.component.scss',
 })
-export class WikiComponent {
-
-}
+export class WikiComponent {}

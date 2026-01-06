@@ -1,32 +1,56 @@
-import {Component, effect, inject, input, InputSignal, signal, WritableSignal} from '@angular/core';
-import {Router} from '@angular/router';
-import {AuthService} from '../../../../common/auth/auth.service';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  InputSignal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../common/auth/auth.service';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [
-    ReactiveFormsModule
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
 })
 export class ResetPasswordComponent {
-  public token: InputSignal<string> = input.required<string>();
+  public token: InputSignal<string> =
+    input.required<string>();
 
   private readonly _router: Router = inject(Router);
-  private readonly _authService: AuthService = inject(AuthService);
+  private readonly _authService: AuthService =
+    inject(AuthService);
 
-  public errorMessage: WritableSignal<string> = signal<string>('');
-  public successMessage: WritableSignal<string> = signal<string>('');
+  public errorMessage: WritableSignal<string> =
+    signal<string>('');
+  public successMessage: WritableSignal<string> =
+    signal<string>('');
 
   public get passwordMatch(): boolean {
-    return this.form.value.password === this.form.value.confirmPassword;
+    return (
+      this.form.value.password ===
+      this.form.value.confirmPassword
+    );
   }
 
   public form: FormGroup = new FormGroup({
-    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
-    confirmPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+    ]),
+    confirmPassword: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+    ]),
   });
 
   constructor() {
@@ -41,22 +65,30 @@ export class ResetPasswordComponent {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    if (this.form.value.password !== this.form.value.confirmPassword) {
+    if (
+      this.form.value.password !==
+      this.form.value.confirmPassword
+    ) {
       this.errorMessage.set('Passwords do not match');
       return;
     }
 
-    this._authService.resetPassword(this.form.value.password, this.token())
+    this._authService
+      .resetPassword(this.form.value.password, this.token())
       .subscribe({
         next: (): void => {
-          this.successMessage.set('Password reset successfully');
+          this.successMessage.set(
+            'Password reset successfully',
+          );
           setTimeout(() => {
             this._router.navigate(['auth/sign-in']);
           }, 2000);
         },
         error: (err: any): void => {
-          this.errorMessage.set(err.message || 'Failed to reset password');
-        }
+          this.errorMessage.set(
+            err.message || 'Failed to reset password',
+          );
+        },
       });
   }
 

@@ -1,48 +1,68 @@
-import {Component, inject, signal, WritableSignal} from '@angular/core';
-import {Router} from '@angular/router';
-import {AuthService} from '../../../../common/auth/auth.service';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {QRCodeComponent} from 'angularx-qrcode';
-import {ClipboardService} from '../../../../common/services/clipboard.service';
+import {
+  Component,
+  inject,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../common/auth/auth.service';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { QRCodeComponent } from 'angularx-qrcode';
+import { ClipboardService } from '../../../../common/services/clipboard.service';
 
 @Component({
   selector: 'app-two-factor-enable',
-  imports: [
-    QRCodeComponent,
-    ReactiveFormsModule
-  ],
+  imports: [QRCodeComponent, ReactiveFormsModule],
   templateUrl: './two-factor-enable.component.html',
   styleUrl: './two-factor-enable.component.scss',
 })
 export class TwoFactorEnableComponent {
   private readonly _router: Router = inject(Router);
-  private readonly _clipboardService: ClipboardService = inject(ClipboardService);
-  public readonly authService: AuthService = inject(AuthService);
+  private readonly _clipboardService: ClipboardService =
+    inject(ClipboardService);
+  public readonly authService: AuthService =
+    inject(AuthService);
 
   public form: FormGroup = new FormGroup({
-    code: new FormControl('', [Validators.required, Validators.minLength(6)])
+    code: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+    ]),
   });
-  public isVerified: WritableSignal<boolean> = signal<boolean>(false);
-  public errorMessage: WritableSignal<string> = signal<string>('');
+  public isVerified: WritableSignal<boolean> =
+    signal<boolean>(false);
+  public errorMessage: WritableSignal<string> =
+    signal<string>('');
 
   constructor() {
-    if (!this.authService.twoFactorEnableData() ||
-      !this.authService.twoFactorEnableData()!.backupCodes ||
-      !this.authService.twoFactorEnableData()!.totpURI) {
+    if (
+      !this.authService.twoFactorEnableData() ||
+      !this.authService.twoFactorEnableData()!
+        .backupCodes ||
+      !this.authService.twoFactorEnableData()!.totpURI
+    ) {
       this._router.navigate(['/']);
     }
   }
 
   public onVerify(): void {
-    this.authService.verifyTwoFactorTOTP(this.form.value.code)
+    this.authService
+      .verifyTwoFactorTOTP(this.form.value.code)
       .subscribe({
         next: (): void => {
           this.errorMessage.set('');
           this.isVerified.set(true);
         },
         error: (err: any): void => {
-          this.errorMessage.set(err.message || 'Invalid verification code');
-        }
+          this.errorMessage.set(
+            err.message || 'Invalid verification code',
+          );
+        },
       });
   }
 
@@ -54,8 +74,11 @@ export class TwoFactorEnableComponent {
   }
 
   public onCopyAllCodes(): void {
-    const allCodes: string = this.authService.twoFactorEnableData()!.backupCodes!.join('\n');
-    this._clipboardService.copyText(allCodes)
+    const allCodes: string = this.authService
+      .twoFactorEnableData()!
+      .backupCodes!.join('\n');
+    this._clipboardService
+      .copyText(allCodes)
       .then((): void => {
         // TODO: Show success message
         console.log('Codes copied to clipboard');

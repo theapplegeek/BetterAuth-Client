@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    "prettier-plugin-organize-attributes",
+    "prettier-plugin-tailwindcss"
+  ],
+  "printWidth": 60,
+  "tabWidth": 2,
+  "useTabs": false,
+  "singleQuote": true,
+  "semi": true,
+  "singleAttributePerLine": true,
+  "attributeGroups": [
+    "^id$",
+    "^class$",
+    "$DEFAULT",
+    "$ANGULAR"
+  ],
+  "tailwindStylesheet": "./src/styles.scss"
+}

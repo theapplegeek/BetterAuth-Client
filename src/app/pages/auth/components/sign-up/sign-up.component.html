@@ -1,90 +1,154 @@
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center px-4">
-  <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
+<div
+  class="bg-gray-100 dark:bg-gray-900 px-4 flex min-h-screen items-center justify-center"
+>
+  <div
+    class="max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border-gray-200 dark:border-gray-700 w-full border"
+  >
     <!-- Logo -->
-    <div class="text-center mb-6">
-      <div class="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    <div class="mb-6 text-center">
+      <div
+        class="w-12 h-12 rounded-lg mb-4 mx-auto flex items-center justify-center bg-primary-600"
+      >
+        <svg
+          class="w-8 h-8 text-white"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+          />
         </svg>
       </div>
     </div>
 
     <div class="text-center">
-      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Sign Up</h2>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Create your account</p>
+      <h2
+        class="text-3xl font-bold text-gray-900 dark:text-white"
+      >
+        Sign Up
+      </h2>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        Create your account
+      </p>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="onSignUp()" class="mt-8 space-y-6">
+    <form
+      class="mt-8 space-y-6"
+      [formGroup]="form"
+      (ngSubmit)="onSignUp()"
+    >
       <div class="space-y-4">
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+          <label
+            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+            for="name"
+            >Name</label
+          >
           <input
             id="name"
+            class="px-4 py-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 w-full border focus:border-transparent focus:ring-2 focus:ring-primary-500 focus:outline-none"
             type="text"
             formControlName="name"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Your name"
           />
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+          <label
+            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+            for="email"
+            >Email</label
+          >
           <input
             id="email"
+            class="px-4 py-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 w-full border focus:border-transparent focus:ring-2 focus:ring-primary-500 focus:outline-none"
             type="email"
             formControlName="email"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="name@example.com"
           />
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+          <label
+            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+            for="password"
+            >Password</label
+          >
           <input
             id="password"
+            class="px-4 py-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 w-full border focus:border-transparent focus:ring-2 focus:ring-primary-500 focus:outline-none"
             type="password"
             formControlName="password"
-            class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="••••••••"
           />
         </div>
       </div>
 
       <button
+        class="py-3 px-4 text-white font-semibold rounded-lg focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:bg-gray-400 disabled:text-gray-200 dark:disabled:bg-gray-600 dark:disabled:text-gray-400 w-full cursor-pointer bg-primary-600 transition duration-200 hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed"
         type="submit"
         [disabled]="form.invalid"
-        class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:bg-gray-400 disabled:text-gray-200 dark:disabled:bg-gray-600 dark:disabled:text-gray-400 cursor-pointer disabled:cursor-not-allowed"
       >
         Sign Up
       </button>
     </form>
 
     @if (successMessage() !== '') {
-      <div class="bg-success-100 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4 mt-6">
+      <div
+        class="rounded-lg p-4 mt-6 border border-success-200 bg-success-100 dark:border-success-800 dark:bg-success-900/20"
+      >
         <div class="flex items-center">
-          <svg class="w-5 h-5 text-success-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          <svg
+            class="w-5 h-5 mr-3 text-success-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd"
+            />
           </svg>
-          <p class="text-sm text-success-800 dark:text-success-200">{{ successMessage() }}</p>
+          <p
+            class="text-sm text-success-800 dark:text-success-200"
+          >
+            {{ successMessage() }}
+          </p>
         </div>
       </div>
     }
 
     @if (errorMessage() !== '') {
-      <div class="bg-error-100 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg p-4 mt-6">
+      <div
+        class="rounded-lg p-4 mt-6 border border-error-200 bg-error-100 dark:border-error-800 dark:bg-error-900/20"
+      >
         <div class="flex items-center">
-          <svg class="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          <svg
+            class="w-5 h-5 text-red-400 mr-3"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
           </svg>
-          <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage() }}</p>
+          <p class="text-sm text-red-800 dark:text-red-200">
+            {{ errorMessage() }}
+          </p>
         </div>
       </div>
     }
 
-    <div class="text-center mt-6">
+    <div class="mt-6 text-center">
       <p class="text-gray-600 dark:text-gray-400">
         Already have an account?
-        <button type="button" (click)="onSignIn()" class="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 font-medium ml-1 cursor-pointer">
+        <button
+          class="font-medium ml-1 cursor-pointer text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          type="button"
+          (click)="onSignIn()"
+        >
           Sign in
         </button>
       </p>

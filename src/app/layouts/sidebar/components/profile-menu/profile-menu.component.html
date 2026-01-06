@@ -1,105 +1,226 @@
 <button
-  class="flex items-center gap-x-2 p-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
-  ngMenuTrigger #origin #trigger="ngMenuTrigger" [menu]="profileMenu()">
-  <span class="icon-[heroicons--user-circle] size-5" translate="no" aria-hidden="true"></span>
+  class="gap-x-2 p-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white flex cursor-pointer items-center transition-colors"
+  ngMenuTrigger
+  #origin
+  #trigger="ngMenuTrigger"
+  [menu]="profileMenu()"
+>
+  <span
+    class="size-5 icon-[heroicons--user-circle]"
+    translate="no"
+    aria-hidden="true"
+  ></span>
   <span class="capitalize">{{ username() }}</span>
-  <svg class="size-4 transform transition-transform duration-200 ease-out"
-       [class.rotate-180]="trigger.expanded()" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-    <path fill-rule="evenodd"
-          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
-          clip-rule="evenodd"/>
+  <svg
+    class="size-4 ease-out transform transition-transform duration-200"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
+    [class.rotate-180]="trigger.expanded()"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
+      clip-rule="evenodd"
+    />
   </svg>
 </button>
 <ng-template
+  cdkAttachPopoverAsChild
   [cdkConnectedOverlayOpen]="trigger.expanded()"
   [cdkConnectedOverlay]="{ origin, usePopover: 'inline' }"
   [cdkConnectedOverlayPositions]="[
-    { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
-    { originX: 'end',   originY: 'bottom', overlayX: 'end',   overlayY: 'top', offsetY: 4 },
+    {
+      originX: 'start',
+      originY: 'bottom',
+      overlayX: 'start',
+      overlayY: 'top',
+      offsetY: 4,
+    },
+    {
+      originX: 'end',
+      originY: 'bottom',
+      overlayX: 'end',
+      overlayY: 'top',
+      offsetY: 4,
+    },
   ]"
-  cdkAttachPopoverAsChild>
-  <div ngMenu
-       class="menu w-[15rem] rounded-md shadow-xl border border-gray-200 dark:border-white/5 p-1 bg-white dark:bg-gray-900"
-       #profileMenu="ngMenu">
+>
+  <div
+    class="menu rounded-md shadow-xl border-gray-200 dark:border-white/5 p-1 bg-white dark:bg-gray-900 w-[15rem] border"
+    ngMenu
+    #profileMenu="ngMenu"
+  >
     <ng-template ngMenuContent>
-      <div class="flex flex-col gap-y-1">
-        <div class="flex flex-col p-3 text-gray-900 dark:text-white">
-          <span class="text-xs text-gray-600 dark:text-gray-400">Signed in as</span>
-          <span class="text-sm font-semibold mt-1">{{ username() }}</span>
+      <div class="gap-y-1 flex flex-col">
+        <div
+          class="p-3 text-gray-900 dark:text-white flex flex-col"
+        >
+          <span
+            class="text-xs text-gray-600 dark:text-gray-400"
+            >Signed in as</span
+          >
+          <span class="text-sm font-semibold mt-1">{{
+            username()
+          }}</span>
         </div>
-        <div role="separator" aria-orientation="horizontal"
-             class="border-t border-gray-200 dark:border-white/10 mx-1"></div>
-        <div ngMenuItem value="Profile"
-             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-             (click)="openProfile()">
-          <span class="icon-[heroicons--user-circle] size-5" translate="no" aria-hidden="true"></span>
+        <div
+          class="border-gray-200 dark:border-white/10 mx-1 border-t"
+          role="separator"
+          aria-orientation="horizontal"
+        ></div>
+        <div
+          class="gap-x-3 p-2 mx-1 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white flex cursor-pointer items-center transition-colors"
+          ngMenuItem
+          value="Profile"
+          (click)="openProfile()"
+        >
+          <span
+            class="size-5 icon-[heroicons--user-circle]"
+            translate="no"
+            aria-hidden="true"
+          ></span>
           <span>Profile</span>
         </div>
-        <div ngMenuItem value="Theme"
-             class="flex items-center justify-between gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-             #themeItem [submenu]="themeMenu()">
-          <div class="flex items-center gap-x-3">
-            <span class="icon-[heroicons--sun] size-5" translate="no" aria-hidden="true"></span>
+        <div
+          class="gap-x-3 p-2 mx-1 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white flex cursor-pointer items-center justify-between transition-colors"
+          ngMenuItem
+          value="Theme"
+          #themeItem
+          [submenu]="themeMenu()"
+        >
+          <div class="gap-x-3 flex items-center">
+            <span
+              class="size-5 icon-[heroicons--sun]"
+              translate="no"
+              aria-hidden="true"
+            ></span>
             <span>Theme</span>
           </div>
-          <svg class="size-4 transform transition-transform duration-200 ease-out" viewBox="0 0 20 20"
-               fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd"
-                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clip-rule="evenodd"/>
+          <svg
+            class="size-4 ease-out transform transition-transform duration-200"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+              clip-rule="evenodd"
+            />
           </svg>
         </div>
         <ng-template
+          cdkAttachPopoverAsChild
           [cdkConnectedOverlayOpen]="profileMenu.visible()"
-          [cdkConnectedOverlay]="{origin: themeItem, usePopover: 'inline'}"
+          [cdkConnectedOverlay]="{
+            origin: themeItem,
+            usePopover: 'inline',
+          }"
           [cdkConnectedOverlayPositions]="[
-            {originX: 'start', originY: 'top', overlayY: 'top', overlayX: 'end', offsetX: -8}
+            {
+              originX: 'start',
+              originY: 'top',
+              overlayY: 'top',
+              overlayX: 'end',
+              offsetX: -8,
+            },
           ]"
-          cdkAttachPopoverAsChild>
-          <div ngMenu
-               class="menu w-[10rem] rounded-md shadow-xl border border-gray-200 dark:border-white/5 p-1 bg-white dark:bg-gray-900"
-               #themeMenu="ngMenu">
+        >
+          <div
+            class="menu rounded-md shadow-xl border-gray-200 dark:border-white/5 p-1 bg-white dark:bg-gray-900 w-[10rem] border"
+            ngMenu
+            #themeMenu="ngMenu"
+          >
             <ng-template ngMenuContent>
-              <div class="flex flex-col gap-y-1">
-                <div ngMenuItem value="system"
-                     class="flex items-center gap-x-3 p-2 mx-1 mt-1 cursor-pointer rounded-md text-sm font-semibold transition-colors"
-                     [class]="currentTheme() === 'system' ? 'bg-primary-100 text-primary-700 dark:bg-primary-600 dark:text-white' : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'"
-                     (click)="setTheme('system')">
-                            <span class="icon-[heroicons--computer-desktop] size-5" translate="no"
-                                  aria-hidden="true"></span>
+              <div class="gap-y-1 flex flex-col">
+                <div
+                  class="gap-x-3 p-2 mx-1 mt-1 rounded-md text-sm font-semibold flex cursor-pointer items-center transition-colors"
+                  ngMenuItem
+                  value="system"
+                  [class]="
+                    currentTheme() === 'system'
+                      ? 'dark:text-white bg-primary-100 text-primary-700 dark:bg-primary-600'
+                      : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  "
+                  (click)="setTheme('system')"
+                >
+                  <span
+                    class="size-5 icon-[heroicons--computer-desktop]"
+                    translate="no"
+                    aria-hidden="true"
+                  ></span>
                   <span>System</span>
                 </div>
-                <div ngMenuItem value="light"
-                     class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold transition-colors"
-                     [class]="currentTheme() === 'light' ? 'bg-primary-100 text-primary-700 dark:bg-primary-600 dark:text-white' : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'"
-                     (click)="setTheme('light')">
-                  <span class="icon-[heroicons--sun] size-5" translate="no" aria-hidden="true"></span>
+                <div
+                  class="gap-x-3 p-2 mx-1 rounded-md text-sm font-semibold flex cursor-pointer items-center transition-colors"
+                  ngMenuItem
+                  value="light"
+                  [class]="
+                    currentTheme() === 'light'
+                      ? 'dark:text-white bg-primary-100 text-primary-700 dark:bg-primary-600'
+                      : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  "
+                  (click)="setTheme('light')"
+                >
+                  <span
+                    class="size-5 icon-[heroicons--sun]"
+                    translate="no"
+                    aria-hidden="true"
+                  ></span>
                   <span>Light</span>
                 </div>
-                <div ngMenuItem value="dark"
-                     class="flex items-center gap-x-3 p-2 mx-1 mb-1 cursor-pointer rounded-md text-sm font-semibold transition-colors"
-                     [class]="currentTheme() === 'dark' ? 'bg-primary-100 text-primary-700 dark:bg-primary-600 dark:text-white' : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'"
-                     (click)="setTheme('dark')">
-                  <span class="icon-[heroicons--moon] size-5" translate="no" aria-hidden="true"></span>
+                <div
+                  class="gap-x-3 p-2 mx-1 mb-1 rounded-md text-sm font-semibold flex cursor-pointer items-center transition-colors"
+                  ngMenuItem
+                  value="dark"
+                  [class]="
+                    currentTheme() === 'dark'
+                      ? 'dark:text-white bg-primary-100 text-primary-700 dark:bg-primary-600'
+                      : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  "
+                  (click)="setTheme('dark')"
+                >
+                  <span
+                    class="size-5 icon-[heroicons--moon]"
+                    translate="no"
+                    aria-hidden="true"
+                  ></span>
                   <span>Dark</span>
                 </div>
               </div>
             </ng-template>
           </div>
         </ng-template>
-        <div ngMenuItem value="Settings"
-             class="flex items-center gap-x-3 p-2 mx-1 cursor-pointer rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-             (click)="openSettings()">
-          <span class="icon-[heroicons--cog-8-tooth] size-5" translate="no" aria-hidden="true"></span>
+        <div
+          class="gap-x-3 p-2 mx-1 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white flex cursor-pointer items-center transition-colors"
+          ngMenuItem
+          value="Settings"
+          (click)="openSettings()"
+        >
+          <span
+            class="size-5 icon-[heroicons--cog-8-tooth]"
+            translate="no"
+            aria-hidden="true"
+          ></span>
           <span>Settings</span>
         </div>
-        <div role="separator" aria-orientation="horizontal"
-             class="border-t border-gray-200 dark:border-white/10 mx-1"></div>
-        <div ngMenuItem value="Logout"
-             class="flex items-center gap-x-3 p-2 mx-1 mb-1 cursor-pointer rounded-md text-sm font-semibold text-error-600 hover:bg-error-100 hover:text-error-700 dark:text-error-400 dark:hover:bg-error-900/30 dark:hover:text-error-300 transition-colors"
-             (click)="signOut()">
-                    <span class="icon-[heroicons--arrow-right-end-on-rectangle] size-5" translate="no"
-                          aria-hidden="true"></span>
+        <div
+          class="border-gray-200 dark:border-white/10 mx-1 border-t"
+          role="separator"
+          aria-orientation="horizontal"
+        ></div>
+        <div
+          class="gap-x-3 p-2 mx-1 mb-1 rounded-md text-sm font-semibold flex cursor-pointer items-center text-error-600 transition-colors hover:bg-error-100 hover:text-error-700 dark:text-error-400 dark:hover:bg-error-900/30 dark:hover:text-error-300"
+          ngMenuItem
+          value="Logout"
+          (click)="signOut()"
+        >
+          <span
+            class="size-5 icon-[heroicons--arrow-right-end-on-rectangle]"
+            translate="no"
+            aria-hidden="true"
+          ></span>
           <span>Logout</span>
         </div>
       </div>

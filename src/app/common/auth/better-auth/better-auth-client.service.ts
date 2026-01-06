@@ -1,9 +1,14 @@
-import {Injectable} from '@angular/core';
-import {environment} from '../../../../environments/environment';
-import {adminClient, jwtClient, magicLinkClient, twoFactorClient} from 'better-auth/client/plugins';
-import {passkeyClient} from '@better-auth/passkey/client';
-import {ac, admin, user} from './permissions';
-import {createAuthClient} from 'better-auth/client';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import {
+  adminClient,
+  jwtClient,
+  magicLinkClient,
+  twoFactorClient,
+} from 'better-auth/client/plugins';
+import { passkeyClient } from '@better-auth/passkey/client';
+import { ac, admin, user } from './permissions';
+import { createAuthClient } from 'better-auth/client';
 
 @Injectable({
   providedIn: 'root',
@@ -21,9 +26,9 @@ export class BetterAuthClientService {
         roles: {
           admin,
           user,
-        }
-      })
-    ]
+        },
+      }),
+    ],
   });
 
   public getClient() {

@@ -3,7 +3,7 @@
 ========================================================== -->
 @if (sidebarVisible()) {
   <div
-    class="lg:hidden fixed inset-0 z-40 bg-black/60 transition-opacity duration-300"
+    class="lg:hidden inset-0 bg-black/60 fixed z-40 transition-opacity duration-300"
     (click)="closeSidebar()"
   ></div>
 }
@@ -12,10 +12,10 @@
   DESKTOP LAYOUT: animate grid columns
 ========================================================== -->
 <div
-  class="min-h-screen overflow-x-hidden lg:grid lg:grid-rows-1 transition-[grid-template-columns] duration-300 ease-out"
+  class="lg:grid lg:grid-rows-1 ease-out min-h-screen overflow-x-hidden transition-[grid-template-columns] duration-300"
   [class]="{
     'lg:grid-cols-[18rem_1fr]': desktopSidebarOpen(),
-    'lg:grid-cols-[0rem_1fr]': !desktopSidebarOpen()
+    'lg:grid-cols-[0rem_1fr]': !desktopSidebarOpen(),
   }"
 >
   <!-- =======================================================
@@ -23,67 +23,83 @@
   ======================================================== -->
   <div class="lg:overflow-hidden">
     <aside
-      class="
-        fixed inset-y-0 left-0 z-50 w-72
-        transform transition-transform duration-300 ease-out
-        bg-gray-900 border-r border-white/5
-        -translate-x-full
-        lg:static lg:inset-auto lg:z-auto lg:w-full lg:translate-x-0
-      "
+      class="inset-y-0 left-0 w-72 ease-out bg-gray-900 border-white/5 lg:static lg:inset-auto lg:z-auto lg:w-full lg:translate-x-0 fixed z-50 -translate-x-full transform border-r transition-transform duration-300"
       [class.translate-x-0]="sidebarVisible()"
     >
       <!-- Fade/disable inner content on desktop collapse (keeps animations) -->
       <div
-        class="flex h-screen grow flex-col gap-y-5 overflow-y-auto px-6
-               transition-[opacity,transform] duration-300 ease-out"
+        class="gap-y-5 px-6 ease-out flex h-screen grow flex-col overflow-y-auto transition-[opacity,transform] duration-300"
         [class]="{
-          'lg:opacity-100 lg:translate-x-0 lg:pointer-events-auto': desktopSidebarOpen(),
-          'lg:opacity-0 lg:-translate-x-2 lg:pointer-events-none': !desktopSidebarOpen()
+          'lg:opacity-100 lg:translate-x-0 lg:pointer-events-auto':
+            desktopSidebarOpen(),
+          'lg:opacity-0 lg:-translate-x-2 lg:pointer-events-none':
+            !desktopSidebarOpen(),
         }"
       >
         <!-- Logo row -->
-        <div class="flex h-16 shrink-0 items-center justify-between">
+        <div
+          class="h-16 flex shrink-0 items-center justify-between"
+        >
           <img
+            class="h-8 w-auto"
             src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
             alt="Your Company"
-            class="h-8 w-auto"
           />
 
           <!-- Close button (mobile only, only when open) -->
           <button
-            type="button"
             class="lg:hidden -m-2.5 p-2.5 text-white"
+            type="button"
+            aria-label="Close sidebar"
             [class.hidden]="!sidebarVisible()"
             (click)="closeSidebar()"
-            aria-label="Close sidebar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                 stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+            <svg
+              class="size-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         <!-- NAV -->
         <nav class="flex flex-1 flex-col">
-          <ul role="list" class="flex flex-1 flex-col">
+          <ul
+            class="flex flex-1 flex-col"
+            role="list"
+          >
             <li>
-              <ul role="list" class="-mx-2 space-y-1">
-
+              <ul
+                class="-mx-2 space-y-1"
+                role="list"
+              >
                 @for (item of navItems(); track item.id) {
-
                   <!-- LINK ITEM -->
                   @if (item.type === 'link') {
                     <li>
                       <a
-                        [routerLink]="item.route"
+                        class="group gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex"
                         routerLinkActive="bg-primary-600 text-white hover:!bg-primary-500"
-                        class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                        [routerLink]="item.route"
                         (click)="closeSidebar()"
                       >
-                        <div class="flex items-center gap-x-2">
+                        <div
+                          class="gap-x-2 flex items-center"
+                        >
                           @if (item.icon) {
-                            <span class="size-5" [class]="item.icon"></span>
+                            <span
+                              class="size-5"
+                              [class]="item.icon"
+                            ></span>
                           }
                           <span>{{ item.label }}</span>
                         </div>
@@ -95,26 +111,33 @@
                   @if (item.type === 'group') {
                     <li>
                       <button
+                        class="group rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex w-full items-center justify-between"
                         type="button"
-                        [routerLink]="item.route"
                         routerLinkActive="!text-white"
-                        class="w-full group flex items-center justify-between rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                        [routerLink]="item.route"
                         (click)="toggleGroup(item.id)"
                       >
-                        <span class="flex items-center gap-x-2">
+                        <span
+                          class="gap-x-2 flex items-center"
+                        >
                           @if (item.icon) {
-                            <span class="size-5" [class]="item.icon"></span>
+                            <span
+                              class="size-5"
+                              [class]="item.icon"
+                            ></span>
                           }
                           <span>{{ item.label }}</span>
                         </span>
 
                         <!-- Chevron -->
                         <svg
-                          class="size-4 transform transition-transform duration-200 ease-out"
-                          [class.rotate-180]="isGroupOpen(item.id)"
+                          class="size-4 ease-out transform transition-transform duration-200"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                           aria-hidden="true"
+                          [class.rotate-180]="
+                            isGroupOpen(item.id)
+                          "
                         >
                           <path
                             fill-rule="evenodd"
@@ -126,27 +149,41 @@
 
                       <!-- Animated dropdown (grid trick) -->
                       <div
-                        class="grid transition-[grid-template-rows] duration-300 ease-out"
-                        [class.grid-rows-[0fr]]="!isGroupOpen(item.id)"
-                        [class.grid-rows-[1fr]]="isGroupOpen(item.id)"
+                        class="ease-out grid transition-[grid-template-rows] duration-300"
+                        [class.grid-rows-[0fr]]="
+                          !isGroupOpen(item.id)
+                        "
+                        [class.grid-rows-[1fr]]="
+                          isGroupOpen(item.id)
+                        "
                       >
                         <div class="overflow-hidden">
                           <ul
-                            class="mt-1 ml-2 space-y-1 border-l border-white/10 pl-2 transition-opacity duration-200 ease-out"
-                            [class.opacity-0]="!isGroupOpen(item.id)"
-                            [class.opacity-100]="isGroupOpen(item.id)"
+                            class="mt-1 ml-2 space-y-1 border-white/10 pl-2 ease-out border-l transition-opacity duration-200"
+                            [class.opacity-0]="
+                              !isGroupOpen(item.id)
+                            "
+                            [class.opacity-100]="
+                              isGroupOpen(item.id)
+                            "
                           >
-                            @for (child of item.children; track child.id) {
+                            @for (child of item.children;
+                              track child.id) {
                               <li>
                                 <a
-                                  [routerLink]="child.route"
+                                  class="rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white block"
                                   routerLinkActive="bg-primary-600 text-white hover:!bg-primary-500"
-                                  class="block rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                                  [routerLink]="child.route"
                                   (click)="closeSidebar()"
                                 >
-                                  <div class="flex items-center gap-x-2">
+                                  <div
+                                    class="gap-x-2 flex items-center"
+                                  >
                                     @if (child.icon) {
-                                      <span class="size-5" [class]="child.icon"></span>
+                                      <span
+                                        class="size-5"
+                                        [class]="child.icon"
+                                      ></span>
                                     }
                                     {{ child.label }}
                                   </div>
@@ -159,7 +196,6 @@
                     </li>
                   }
                 }
-
               </ul>
             </li>
           </ul>
@@ -173,36 +209,60 @@
   ======================================================== -->
   <div class="min-w-0">
     <header
-      class="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-900/5 dark:border-white/5 bg-white dark:bg-gray-900 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"
+      class="top-0 h-16 gap-x-4 border-gray-900/5 dark:border-white/5 bg-white dark:bg-gray-900 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8 sticky z-30 flex shrink-0 items-center border-b"
     >
       <!-- Mobile hamburger -->
       <button
-        type="button"
         class="-m-2.5 p-2.5 lg:hidden cursor-pointer"
-        (click)="changeSidebarVisibility()"
+        type="button"
         aria-label="Open sidebar"
+        (click)="changeSidebarVisibility()"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6">
-          <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
 
       <!-- Desktop collapse/expand -->
       <button
+        class="lg:flex -m-2.5 p-2.5 hidden cursor-pointer"
         type="button"
-        class="hidden lg:flex -m-2.5 p-2.5 cursor-pointer"
-        (click)="toggleDesktopSidebar()"
         aria-label="Toggle sidebar"
+        (click)="toggleDesktopSidebar()"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6">
-          <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
 
       <div class="flex-1"></div>
 
-      <div class="flex flex-1 gap-x-4 justify-end self-stretch">
-        <div class="flex items-center gap-x-2">
+      <div
+        class="gap-x-4 flex flex-1 justify-end self-stretch"
+      >
+        <div class="gap-x-2 flex items-center">
           <!-- Separator -->
           <!--<div aria-hidden="true" class="h-6 w-px bg-white/20"></div>-->
 

@@ -1,8 +1,8 @@
-import {Router, Routes} from '@angular/router';
-import {LayoutsComponent} from './layouts/layouts.component';
-import {inject} from '@angular/core';
-import {authGuard} from './common/auth/guards/auth.guard';
-import {noAuthGuard} from './common/auth/guards/no-auth.guard';
+import { Router, Routes } from '@angular/router';
+import { LayoutsComponent } from './layouts/layouts.component';
+import { inject } from '@angular/core';
+import { authGuard } from './common/auth/guards/auth.guard';
+import { noAuthGuard } from './common/auth/guards/no-auth.guard';
 
 export const routes: Routes = [
   {
@@ -26,7 +26,7 @@ export const routes: Routes = [
       const router = inject(Router);
       return router.createUrlTree(
         ['/auth/reset-password'],
-        { queryParams: route.queryParams }
+        { queryParams: route.queryParams },
       );
     }, // Your Reset Password (New Password Form) page path
     pathMatch: 'full',
@@ -45,14 +45,17 @@ export const routes: Routes = [
     path: '',
     component: LayoutsComponent,
     data: {
-      layout: 'empty'
+      layout: 'empty',
     },
     children: [
       {
         path: 'auth',
         canActivate: [noAuthGuard],
-        loadChildren: () => import('./pages/auth/auth.routes').then(m => m.routes),
-      }
+        loadChildren: () =>
+          import('./pages/auth/auth.routes').then(
+            (m) => m.routes,
+          ),
+      },
     ],
   },
   {
@@ -60,30 +63,42 @@ export const routes: Routes = [
     component: LayoutsComponent,
     canActivate: [authGuard],
     data: {
-      layout: 'sidebar'
+      layout: 'sidebar',
     },
     children: [
       {
         path: 'home',
-        loadChildren: () => import('./pages/home/home.routes').then(m => m.routes),
+        loadChildren: () =>
+          import('./pages/home/home.routes').then(
+            (m) => m.routes,
+          ),
       },
       {
         path: 'customer',
-        loadChildren: () => import('./pages/customers/customers.routes').then(m => m.routes),
+        loadChildren: () =>
+          import('./pages/customers/customers.routes').then(
+            (m) => m.routes,
+          ),
       },
       {
         path: 'wiki',
-        loadChildren: () => import('./pages/wiki/wiki-routes').then(m => m.routes),
+        loadChildren: () =>
+          import('./pages/wiki/wiki-routes').then(
+            (m) => m.routes,
+          ),
       },
       {
         path: 'settings',
-        loadChildren: () => import('./pages/settings/settings.routes').then(m => m.routes),
-      }
-    ]
+        loadChildren: () =>
+          import('./pages/settings/settings.routes').then(
+            (m) => m.routes,
+          ),
+      },
+    ],
   },
   {
     path: '**',
     redirectTo: '/home',
     pathMatch: 'full',
-  }
+  },
 ];
