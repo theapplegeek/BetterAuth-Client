@@ -295,7 +295,6 @@ export class AuthService {
         map((res) => {
           if (res.error) throw res.error;
           if (!this.jwtToken()) this.getJwtToken();
-          console.log(res.data);
           this._userService.user.set(res.data!.user as User);
           return res.data as { session: Session, user: User };
         }),

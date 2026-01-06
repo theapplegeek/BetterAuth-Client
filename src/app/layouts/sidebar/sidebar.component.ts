@@ -1,9 +1,8 @@
-import {Component, computed, inject, signal, Signal, viewChild, WritableSignal} from '@angular/core';
+import {Component, signal, WritableSignal} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {NavItem} from './models/sidebar-item.type';
-import {AuthService} from '../../common/auth/auth.service';
-import {Menu, MenuContent, MenuItem, MenuTrigger} from '@angular/aria/menu';
 import {OverlayModule} from '@angular/cdk/overlay';
+import {ProfileMenuComponent} from './components/profile-menu/profile-menu.component';
 
 @Component({
   selector: 'sidebar-layout',
@@ -11,20 +10,13 @@ import {OverlayModule} from '@angular/cdk/overlay';
     RouterLink,
     RouterLinkActive,
     RouterOutlet,
-    MenuTrigger,
-    MenuItem,
-    Menu,
-    MenuContent,
-    OverlayModule
+    OverlayModule,
+    ProfileMenuComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  private readonly _authService: AuthService = inject(AuthService);
-
-  public formatMenu = viewChild<Menu<string>>('formatMenu');
-  public categorizeMenu = viewChild<Menu<string>>('categorizeMenu');
   public sidebarVisible: WritableSignal<boolean> = signal(false);
   public desktopSidebarOpen: WritableSignal<boolean> = signal(true);
   public navItems: WritableSignal<NavItem[]> = signal<NavItem[]>([
@@ -44,17 +36,6 @@ export class SidebarComponent {
     },
   ]);
   public openGroups: WritableSignal<Record<string, boolean>> = signal<Record<string, boolean>>({});
-  public username: Signal<string> = computed((): string => {
-    return "User";
-  });
-
-  public signOut(): void {
-    this._authService.signOut().subscribe();
-  }
-
-  public haveAdminRole(): boolean {
-    return true;
-  }
 
   public closeSidebar(): void {
     this.sidebarVisible.set(false);
