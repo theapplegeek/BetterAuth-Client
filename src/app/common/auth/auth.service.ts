@@ -2,6 +2,9 @@ import {inject, Injectable, signal, WritableSignal} from '@angular/core';
 import {BetterAuthClientService} from './better-auth/better-auth-client.service';
 import {catchError, EMPTY, from, map, tap, throwError} from 'rxjs';
 import {Router} from '@angular/router';
+import {Session} from 'better-auth';
+import {User} from '../user/models/user.type';
+import {UserService} from '../user/user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +13,7 @@ export class AuthService {
   private readonly _betterAuthClient: BetterAuthClientService = inject(BetterAuthClientService);
   private readonly _router: Router = inject(Router);
   private readonly _authClient = this._betterAuthClient.getClient();
+  private readonly _userService: UserService = inject(UserService);
 
   public twoFactorEnableData: WritableSignal<{
     backupCodes?: string[],
@@ -280,5 +284,25 @@ export class AuthService {
         return throwError(() => err);
       })
     );
+  }
+
+  // ==========================================================================
+  // Get Session
+  // ==========================================================================
+  public getSession() {
+    return from(this._authClient.getSession())
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          if (!this.jwtToken()) this.getJwtToken();
+          console.log(res.data);
+          this._userService.user.set(res.data!.user as User);
+          return res.data as { session: Session, user: User };
+        }),
+        catchError((err: any) => {
+          // TODO: Handle better auth error
+          return throwError(() => err);
+        })
+      );
   }
 }

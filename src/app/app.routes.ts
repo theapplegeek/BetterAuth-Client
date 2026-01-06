@@ -1,6 +1,8 @@
 import {Router, Routes} from '@angular/router';
 import {LayoutsComponent} from './layouts/layouts.component';
 import {inject} from '@angular/core';
+import {authGuard} from './common/auth/guards/auth.guard';
+import {noAuthGuard} from './common/auth/guards/no-auth.guard';
 
 export const routes: Routes = [
   {
@@ -53,6 +55,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'auth',
+        canActivate: [noAuthGuard],
         loadChildren: () => import('./pages/auth/auth.routes').then(m => m.routes),
       }
     ],
@@ -60,6 +63,7 @@ export const routes: Routes = [
   {
     path: '',
     component: LayoutsComponent,
+    canActivate: [authGuard],
     data: {
       layout: 'sidebar'
     },
