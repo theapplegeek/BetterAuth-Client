@@ -1,0 +1,307 @@
+<div class="space-y-6">
+  @if (feedback(); as feedbackMessage) {
+    <div
+      class="rounded-lg px-4 py-3 text-sm border"
+      [class]="{
+        'border-success-200 bg-success-100 text-success-800 dark:border-success-800 dark:bg-success-900/20 dark:text-success-200':
+          feedbackMessage.type === 'success',
+        'border-warning-200 bg-warning-100 text-warning-800 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-200':
+          feedbackMessage.type === 'warning',
+        'border-error-200 bg-error-100 text-error-800 dark:border-error-800 dark:bg-error-900/20 dark:text-error-200':
+          feedbackMessage.type === 'error',
+      }"
+    >
+      {{ feedbackMessage.text }}
+    </div>
+  }
+
+  @if (isLoadingSession()) {
+    <div
+      class="rounded-lg border-gray-200 bg-gray-50 p-5 dark:border-white/10 dark:bg-gray-800/40 border"
+    >
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Loading your account details...
+      </p>
+    </div>
+  } @else {
+    <section
+      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <div
+        class="mb-6 gap-4 sm:flex-row sm:items-center sm:justify-between flex flex-col"
+      >
+        <div>
+          <h2
+            class="text-lg font-semibold text-gray-900 dark:text-white"
+          >
+            Profile Overview
+          </h2>
+          <p
+            class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+          >
+            Your account metadata and profile identity.
+          </p>
+        </div>
+        <span
+          class="px-3 py-1 text-xs font-semibold inline-flex w-fit rounded-full bg-primary-100 text-primary-700 uppercase dark:bg-primary-900/40 dark:text-primary-300"
+        >
+          {{ user()?.role ?? 'user' }}
+        </span>
+      </div>
+
+      <dl class="gap-4 sm:grid-cols-2 grid">
+        <div
+          class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
+        >
+          <dt
+            class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase"
+          >
+            User ID
+          </dt>
+          <dd
+            class="mt-2 text-sm text-gray-900 dark:text-white break-all"
+          >
+            {{ user()?.id }}
+          </dd>
+        </div>
+
+        <div
+          class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
+        >
+          <dt
+            class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase"
+          >
+            Email Verification
+          </dt>
+          <dd
+            class="mt-2 text-sm font-medium"
+            [class]="{
+              'text-success-700 dark:text-success-300':
+                user()?.emailVerified,
+              'text-warning-700 dark:text-warning-300':
+                !user()?.emailVerified,
+            }"
+          >
+            {{
+              user()?.emailVerified
+                ? 'Verified'
+                : 'Pending verification'
+            }}
+          </dd>
+        </div>
+
+        <div
+          class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
+        >
+          <dt
+            class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase"
+          >
+            Member Since
+          </dt>
+          <dd
+            class="mt-2 text-sm text-gray-900 dark:text-white"
+          >
+            {{
+              user()?.createdAt | date: 'dd MMM yyyy, HH:mm'
+            }}
+          </dd>
+        </div>
+
+        <div
+          class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
+        >
+          <dt
+            class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase"
+          >
+            Roles
+          </dt>
+          <dd
+            class="mt-2 text-sm text-gray-900 dark:text-white"
+          >
+            {{
+              user()?.roles?.length
+                ? user()!.roles.join(', ')
+                : 'No explicit roles assigned'
+            }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section
+      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <h2
+        class="text-lg font-semibold text-gray-900 dark:text-white"
+      >
+        Update Username
+      </h2>
+      <p
+        class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+      >
+        Your display name is visible in this app.
+      </p>
+
+      <form
+        class="mt-5 space-y-4"
+        [formGroup]="profileForm"
+        (ngSubmit)="saveProfile()"
+      >
+        <div>
+          <label
+            class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
+            for="account-name"
+          >
+            Username
+          </label>
+          <input
+            id="account-name"
+            class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
+            formControlName="name"
+            type="text"
+          />
+          @if (
+            profileForm.controls.name.invalid &&
+            profileForm.controls.name.touched
+          ) {
+            <p
+              class="mt-2 text-xs text-error-600 dark:text-error-300"
+            >
+              Enter a valid username (2-120 chars).
+            </p>
+          }
+        </div>
+
+        <button
+          class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          type="submit"
+          [disabled]="
+            profileForm.invalid ||
+            profileForm.controls.name.value.trim() ===
+              (user()?.name ?? '') ||
+            isSavingName()
+          "
+        >
+          {{
+            isSavingName() ? 'Saving...' : 'Save Username'
+          }}
+        </button>
+      </form>
+    </section>
+
+    <section
+      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <h2
+        class="text-lg font-semibold text-gray-900 dark:text-white"
+      >
+        Update Email
+      </h2>
+      <p
+        class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+      >
+        We'll send a verification link to your new email
+        address.
+      </p>
+
+      <form
+        class="mt-5 space-y-4"
+        [formGroup]="emailForm"
+        (ngSubmit)="saveEmail()"
+      >
+        <div>
+          <label
+            class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
+            for="account-email"
+          >
+            New email
+          </label>
+          <input
+            id="account-email"
+            class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
+            formControlName="email"
+            type="email"
+          />
+          @if (
+            emailForm.controls.email.invalid &&
+            emailForm.controls.email.touched
+          ) {
+            <p
+              class="mt-2 text-xs text-error-600 dark:text-error-300"
+            >
+              Enter a valid email address.
+            </p>
+          }
+        </div>
+
+        <button
+          class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          type="submit"
+          [disabled]="
+            emailForm.invalid ||
+            emailForm.controls.email.value.trim() ===
+              (user()?.email ?? '') ||
+            isSavingEmail()
+          "
+        >
+          {{
+            isSavingEmail()
+              ? 'Submitting...'
+              : 'Update Email'
+          }}
+        </button>
+      </form>
+    </section>
+
+    <section
+      class="rounded-xl p-5 border border-error-200 bg-error-100/40 dark:border-error-800 dark:bg-error-900/10"
+    >
+      <h2
+        class="text-lg font-semibold text-error-700 dark:text-error-300"
+      >
+        Danger Zone
+      </h2>
+      <p
+        class="mt-1 text-sm text-gray-700 dark:text-gray-300"
+      >
+        Deleting your account is irreversible. Type your
+        current email to confirm.
+      </p>
+
+      <form
+        class="mt-5 space-y-4"
+        [formGroup]="deleteForm"
+        (ngSubmit)="deleteAccount()"
+      >
+        <div>
+          <label
+            class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
+            for="delete-confirm-email"
+          >
+            Confirm email
+          </label>
+          <input
+            id="delete-confirm-email"
+            class="rounded-lg bg-white px-3 py-2 text-sm text-gray-900 dark:bg-gray-800 dark:text-white w-full border border-error-300 focus:border-error-500 focus:ring-2 focus:ring-error-500/20 focus:outline-none dark:border-error-700"
+            formControlName="confirmationEmail"
+            type="email"
+          />
+        </div>
+
+        <button
+          class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center bg-error-600 transition-colors hover:bg-error-700 disabled:cursor-not-allowed disabled:opacity-60"
+          type="submit"
+          [disabled]="
+            deleteForm.invalid || isDeletingAccount()
+          "
+        >
+          {{
+            isDeletingAccount()
+              ? 'Requesting...'
+              : 'Delete Account'
+          }}
+        </button>
+      </form>
+    </section>
+  }
+</div>
