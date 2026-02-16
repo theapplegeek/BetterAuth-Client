@@ -1,17 +1,17 @@
 <div
-  class="pointer-events-none fixed right-4 top-4 z-[120] w-full max-w-sm space-y-2"
+  class="pointer-events-none fixed bottom-4 left-1/2 z-[120] w-full max-w-lg -translate-x-1/2 space-y-2 px-4"
 >
   @for (message of messages(); track message.id) {
     <div
-      class="pointer-events-auto rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm"
+      class="pointer-events-auto rounded-xl border px-4 py-3 shadow-xl backdrop-blur-sm"
       [class]="{
-        'border-success-200 bg-success-100/95 text-success-900 dark:border-success-700 dark:bg-success-900/85 dark:text-success-200':
+        'border-success-300 bg-success-200/95 text-success-900 dark:border-success-700 dark:bg-success-700/90 dark:text-success-100':
           message.type === 'success',
-        'border-warning-200 bg-warning-100/95 text-warning-900 dark:border-warning-700 dark:bg-warning-900/85 dark:text-warning-200':
+        'border-warning-300 bg-warning-200/95 text-warning-900 dark:border-warning-700 dark:bg-warning-700/90 dark:text-warning-100':
           message.type === 'warning',
-        'border-error-200 bg-error-100/95 text-error-900 dark:border-error-700 dark:bg-error-900/85 dark:text-error-200':
+        'border-error-300 bg-error-200/95 text-error-900 dark:border-error-700 dark:bg-error-700/90 dark:text-error-100':
           message.type === 'error',
-        'border-primary-200 bg-primary-100/95 text-primary-900 dark:border-primary-700 dark:bg-primary-900/85 dark:text-primary-200':
+        'border-primary-300 bg-primary-200/95 text-primary-900 dark:border-primary-700 dark:bg-primary-700/90 dark:text-primary-100':
           message.type === 'info',
       }"
     >
