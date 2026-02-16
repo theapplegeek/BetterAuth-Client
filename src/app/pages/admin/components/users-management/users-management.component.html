@@ -1,4 +1,7 @@
-<div class="space-y-5">
+<div
+  class="space-y-5"
+  (click)="closeActionMenu()"
+>
   <div
     class="gap-3 rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 flex flex-col border"
   >
@@ -186,71 +189,124 @@
               >
                 {{ user.createdAt | date: 'dd MMM yyyy' }}
               </td>
-              <td class="px-4 py-4 text-sm">
-                <div class="gap-1 flex flex-wrap">
+              <td
+                class="px-4 py-4 text-right text-sm"
+              >
+                <div
+                  class="relative inline-flex"
+                  (click)="$event.stopPropagation()"
+                >
                   <button
-                    class="rounded-md border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-secondary-300 bg-white text-secondary-700 transition hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-secondary-800"
                     type="button"
-                    (click)="openDetail(user)"
+                    aria-label="Open user actions menu"
+                    (click)="
+                      toggleActionMenu(user.id, $event)
+                    "
                   >
-                    Detail
+                    <span
+                      class="icon-[heroicons--ellipsis-vertical] size-5"
+                    ></span>
                   </button>
-                  <button
-                    class="rounded-md border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border"
-                    type="button"
-                    (click)="openEdit(user)"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    class="rounded-md border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border"
-                    type="button"
-                    (click)="openPasswordEditor(user)"
-                  >
-                    Password
-                  </button>
-                  @if (user.banned) {
-                    <button
-                      class="rounded-md px-2 py-1 text-xs font-semibold border border-success-300 text-success-700 hover:bg-success-100 dark:border-success-700 dark:text-success-300 dark:hover:bg-success-900/20"
-                      type="button"
-                      [disabled]="
-                        updatingBanUserId() === user.id
-                      "
-                      (click)="unbanUser(user)"
+
+                  @if (
+                    openActionMenuUserId() === user.id
+                  ) {
+                    <div
+                      class="absolute right-0 top-10 z-30 w-52 rounded-lg border border-secondary-200 bg-white p-1 shadow-xl dark:border-secondary-700 dark:bg-secondary-900"
                     >
-                      Unban
-                    </button>
-                  } @else {
-                    <button
-                      class="rounded-md px-2 py-1 text-xs font-semibold border border-error-300 text-error-700 hover:bg-error-100 dark:border-error-700 dark:text-error-300 dark:hover:bg-error-900/20"
-                      type="button"
-                      (click)="openBanModal(user)"
-                    >
-                      Ban
-                    </button>
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                        type="button"
+                        (click)="openDetail(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--eye] size-4"
+                        ></span>
+                        Detail
+                      </button>
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                        type="button"
+                        (click)="openEdit(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--pencil-square] size-4"
+                        ></span>
+                        Edit
+                      </button>
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                        type="button"
+                        (click)="openPasswordEditor(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--key] size-4"
+                        ></span>
+                        Set Password
+                      </button>
+                      @if (user.banned) {
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-success-700 hover:bg-success-100 dark:text-success-300 dark:hover:bg-success-900/20"
+                          type="button"
+                          [disabled]="
+                            updatingBanUserId() === user.id
+                          "
+                          (click)="unbanUser(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--check-circle] size-4"
+                          ></span>
+                          Unban
+                        </button>
+                      } @else {
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-error-700 hover:bg-error-100 dark:text-error-300 dark:hover:bg-error-900/20"
+                          type="button"
+                          (click)="openBanModal(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--no-symbol] size-4"
+                          ></span>
+                          Ban
+                        </button>
+                      }
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-warning-700 hover:bg-warning-100 dark:text-warning-300 dark:hover:bg-warning-900/20"
+                        type="button"
+                        [disabled]="isImpersonatingUser()"
+                        (click)="impersonateUser(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--user-circle] size-4"
+                        ></span>
+                        Impersonate
+                      </button>
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                        type="button"
+                        (click)="openSessions(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--computer-desktop] size-4"
+                        ></span>
+                        Sessions
+                      </button>
+                      <div
+                        class="my-1 h-px bg-secondary-200 dark:bg-secondary-700"
+                      ></div>
+                      <button
+                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-error-700 hover:bg-error-100 dark:text-error-300 dark:hover:bg-error-900/20"
+                        type="button"
+                        (click)="openDelete(user)"
+                      >
+                        <span
+                          class="icon-[heroicons--trash] size-4"
+                        ></span>
+                        Delete
+                      </button>
+                    </div>
                   }
-                  <button
-                    class="rounded-md px-2 py-1 text-xs font-semibold border border-warning-300 text-warning-700 hover:bg-warning-100 dark:border-warning-700 dark:text-warning-300 dark:hover:bg-warning-900/20"
-                    type="button"
-                    [disabled]="isImpersonatingUser()"
-                    (click)="impersonateUser(user)"
-                  >
-                    Impersonate
-                  </button>
-                  <button
-                    class="rounded-md border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border"
-                    type="button"
-                    (click)="openSessions(user)"
-                  >
-                    Sessions
-                  </button>
-                  <button
-                    class="rounded-md px-2 py-1 text-xs font-semibold border border-error-300 text-error-700 hover:bg-error-100 dark:border-error-700 dark:text-error-300 dark:hover:bg-error-900/20"
-                    type="button"
-                    (click)="openDelete(user)"
-                  >
-                    Delete
-                  </button>
                 </div>
               </td>
             </tr>
@@ -639,11 +695,11 @@
             >
               Reason
             </label>
-            <input
-              class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border"
+            <textarea
+              class="w-full"
               formControlName="reason"
-              type="text"
-            />
+              rows="3"
+            ></textarea>
           </div>
           <div>
             <label
@@ -796,26 +852,6 @@
               }}
             </button>
           </div>
-        </div>
-      }
-
-      @if (
-        activeModal() !== 'none' &&
-        activeModal() !== 'create' &&
-        activeModal() !== 'edit' &&
-        activeModal() !== 'password' &&
-        activeModal() !== 'ban' &&
-        activeModal() !== 'sessions' &&
-        activeModal() !== 'delete'
-      ) {
-        <div class="flex justify-end">
-          <button
-            class="rounded-lg border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300 border"
-            type="button"
-            (click)="closeModal()"
-          >
-            Close
-          </button>
         </div>
       }
 

@@ -68,6 +68,9 @@ export class UsersManagementComponent {
   public readonly selectedUser: WritableSignal<
     AdminUser | undefined
   > = signal<AdminUser | undefined>(undefined);
+  public readonly openActionMenuUserId: WritableSignal<
+    string | undefined
+  > = signal<string | undefined>(undefined);
   public readonly activeModal: WritableSignal<UserModal> =
     signal<UserModal>('none');
 
@@ -251,11 +254,14 @@ export class UsersManagementComponent {
       searchValue: '',
       searchField: 'name',
     });
+    this.closeActionMenu();
     this.currentPage.set(1);
     this.loadUsers();
   }
 
   public toggleSort(column: UserSortColumn): void {
+    this.closeActionMenu();
+
     if (this.sortColumn() !== column) {
       this.sortColumn.set(column);
       this.sortDirection.set('asc');
@@ -274,6 +280,7 @@ export class UsersManagementComponent {
 
   public goToPage(page: number): void {
     if (page < 1 || page > this.totalPages()) return;
+    this.closeActionMenu();
     this.currentPage.set(page);
     this.loadUsers();
   }
@@ -282,6 +289,7 @@ export class UsersManagementComponent {
     const nextPageSize: number = Number(value);
     if (!nextPageSize || nextPageSize < 1) return;
 
+    this.closeActionMenu();
     this.pageSize.set(nextPageSize);
     this.currentPage.set(1);
     this.loadUsers();
@@ -293,17 +301,20 @@ export class UsersManagementComponent {
   }
 
   public openDetail(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('detail');
   }
 
   public openCreate(): void {
+    this.closeActionMenu();
     this.selectedUser.set(undefined);
     this._resetUserForm();
     this.activeModal.set('create');
   }
 
   public openEdit(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this._resetUserForm();
     this.userForm.patchValue({
@@ -321,6 +332,7 @@ export class UsersManagementComponent {
   }
 
   public openPasswordEditor(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this.passwordForm.reset({
       newPassword: '',
@@ -329,6 +341,7 @@ export class UsersManagementComponent {
   }
 
   public openBanModal(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this.banForm.reset({
       reason: '',
@@ -338,12 +351,14 @@ export class UsersManagementComponent {
   }
 
   public openSessions(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('sessions');
     this._loadSessionsForSelectedUser();
   }
 
   public openDelete(user: AdminUser): void {
+    this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('delete');
   }
@@ -358,6 +373,21 @@ export class UsersManagementComponent {
       reason: '',
       durationHours: 0,
     });
+  }
+
+  public toggleActionMenu(
+    userId: string,
+    event: Event,
+  ): void {
+    event.stopPropagation();
+    this.openActionMenuUserId.update(
+      (currentUserId: string | undefined): string | undefined =>
+        currentUserId === userId ? undefined : userId,
+    );
+  }
+
+  public closeActionMenu(): void {
+    this.openActionMenuUserId.set(undefined);
   }
 
   public toggleRoleSelection(
@@ -564,6 +594,7 @@ export class UsersManagementComponent {
   }
 
   public unbanUser(user: AdminUser): void {
+    this.closeActionMenu();
     const shouldUnban: boolean = window.confirm(
       `Unban ${user.name}?`,
     );
@@ -592,6 +623,7 @@ export class UsersManagementComponent {
   }
 
   public impersonateUser(user: AdminUser): void {
+    this.closeActionMenu();
     if (user.banned) {
       this._toast.warning(
         'Cannot impersonate a banned user.',
