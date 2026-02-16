@@ -128,7 +128,20 @@
   }
 
   .app-modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-[6px];
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(2, 6, 23, 0.93) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  [data-theme='dark'] .app-modal-overlay {
+    background: rgba(0, 0, 0, 0.95) !important;
   }
 
   .app-modal-panel {
