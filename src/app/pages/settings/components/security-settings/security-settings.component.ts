@@ -23,14 +23,9 @@ import {
   UserSession,
 } from '../../../../common/auth/account-security.service';
 import { AuthService } from '../../../../common/auth/auth.service';
+import { ToastService } from '../../../../common/services/toast.service';
 import { User } from '../../../../common/user/models/user.type';
 import { UserService } from '../../../../common/user/user.service';
-
-type FeedbackType = 'success' | 'error' | 'warning';
-type FeedbackMessage = {
-  type: FeedbackType;
-  text: string;
-};
 
 type ProviderId = 'credential' | 'google' | 'discord';
 type ProviderCard = {
@@ -57,10 +52,8 @@ export class SecuritySettingsComponent {
     inject(AuthService);
   private readonly _userService: UserService =
     inject(UserService);
-
-  private _feedbackTimeout:
-    | ReturnType<typeof setTimeout>
-    | undefined;
+  private readonly _toast: ToastService =
+    inject(ToastService);
 
   public readonly user = computed((): User | undefined =>
     this._userService.user(),
@@ -97,9 +90,6 @@ export class SecuritySettingsComponent {
   public readonly unlinkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
-  public readonly feedback: WritableSignal<
-    FeedbackMessage | undefined
-  > = signal<FeedbackMessage | undefined>(undefined);
 
   public readonly passkeys: WritableSignal<Passkey[]> =
     signal<Passkey[]>([]);
@@ -161,8 +151,7 @@ export class SecuritySettingsComponent {
         },
         error: (error: unknown): void => {
           this.isLoading.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load security settings.',
@@ -175,8 +164,7 @@ export class SecuritySettingsComponent {
   public requestCredentialSetup(): void {
     const currentUser: User | undefined = this.user();
     if (!currentUser?.email) {
-      this._showFeedback(
-        'error',
+      this._toast.error(
         'Unable to read your account email.',
       );
       return;
@@ -192,15 +180,13 @@ export class SecuritySettingsComponent {
       .subscribe({
         next: (): void => {
           this.isRequestingCredentialSetup.set(false);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Check your inbox: we sent a link to set your password.',
           );
         },
         error: (error: unknown): void => {
           this.isRequestingCredentialSetup.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to send password setup email.',
@@ -217,8 +203,7 @@ export class SecuritySettingsComponent {
     }
 
     if (!this.hasCredentialAccount()) {
-      this._showFeedback(
-        'warning',
+      this._toast.warning(
         'Link credential login before changing password.',
       );
       return;
@@ -248,8 +233,7 @@ export class SecuritySettingsComponent {
             newPassword: '',
             revokeOtherSessions: true,
           });
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Password changed successfully.',
           );
 
@@ -259,8 +243,7 @@ export class SecuritySettingsComponent {
         },
         error: (error: unknown): void => {
           this.isChangingPassword.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to change password.',
@@ -277,8 +260,7 @@ export class SecuritySettingsComponent {
     }
 
     if (!this.hasCredentialAccount()) {
-      this._showFeedback(
-        'warning',
+      this._toast.warning(
         'Credential login is required before managing 2FA.',
       );
       return;
@@ -297,15 +279,13 @@ export class SecuritySettingsComponent {
         .subscribe({
           next: (): void => {
             this.isUpdatingTwoFactor.set(false);
-            this._showFeedback(
-              'success',
+            this._toast.success(
               'Two-factor setup started. Complete verification in the next screen.',
             );
           },
           error: (error: unknown): void => {
             this.isUpdatingTwoFactor.set(false);
-            this._showFeedback(
-              'error',
+            this._toast.error(
               this._extractErrorMessage(
                 error,
                 'Unable to start 2FA setup.',
@@ -325,16 +305,14 @@ export class SecuritySettingsComponent {
           this.twoFactorForm.reset({
             password: '',
           });
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Two-factor authentication disabled.',
           );
           this.loadSecurityState();
         },
         error: (error: unknown): void => {
           this.isUpdatingTwoFactor.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to disable 2FA.',
@@ -358,16 +336,14 @@ export class SecuritySettingsComponent {
           this.passkeyForm.reset({
             name: '',
           });
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Passkey registered successfully.',
           );
           this._loadPasskeys();
         },
         error: (error: unknown): void => {
           this.isAddingPasskey.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to add passkey.',
@@ -390,13 +366,12 @@ export class SecuritySettingsComponent {
       .subscribe({
         next: (): void => {
           this.deletingPasskeyId.set(undefined);
-          this._showFeedback('success', 'Passkey removed.');
+          this._toast.success('Passkey removed.');
           this._loadPasskeys();
         },
         error: (error: unknown): void => {
           this.deletingPasskeyId.set(undefined);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to delete passkey.',
@@ -419,16 +394,14 @@ export class SecuritySettingsComponent {
       .subscribe({
         next: (): void => {
           this.isRevokingOthers.set(false);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Other sessions revoked.',
           );
           this._loadSessions();
         },
         error: (error: unknown): void => {
           this.isRevokingOthers.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to revoke other sessions.',
@@ -451,16 +424,14 @@ export class SecuritySettingsComponent {
       .subscribe({
         next: (): void => {
           this.isRevokingAll.set(false);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'All sessions revoked. Redirecting to sign in...',
           );
           this._router.navigate(['/redirect-to-sign-in']);
         },
         error: (error: unknown): void => {
           this.isRevokingAll.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to revoke all sessions.',
@@ -489,8 +460,7 @@ export class SecuritySettingsComponent {
         },
         error: (error: unknown): void => {
           this.linkingProviderId.set(undefined);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               `Unable to connect ${provider}.`,
@@ -515,16 +485,14 @@ export class SecuritySettingsComponent {
       .subscribe({
         next: (): void => {
           this.unlinkingProviderId.set(undefined);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             `${provider} account disconnected.`,
           );
           this._loadAccounts();
         },
         error: (error: unknown): void => {
           this.unlinkingProviderId.set(undefined);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               `Unable to disconnect ${provider}.`,
@@ -663,20 +631,6 @@ export class SecuritySettingsComponent {
         canDisconnect: true,
       },
     ];
-  }
-
-  private _showFeedback(
-    type: FeedbackType,
-    text: string,
-  ): void {
-    if (this._feedbackTimeout) {
-      clearTimeout(this._feedbackTimeout);
-    }
-
-    this.feedback.set({ type, text });
-    this._feedbackTimeout = setTimeout((): void => {
-      this.feedback.set(undefined);
-    }, 7000);
   }
 
   private _extractErrorMessage(

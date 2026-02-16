@@ -14,6 +14,7 @@ import {
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AdminService } from '../../../../common/admin/admin.service';
+import { ToastService } from '../../../../common/services/toast.service';
 import {
   AdminPermission,
   AdminRole,
@@ -21,11 +22,6 @@ import {
   SortDirection,
 } from '../../../../common/admin/models/admin.model';
 
-type FeedbackType = 'success' | 'error' | 'warning';
-type FeedbackMessage = {
-  type: FeedbackType;
-  text: string;
-};
 type RoleModal = 'none' | 'create' | 'edit' | 'delete';
 type RoleSortColumn = 'name' | 'description';
 
@@ -40,10 +36,8 @@ export class RolesManagementComponent {
     inject(DestroyRef);
   private readonly _adminService: AdminService =
     inject(AdminService);
-
-  private _feedbackTimeout:
-    | ReturnType<typeof setTimeout>
-    | undefined;
+  private readonly _toast: ToastService =
+    inject(ToastService);
 
   public readonly roles: WritableSignal<AdminRole[]> =
     signal<AdminRole[]>([]);
@@ -58,9 +52,6 @@ export class RolesManagementComponent {
   > = signal<number[]>([]);
   public readonly activeModal: WritableSignal<RoleModal> =
     signal<RoleModal>('none');
-  public readonly feedback: WritableSignal<
-    FeedbackMessage | undefined
-  > = signal<FeedbackMessage | undefined>(undefined);
   public readonly isLoading: WritableSignal<boolean> =
     signal<boolean>(true);
   public readonly isSaving: WritableSignal<boolean> =
@@ -166,8 +157,7 @@ export class RolesManagementComponent {
         },
         error: (error: unknown): void => {
           this.isLoading.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load roles.',
@@ -302,16 +292,14 @@ export class RolesManagementComponent {
           next: (): void => {
             this.isSaving.set(false);
             this.closeModal();
-            this._showFeedback(
-              'success',
+            this._toast.success(
               'Role created successfully.',
             );
             this.loadData();
           },
           error: (error: unknown): void => {
             this.isSaving.set(false);
-            this._showFeedback(
-              'error',
+            this._toast.error(
               this._extractErrorMessage(
                 error,
                 'Unable to create role.',
@@ -335,16 +323,14 @@ export class RolesManagementComponent {
         next: (): void => {
           this.isSaving.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Role updated successfully.',
           );
           this.loadData();
         },
         error: (error: unknown): void => {
           this.isSaving.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to update role.',
@@ -366,16 +352,14 @@ export class RolesManagementComponent {
         next: (): void => {
           this.isDeleting.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Role deleted successfully.',
           );
           this.loadData();
         },
         error: (error: unknown): void => {
           this.isDeleting.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to delete role.',
@@ -394,20 +378,6 @@ export class RolesManagementComponent {
         )
         .join(', ') ?? ''
     );
-  }
-
-  private _showFeedback(
-    type: FeedbackType,
-    text: string,
-  ): void {
-    if (this._feedbackTimeout) {
-      clearTimeout(this._feedbackTimeout);
-    }
-
-    this.feedback.set({ type, text });
-    this._feedbackTimeout = setTimeout((): void => {
-      this.feedback.set(undefined);
-    }, 7000);
   }
 
   private _extractErrorMessage(

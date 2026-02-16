@@ -17,6 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { AuthService } from '../../../../common/auth/auth.service';
+import { ToastService } from '../../../../common/services/toast.service';
 import {
   AdminRole,
   AdminUser,
@@ -26,11 +27,6 @@ import {
   UserUpsertPayload,
 } from '../../../../common/admin/models/admin.model';
 
-type FeedbackType = 'success' | 'error' | 'warning';
-type FeedbackMessage = {
-  type: FeedbackType;
-  text: string;
-};
 type UserModal =
   | 'none'
   | 'detail'
@@ -56,10 +52,8 @@ export class UsersManagementComponent {
   private readonly _authService: AuthService =
     inject(AuthService);
   private readonly _router: Router = inject(Router);
-
-  private _feedbackTimeout:
-    | ReturnType<typeof setTimeout>
-    | undefined;
+  private readonly _toast: ToastService =
+    inject(ToastService);
 
   public readonly users: WritableSignal<AdminUser[]> =
     signal<AdminUser[]>([]);
@@ -76,9 +70,6 @@ export class UsersManagementComponent {
   > = signal<AdminUser | undefined>(undefined);
   public readonly activeModal: WritableSignal<UserModal> =
     signal<UserModal>('none');
-  public readonly feedback: WritableSignal<
-    FeedbackMessage | undefined
-  > = signal<FeedbackMessage | undefined>(undefined);
 
   public readonly isLoadingUsers: WritableSignal<boolean> =
     signal<boolean>(true);
@@ -240,8 +231,7 @@ export class UsersManagementComponent {
         },
         error: (error: unknown): void => {
           this.isLoadingUsers.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load users.',
@@ -432,8 +422,7 @@ export class UsersManagementComponent {
     if (mode === 'create') {
       if (!formValue.password.trim()) {
         this.isSavingUser.set(false);
-        this._showFeedback(
-          'warning',
+        this._toast.warning(
           'Password is required for new users.',
         );
         return;
@@ -447,16 +436,14 @@ export class UsersManagementComponent {
           next: (): void => {
             this.isSavingUser.set(false);
             this.closeModal();
-            this._showFeedback(
-              'success',
+            this._toast.success(
               'User created successfully.',
             );
             this.loadUsers();
           },
           error: (error: unknown): void => {
             this.isSavingUser.set(false);
-            this._showFeedback(
-              'error',
+            this._toast.error(
               this._extractErrorMessage(
                 error,
                 'Unable to create user.',
@@ -480,16 +467,14 @@ export class UsersManagementComponent {
         next: (): void => {
           this.isSavingUser.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'User updated successfully.',
           );
           this.loadUsers();
         },
         error: (error: unknown): void => {
           this.isSavingUser.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to update user.',
@@ -519,15 +504,11 @@ export class UsersManagementComponent {
         next: (): void => {
           this.isSavingPassword.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
-            'Password updated.',
-          );
+          this._toast.success('Password updated.');
         },
         error: (error: unknown): void => {
           this.isSavingPassword.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to set password.',
@@ -565,16 +546,14 @@ export class UsersManagementComponent {
         next: (): void => {
           this.isSavingBan.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'User banned successfully.',
           );
           this.loadUsers();
         },
         error: (error: unknown): void => {
           this.isSavingBan.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to ban user.',
@@ -597,13 +576,12 @@ export class UsersManagementComponent {
       .subscribe({
         next: (): void => {
           this.updatingBanUserId.set(undefined);
-          this._showFeedback('success', 'User unbanned.');
+          this._toast.success('User unbanned.');
           this.loadUsers();
         },
         error: (error: unknown): void => {
           this.updatingBanUserId.set(undefined);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to unban user.',
@@ -615,8 +593,7 @@ export class UsersManagementComponent {
 
   public impersonateUser(user: AdminUser): void {
     if (user.banned) {
-      this._showFeedback(
-        'warning',
+      this._toast.warning(
         'Cannot impersonate a banned user.',
       );
       return;
@@ -642,8 +619,7 @@ export class UsersManagementComponent {
         },
         error: (error: unknown): void => {
           this.isImpersonatingUser.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to impersonate user.',
@@ -665,16 +641,14 @@ export class UsersManagementComponent {
         next: (): void => {
           this.isDeletingUser.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'User deleted successfully.',
           );
           this.loadUsers();
         },
         error: (error: unknown): void => {
           this.isDeletingUser.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to delete user.',
@@ -703,8 +677,7 @@ export class UsersManagementComponent {
         },
         error: (error: unknown): void => {
           this.revokingSessionToken.set(undefined);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to revoke session.',
@@ -734,8 +707,7 @@ export class UsersManagementComponent {
         },
         error: (error: unknown): void => {
           this.isRevokingAllSessions.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to revoke all user sessions.',
@@ -794,8 +766,7 @@ export class UsersManagementComponent {
         },
         error: (error: unknown): void => {
           this.isLoadingSessions.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load user sessions.',
@@ -815,20 +786,6 @@ export class UsersManagementComponent {
       password: '',
     });
     this.selectedRoleIds.set([]);
-  }
-
-  private _showFeedback(
-    type: FeedbackType,
-    text: string,
-  ): void {
-    if (this._feedbackTimeout) {
-      clearTimeout(this._feedbackTimeout);
-    }
-
-    this.feedback.set({ type, text });
-    this._feedbackTimeout = setTimeout((): void => {
-      this.feedback.set(undefined);
-    }, 7000);
   }
 
   private _extractErrorMessage(

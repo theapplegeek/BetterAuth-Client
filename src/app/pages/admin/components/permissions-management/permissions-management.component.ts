@@ -14,17 +14,13 @@ import {
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AdminService } from '../../../../common/admin/admin.service';
+import { ToastService } from '../../../../common/services/toast.service';
 import {
   AdminPermission,
   PermissionUpsertPayload,
   SortDirection,
 } from '../../../../common/admin/models/admin.model';
 
-type FeedbackType = 'success' | 'error' | 'warning';
-type FeedbackMessage = {
-  type: FeedbackType;
-  text: string;
-};
 type PermissionModal =
   | 'none'
   | 'create'
@@ -43,10 +39,8 @@ export class PermissionsManagementComponent {
     inject(DestroyRef);
   private readonly _adminService: AdminService =
     inject(AdminService);
-
-  private _feedbackTimeout:
-    | ReturnType<typeof setTimeout>
-    | undefined;
+  private readonly _toast: ToastService =
+    inject(ToastService);
 
   public readonly permissions: WritableSignal<
     AdminPermission[]
@@ -56,9 +50,6 @@ export class PermissionsManagementComponent {
   > = signal<AdminPermission | undefined>(undefined);
   public readonly activeModal: WritableSignal<PermissionModal> =
     signal<PermissionModal>('none');
-  public readonly feedback: WritableSignal<
-    FeedbackMessage | undefined
-  > = signal<FeedbackMessage | undefined>(undefined);
   public readonly isLoading: WritableSignal<boolean> =
     signal<boolean>(true);
   public readonly isSaving: WritableSignal<boolean> =
@@ -162,8 +153,7 @@ export class PermissionsManagementComponent {
         },
         error: (error: unknown): void => {
           this.isLoading.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load permissions.',
@@ -250,16 +240,14 @@ export class PermissionsManagementComponent {
           next: (): void => {
             this.isSaving.set(false);
             this.closeModal();
-            this._showFeedback(
-              'success',
+            this._toast.success(
               'Permission created successfully.',
             );
             this.loadPermissions();
           },
           error: (error: unknown): void => {
             this.isSaving.set(false);
-            this._showFeedback(
-              'error',
+            this._toast.error(
               this._extractErrorMessage(
                 error,
                 'Unable to create permission.',
@@ -283,16 +271,14 @@ export class PermissionsManagementComponent {
         next: (): void => {
           this.isSaving.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Permission updated successfully.',
           );
           this.loadPermissions();
         },
         error: (error: unknown): void => {
           this.isSaving.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to update permission.',
@@ -314,16 +300,14 @@ export class PermissionsManagementComponent {
         next: (): void => {
           this.isDeleting.set(false);
           this.closeModal();
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Permission deleted successfully.',
           );
           this.loadPermissions();
         },
         error: (error: unknown): void => {
           this.isDeleting.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to delete permission.',
@@ -331,20 +315,6 @@ export class PermissionsManagementComponent {
           );
         },
       });
-  }
-
-  private _showFeedback(
-    type: FeedbackType,
-    text: string,
-  ): void {
-    if (this._feedbackTimeout) {
-      clearTimeout(this._feedbackTimeout);
-    }
-
-    this.feedback.set({ type, text });
-    this._feedbackTimeout = setTimeout((): void => {
-      this.feedback.set(undefined);
-    }, 7000);
   }
 
   private _extractErrorMessage(

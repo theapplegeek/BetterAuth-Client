@@ -15,14 +15,9 @@ import {
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AccountSecurityService } from '../../../../common/auth/account-security.service';
+import { ToastService } from '../../../../common/services/toast.service';
 import { UserService } from '../../../../common/user/user.service';
 import { User } from '../../../../common/user/models/user.type';
-
-type FeedbackType = 'success' | 'error' | 'warning';
-type FeedbackMessage = {
-  type: FeedbackType;
-  text: string;
-};
 
 @Component({
   selector: 'app-account-settings',
@@ -37,10 +32,8 @@ export class AccountSettingsComponent {
     inject(AccountSecurityService);
   private readonly _userService: UserService =
     inject(UserService);
-
-  private _feedbackTimeout:
-    | ReturnType<typeof setTimeout>
-    | undefined;
+  private readonly _toast: ToastService =
+    inject(ToastService);
 
   public readonly user = computed((): User | undefined =>
     this._userService.user(),
@@ -53,9 +46,6 @@ export class AccountSettingsComponent {
     signal<boolean>(false);
   public readonly isDeletingAccount: WritableSignal<boolean> =
     signal<boolean>(false);
-  public readonly feedback: WritableSignal<
-    FeedbackMessage | undefined
-  > = signal<FeedbackMessage | undefined>(undefined);
 
   public readonly profileForm = new FormGroup({
     name: new FormControl('', {
@@ -101,8 +91,7 @@ export class AccountSettingsComponent {
         },
         error: (error: unknown): void => {
           this.isLoadingSession.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to load profile information.',
@@ -132,16 +121,14 @@ export class AccountSettingsComponent {
       .subscribe({
         next: (): void => {
           this.isSavingName.set(false);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Username updated successfully.',
           );
           this.loadSession();
         },
         error: (error: unknown): void => {
           this.isSavingName.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to update username.',
@@ -175,15 +162,13 @@ export class AccountSettingsComponent {
       .subscribe({
         next: (): void => {
           this.isSavingEmail.set(false);
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Verification email sent. Confirm your new address from inbox.',
           );
         },
         error: (error: unknown): void => {
           this.isSavingEmail.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to request email update.',
@@ -205,8 +190,7 @@ export class AccountSettingsComponent {
     const confirmationEmail: string =
       this.deleteForm.controls.confirmationEmail.value.trim();
     if (confirmationEmail !== currentUser.email) {
-      this._showFeedback(
-        'warning',
+      this._toast.warning(
         'Email confirmation does not match your account email.',
       );
       return;
@@ -224,15 +208,13 @@ export class AccountSettingsComponent {
           this.deleteForm.reset({
             confirmationEmail: '',
           });
-          this._showFeedback(
-            'success',
+          this._toast.success(
             'Account deletion confirmation email sent. Complete the verification from your inbox.',
           );
         },
         error: (error: unknown): void => {
           this.isDeletingAccount.set(false);
-          this._showFeedback(
-            'error',
+          this._toast.error(
             this._extractErrorMessage(
               error,
               'Unable to start account deletion.',
@@ -255,20 +237,6 @@ export class AccountSettingsComponent {
     this.deleteForm.patchValue({
       confirmationEmail: '',
     });
-  }
-
-  private _showFeedback(
-    type: FeedbackType,
-    text: string,
-  ): void {
-    if (this._feedbackTimeout) {
-      clearTimeout(this._feedbackTimeout);
-    }
-
-    this.feedback.set({ type, text });
-    this._feedbackTimeout = setTimeout((): void => {
-      this.feedback.set(undefined);
-    }, 6500);
   }
 
   private _extractErrorMessage(
