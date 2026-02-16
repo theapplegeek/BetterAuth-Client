@@ -75,16 +75,9 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'customer',
+        path: 'todos',
         loadChildren: () =>
-          import('./pages/customers/customers.routes').then(
-            (m) => m.routes,
-          ),
-      },
-      {
-        path: 'wiki',
-        loadChildren: () =>
-          import('./pages/wiki/wiki-routes').then(
+          import('./pages/todos/todos.routes').then(
             (m) => m.routes,
           ),
       },

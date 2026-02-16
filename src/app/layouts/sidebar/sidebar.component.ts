@@ -1,5 +1,8 @@
 import {
   Component,
+  computed,
+  inject,
+  Signal,
   signal,
   WritableSignal,
 } from '@angular/core';
@@ -11,6 +14,7 @@ import {
 import { NavItem } from './models/sidebar-item.type';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { ProfileMenuComponent } from './components/profile-menu/profile-menu.component';
+import { UserService } from '../../common/user/user.service';
 
 @Component({
   selector: 'sidebar-layout',
@@ -25,33 +29,41 @@ import { ProfileMenuComponent } from './components/profile-menu/profile-menu.com
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
+  private readonly _userService: UserService =
+    inject(UserService);
+
   public sidebarVisible: WritableSignal<boolean> =
     signal(false);
   public desktopSidebarOpen: WritableSignal<boolean> =
     signal(true);
-  public navItems: WritableSignal<NavItem[]> = signal<
-    NavItem[]
-  >([
+  private readonly _baseNavItems: NavItem[] = [
     {
       id: 'home',
       type: 'link',
-      label: 'Home',
-      icon: 'icon-[heroicons--home]',
+      label: 'Dashboard',
+      icon: 'icon-[heroicons--squares-2x2]',
       route: '/home',
     },
     {
-      id: 'customer',
+      id: 'todos',
       type: 'link',
-      label: 'Customer',
-      icon: 'icon-[heroicons--shopping-bag]',
-      route: '/customer',
+      label: 'My Tasks',
+      icon: 'icon-[heroicons--check-badge]',
+      route: '/todos',
     },
     {
-      id: 'wiki',
+      id: 'completed',
       type: 'link',
-      label: 'Wiki',
-      icon: 'icon-[heroicons--book-open]',
-      route: '/wiki',
+      label: 'Completed',
+      icon: 'icon-[heroicons--archive-box]',
+      route: '/todos/completed',
+    },
+    {
+      id: 'settings',
+      type: 'link',
+      label: 'Settings',
+      icon: 'icon-[heroicons--cog-8-tooth]',
+      route: '/settings',
     },
     {
       id: 'admin',
@@ -59,22 +71,57 @@ export class SidebarComponent {
       label: 'Admin',
       route: '/admin',
       icon: 'icon-[heroicons--shield-check]',
+      roles: ['admin'],
       children: [
         {
           id: 'users',
           label: 'Users',
-          icon: 'icon-[heroicons--user]',
+          icon: 'icon-[heroicons--users]',
           route: '/admin/users',
+          roles: ['admin'],
         },
         {
-          id: 'logs',
-          label: 'Logs',
-          icon: 'icon-[heroicons--clipboard-document-list]',
-          route: '/logs',
+          id: 'roles',
+          label: 'Roles',
+          icon: 'icon-[heroicons--lock-open]',
+          route: '/admin/roles',
+          roles: ['admin'],
+        },
+        {
+          id: 'permissions',
+          label: 'Permissions',
+          icon: 'icon-[heroicons--key]',
+          route: '/admin/permissions',
+          roles: ['admin'],
         },
       ],
     },
-  ]);
+  ];
+  public navItems: Signal<NavItem[]> = computed(
+    (): NavItem[] => {
+      return this._baseNavItems
+        .filter((item: NavItem): boolean =>
+          this._canAccess(item.roles),
+        )
+        .map((item: NavItem): NavItem => {
+          if (item.type !== 'group') return item;
+
+          const children =
+            item.children?.filter((child) =>
+              this._canAccess(child.roles),
+            ) ?? [];
+
+          return {
+            ...item,
+            children: children,
+          };
+        })
+        .filter((item: NavItem): boolean => {
+          if (item.type !== 'group') return true;
+          return (item.children?.length ?? 0) > 0;
+        });
+    },
+  );
   public openGroups: WritableSignal<
     Record<string, boolean>
   > = signal<Record<string, boolean>>({});
@@ -100,5 +147,23 @@ export class SidebarComponent {
 
   public isGroupOpen(label: string): boolean {
     return this.openGroups()[label];
+  }
+
+  private _canAccess(requiredRoles?: string[]): boolean {
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
+    }
+
+    const user = this._userService.user();
+    if (!user) return false;
+
+    const mergedRoles = [...user.roles, user.role].filter(
+      (value): value is string =>
+        typeof value === 'string' && value.length > 0,
+    );
+
+    return requiredRoles.some((requiredRole: string) =>
+      mergedRoles.includes(requiredRole),
+    );
   }
 }

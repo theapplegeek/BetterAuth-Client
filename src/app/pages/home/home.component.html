@@ -1,1 +1,136 @@
-<p>home works!</p>
+<section class="space-y-6">
+  <header
+    class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+  >
+    <p
+      class="text-xs font-semibold tracking-[0.16em] text-primary-700 uppercase dark:text-primary-300"
+    >
+      Todo Dashboard
+    </p>
+    <h1
+      class="mt-2 text-2xl font-bold text-gray-900 dark:text-white"
+    >
+      Welcome back
+    </h1>
+    <p
+      class="mt-2 text-sm text-gray-600 dark:text-gray-400"
+    >
+      Track progress and manage priorities in a lightweight
+      todo workflow.
+    </p>
+  </header>
+
+  <div class="gap-4 sm:grid-cols-3 grid">
+    <article
+      class="rounded-xl border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <p
+        class="text-xs text-gray-500 dark:text-gray-400 uppercase"
+      >
+        Total tasks
+      </p>
+      <p
+        class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white"
+      >
+        {{ tasks().length }}
+      </p>
+    </article>
+
+    <article
+      class="rounded-xl border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <p
+        class="text-xs text-gray-500 dark:text-gray-400 uppercase"
+      >
+        Open tasks
+      </p>
+      <p
+        class="mt-2 text-2xl font-semibold text-warning-700 dark:text-warning-300"
+      >
+        {{ openTasks().length }}
+      </p>
+    </article>
+
+    <article
+      class="rounded-xl border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 border"
+    >
+      <p
+        class="text-xs text-gray-500 dark:text-gray-400 uppercase"
+      >
+        Completed
+      </p>
+      <p
+        class="mt-2 text-2xl font-semibold text-success-700 dark:text-success-300"
+      >
+        {{ completedTasks().length }}
+      </p>
+    </article>
+  </div>
+
+  <section
+    class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+  >
+    <div
+      class="mb-4 gap-2 sm:flex-row sm:items-center sm:justify-between flex flex-col"
+    >
+      <h2
+        class="text-lg font-semibold text-gray-900 dark:text-white"
+      >
+        Most Recent Tasks
+      </h2>
+      <div class="gap-2 flex">
+        <a
+          class="rounded-lg px-3 py-2 text-xs font-semibold text-white bg-primary-600 transition-colors hover:bg-primary-700"
+          routerLink="/todos"
+        >
+          Open Task Board
+        </a>
+        <a
+          class="rounded-lg border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border transition-colors"
+          routerLink="/todos/completed"
+        >
+          View Completed
+        </a>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      @for (task of tasks().slice(0, 5); track task.id) {
+        <div
+          class="rounded-lg border-gray-200 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-800/40 flex items-center justify-between border"
+        >
+          <div class="min-w-0">
+            <p
+              class="text-sm font-semibold text-gray-900 dark:text-white truncate"
+            >
+              {{ task.title }}
+            </p>
+            <p
+              class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+            >
+              Created:
+              {{
+                task.createdAt | date: 'dd MMM yyyy, HH:mm'
+              }}
+            </p>
+          </div>
+          <span
+            class="px-2 py-1 font-semibold inline-flex rounded-full text-[10px] uppercase"
+            [class]="{
+              'bg-success-100 text-success-700 dark:bg-success-900/20 dark:text-success-300':
+                task.completed,
+              'bg-warning-100 text-warning-700 dark:bg-warning-900/20 dark:text-warning-300':
+                !task.completed,
+            }"
+          >
+            {{ task.completed ? 'Done' : 'Open' }}
+          </span>
+        </div>
+      } @empty {
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          No tasks yet. Start from the task board.
+        </p>
+      }
+    </div>
+  </section>
+</section>
