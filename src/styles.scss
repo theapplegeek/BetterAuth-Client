@@ -135,19 +135,26 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    background: rgba(2, 6, 23, 0.93) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.68) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   [data-theme='dark'] .app-modal-overlay {
-    background: rgba(0, 0, 0, 0.95) !important;
+    background: rgba(2, 6, 23, 0.78) !important;
   }
 
   .app-modal-panel {
-    @apply w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-[#6a7194] bg-[#121b3d] p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    @apply w-full max-h-[90vh] overflow-y-auto rounded-3xl border p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    border-color: rgba(148, 163, 184, 0.25) !important;
+    background: rgba(17, 24, 39, 0.96) !important;
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  [data-theme='dark'] .app-modal-panel {
+    border-color: rgba(100, 116, 139, 0.35) !important;
+    background: rgba(2, 6, 23, 0.96) !important;
   }
 
   .app-modal-panel::-webkit-scrollbar {
@@ -163,11 +170,11 @@
   }
 
   .app-modal-close {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#5c6390] bg-[#273160] text-slate-100 transition hover:bg-[#323d72];
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-600 bg-gray-800 text-slate-100 transition hover:bg-gray-700;
   }
 
   .app-btn-secondary {
-    @apply inline-flex items-center gap-2 rounded-xl border border-[#666e97] bg-[#384172] px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:bg-[#495284];
+    @apply inline-flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-800 px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:bg-gray-700;
   }
 
   .app-btn-primary {
