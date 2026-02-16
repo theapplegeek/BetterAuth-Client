@@ -14,12 +14,12 @@ import {
 } from '../../common/todo/todo.service';
 
 @Component({
-  selector: 'app-wiki',
+  selector: 'app-completed-tasks',
   imports: [DatePipe, ConfirmDialogComponent],
-  templateUrl: './wiki.component.html',
-  styleUrl: './wiki.component.scss',
+  templateUrl: './completed-tasks.component.html',
+  styleUrl: './completed-tasks.component.scss',
 })
-export class WikiComponent {
+export class CompletedTasksComponent {
   private readonly _todoService: TodoService =
     inject(TodoService);
   public readonly isClearDialogOpen: WritableSignal<boolean> =

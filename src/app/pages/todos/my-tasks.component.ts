@@ -13,12 +13,12 @@ import {
 } from '../../common/todo/todo.service';
 
 @Component({
-  selector: 'app-customers',
+  selector: 'app-my-tasks',
   imports: [ReactiveFormsModule, DatePipe],
-  templateUrl: './customers.component.html',
-  styleUrl: './customers.component.scss',
+  templateUrl: './my-tasks.component.html',
+  styleUrl: './my-tasks.component.scss',
 })
-export class CustomersComponent {
+export class MyTasksComponent {
   private readonly _todoService: TodoService =
     inject(TodoService);
 

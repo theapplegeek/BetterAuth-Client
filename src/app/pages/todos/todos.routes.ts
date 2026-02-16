@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
-import { CustomersComponent } from '../customers/customers.component';
-import { WikiComponent } from '../wiki/wiki.component';
+import { MyTasksComponent } from './my-tasks.component';
+import { CompletedTasksComponent } from './completed-tasks.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: CustomersComponent,
+    component: MyTasksComponent,
   },
   {
     path: 'completed',
-    component: WikiComponent,
+    component: CompletedTasksComponent,
   },
 ];
