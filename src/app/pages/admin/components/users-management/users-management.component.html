@@ -395,6 +395,8 @@
 @if (activeModal() !== 'none') {
   <div
     class="app-modal-overlay"
+    tabindex="0"
+    (keydown)="onModalKeydown($event)"
     (click)="closeModal()"
   >
     <div
@@ -507,6 +509,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-secondary"
@@ -514,6 +517,7 @@
               (click)="closeModal()"
             >
               Close
+              <span class="app-kbd">ENTER</span>
             </button>
           </div>
         </div>
@@ -658,6 +662,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-primary"
@@ -665,6 +670,9 @@
               [disabled]="isSavingUser()"
             >
               {{ isSavingUser() ? 'Saving...' : 'Save' }}
+              @if (!isSavingUser()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </form>
@@ -711,6 +719,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-primary"
@@ -722,6 +731,9 @@
                   ? 'Saving...'
                   : 'Update Password'
               }}
+              @if (!isSavingPassword()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </form>
@@ -780,6 +792,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-danger"
@@ -787,6 +800,9 @@
               [disabled]="isSavingBan()"
             >
               {{ isSavingBan() ? 'Saving...' : 'Ban User' }}
+              @if (!isSavingBan()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </form>
@@ -825,6 +841,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-primary"
@@ -837,6 +854,9 @@
                   ? 'Switching...'
                   : 'Impersonate'
               }}
+              @if (!isImpersonatingUser()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </div>
@@ -970,6 +990,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-danger"
@@ -982,6 +1003,9 @@
                   ? 'Deleting...'
                   : 'Delete User'
               }}
+              @if (!isDeletingUser()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </div>

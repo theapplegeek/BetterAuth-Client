@@ -389,6 +389,35 @@ export class UsersManagementComponent {
     });
   }
 
+  public onModalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+
+    if (event.key !== 'Enter') return;
+    if (event.target instanceof HTMLTextAreaElement) {
+      return;
+    }
+
+    const activeModal = this.activeModal();
+    if (activeModal === 'detail') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+    if (activeModal === 'delete') {
+      event.preventDefault();
+      this.deleteSelectedUser();
+      return;
+    }
+    if (activeModal === 'impersonate') {
+      event.preventDefault();
+      this.confirmImpersonation();
+    }
+  }
+
   public toggleActionMenu(
     userId: string,
     event: Event,

@@ -234,6 +234,22 @@ export class RolesManagementComponent {
     this.activeModal.set('none');
   }
 
+  public onModalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+
+    if (
+      event.key === 'Enter' &&
+      this.activeModal() === 'delete'
+    ) {
+      event.preventDefault();
+      this.deleteRole();
+    }
+  }
+
   public togglePermission(
     permissionId: number,
     event: Event,

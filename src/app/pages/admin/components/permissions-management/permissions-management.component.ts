@@ -213,6 +213,22 @@ export class PermissionsManagementComponent {
     this.activeModal.set('none');
   }
 
+  public onModalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+
+    if (
+      event.key === 'Enter' &&
+      this.activeModal() === 'delete'
+    ) {
+      event.preventDefault();
+      this.deletePermission();
+    }
+  }
+
   public savePermission(): void {
     const mode = this.activeModal();
     if (mode !== 'create' && mode !== 'edit') return;

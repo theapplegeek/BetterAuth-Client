@@ -163,6 +163,8 @@
 @if (activeModal() !== 'none') {
   <div
     class="app-modal-overlay"
+    tabindex="0"
+    (keydown)="onModalKeydown($event)"
     (click)="closeModal()"
   >
     <div
@@ -240,6 +242,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-primary"
@@ -247,6 +250,9 @@
               [disabled]="isSaving()"
             >
               {{ isSaving() ? 'Saving...' : 'Save' }}
+              @if (!isSaving()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </form>
@@ -285,6 +291,7 @@
               (click)="closeModal()"
             >
               Cancel
+              <span class="app-kbd">ESC</span>
             </button>
             <button
               class="app-btn-danger"
@@ -297,6 +304,9 @@
                   ? 'Deleting...'
                   : 'Delete Permission'
               }}
+              @if (!isDeleting()) {
+                <span class="app-kbd">ENTER</span>
+              }
             </button>
           </div>
         </div>
