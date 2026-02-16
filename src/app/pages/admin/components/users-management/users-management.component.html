@@ -340,11 +340,16 @@
         <span class="whitespace-nowrap">Per page</span>
         <select
           class="w-20 shrink-0 rounded-md border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white border"
-          [value]="pageSize()"
+          [value]="pageSize().toString()"
           (change)="onPageSizeSelectChange($event)"
         >
           @for (size of pageSizeOptions; track size) {
-            <option [value]="size">{{ size }}</option>
+            <option
+              [value]="size"
+              [selected]="size === pageSize()"
+            >
+              {{ size }}
+            </option>
           }
         </select>
       </label>
