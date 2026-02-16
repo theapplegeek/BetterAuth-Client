@@ -1,56 +1,178 @@
+# AI Engineering Guidelines
+## Angular 21+ Enterprise Projects (Reusable Baseline)
 
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+This file defines the default engineering rules for AI agents working on Angular 21+ projects.
+It is designed to be reusable across future repositories.
 
-## TypeScript Best Practices
+## 1. Purpose and Scope
 
-- Use strict type checking
-- Prefer type inference when the type is obvious
-- Avoid the `any` type; use `unknown` when type is uncertain
+Use these rules when generating, refactoring, or reviewing code to ensure:
 
-## Angular Best Practices
+- architectural consistency
+- strict typing and maintainability
+- production-grade quality
+- predictable behavior in zoneless Angular apps
+- scalable project structure
 
-- Always use standalone components over NgModules
-- Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Use signals for state management
-- Implement lazy loading for feature routes
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
-- Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
+If a repository has stricter local rules, local rules take precedence.
 
-## Accessibility Requirements
+## 2. Core Principles
 
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+Agents must:
 
-### Components
+1. Prefer modern Angular patterns (standalone, signals, lazy routes, `inject()` DI).
+2. Enforce strict typing and avoid unsafe patterns.
+3. Keep business logic out of templates.
+4. Minimize coupling and preserve separation of concerns.
+5. Avoid overengineering while keeping solutions extensible.
+6. Write code safe for production and future maintenance.
 
-- Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
-- Prefer Reactive forms instead of Template-driven ones
-- Do NOT use `ngClass`, use `class` bindings instead
-- Do NOT use `ngStyle`, use `style` bindings instead
-- When using external templates/styles, use paths relative to the component TS file.
+## 3. TypeScript Standards
 
-## State Management
+## 3.1 Typing rules
 
-- Use signals for local component state
-- Use `computed()` for derived state
-- Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
+- Use strict types everywhere.
+- Avoid `any`.
+- If `unknown` is used, narrow it before usage.
+- Add explicit return types for non-trivial methods.
+- Add explicit generic types for signals, observables, and forms.
+- Prefer model types/interfaces in shared model folders.
 
-## Templates
+## 3.2 Class member conventions
 
-- Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
-- Do not assume globals like (`new Date()`) are available.
-- Do not write arrow functions in templates (they are not supported).
+- Every class member must include visibility (`public`/`private`/`protected`).
+- Prefix private members with `_`.
+- Keep naming consistent and intention-revealing.
 
-## Services
+## 4. Angular Architecture Standards
 
-- Design services around a single responsibility
-- Use the `providedIn: 'root'` option for singleton services
-- Use the `inject()` function instead of constructor injection
+## 4.1 Standalone and control flow
+
+- Use standalone components by default.
+- Do not add `standalone: true` unless the repository/tooling explicitly requires it.
+- Use Angular built-in control flow (`@if`, `@for`, `@switch`) in new code.
+- Do not introduce new `*ngIf` / `*ngFor` / `*ngSwitch` patterns.
+- Import only what the template actually uses.
+
+## 4.2 Zoneless-compatible state
+
+Angular 21+ is zoneless-first. If state is rendered in template:
+
+- it must be signal-driven (`signal`, `computed`, derived signals), or
+- managed through explicit reactive flow compatible with zoneless updates.
+
+Do not rely on plain mutable class fields to update UI.
+
+## 4.3 Signals-first UI state
+
+- Use signals for local UI state.
+- Use `computed()` for derived values.
+- Prefer pure and predictable state transitions (`set`, `update`).
+- Avoid signal mutation anti-patterns.
+
+## 4.4 Dependency Injection
+
+- Prefer functional DI with `inject()`.
+- Keep constructor lightweight (no heavy side effects).
+- Design services with single responsibility.
+
+## 4.5 Component boundaries
+
+- Smart components: orchestration, data loading, page-level state.
+- Presentational components: render-only, inputs/outputs, no business services.
+- Keep components focused and reasonably small.
+
+## 4.6 Change detection and rendering
+
+- Default new components to `ChangeDetectionStrategy.OnPush` unless repository policy differs.
+- Use `@for (...; track ...)` for list rendering.
+
+## 5. Template Rules
+
+- Keep templates declarative and simple.
+- Avoid heavy expressions and nested ternaries.
+- Do not write arrow functions in templates.
+- Do not assume global constructors/functions in templates.
+- Precompute non-trivial UI values in component state.
+- Prefer class/style bindings over imperative DOM manipulation.
+
+## 6. Services and Data Access
+
+- Use `@Injectable({ providedIn: 'root' })` for app-wide singleton services.
+- Keep HTTP contracts strongly typed.
+- Map API payloads to internal models before exposing to UI.
+- Handle error branches explicitly.
+- Avoid leaking raw transport models into components.
+
+## 7. Error Handling and UX Consistency
+
+- Never swallow errors silently.
+- Normalize and centralize UI feedback.
+- Prefer centralized toast/notification services.
+- Avoid direct `window.alert`/`window.confirm` in app flows.
+- Prefer reusable dialog patterns for confirmations and critical actions.
+
+## 8. UI System Consistency (Recommended)
+
+For multi-page enterprise apps:
+
+- centralize visual tokens (colors, spacing, semantic states)
+- keep form controls stylistically consistent
+- use one consistent dialog system and keyboard behavior (ESC/ENTER)
+- apply consistent interaction cues (`cursor-pointer` for clickable elements)
+- keep accessibility and color contrast compliant (WCAG AA minimum)
+
+## 9. Security and Production Safety
+
+Agents must not:
+
+- hardcode secrets
+- bypass sanitization/security controls
+- disable CSP-related protections without explicit requirement
+
+Agents should:
+
+- validate external input boundaries
+- keep auth/session handling aligned with backend policy
+- avoid storing sensitive tokens in insecure storage unless explicitly required
+
+## 10. Performance and Scalability
+
+- Lazy-load feature routes.
+- Avoid redundant reactive computations.
+- Avoid unnecessary subscriptions.
+- Keep state updates minimal and immutable-friendly.
+- Prevent circular dependencies.
+
+## 11. Anti-Patterns to Avoid
+
+- `any` proliferation
+- business logic in templates
+- monolithic components with mixed concerns
+- side effects inside getters
+- direct DOM querying (`document.querySelector`) unless explicitly justified
+- introducing legacy Angular patterns in new code
+
+## 12. Delivery Checklist
+
+Before completing a task, verify:
+
+- no `any` introduced
+- no unused imports/dead code
+- all critical flows have explicit error handling
+- template state is zoneless-safe
+- list rendering includes tracking
+- accessibility basics are preserved
+- UX remains consistent with project design system
+
+## 13. Repository Pattern Addendum (Current Project Experience)
+
+When working on admin/security-heavy Angular apps like this one, prefer:
+
+- page-scoped dialog folders (`<page>/dialogs/*`)
+- one component per dialog use case
+- dialog-internal operation logic
+- host-driven open/close orchestration and result handling
+- centralized toast service for success/error/warning/info
+
+These patterns are strongly recommended as a baseline for future projects.
