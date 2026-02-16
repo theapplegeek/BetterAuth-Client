@@ -250,9 +250,6 @@
                         <button
                           class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-success-700 hover:bg-success-100 dark:text-success-300 dark:hover:bg-success-900/20"
                           type="button"
-                          [disabled]="
-                            updatingBanUserId() === user.id
-                          "
                           (click)="unbanUser(user)"
                         >
                           <span
@@ -275,7 +272,6 @@
                       <button
                         class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-warning-700 hover:bg-warning-100 dark:text-warning-300 dark:hover:bg-warning-900/20"
                         type="button"
-                        [disabled]="isImpersonatingUser()"
                         (click)="openImpersonateModal(user)"
                       >
                         <span
@@ -396,4 +392,3 @@
     </div>
   </div>
 </div>
-

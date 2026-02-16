@@ -6,27 +6,28 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { DialogRef } from '@angular/cdk/dialog';
 import {
   FormControl,
-  FormGroup,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
-import { RolesManagementDialogComponent } from '../../../../dialogs/admin/roles-management-dialog/roles-management-dialog.component';
 import {
   AdminPermission,
   AdminRole,
-  RoleUpsertPayload,
   SortDirection,
 } from '../../../../common/admin/models/admin.model';
+import {
+  RoleDeleteDialogComponent,
+  RoleDeleteDialogResult,
+} from './dialogs/role-delete-dialog/role-delete-dialog.component';
+import {
+  RoleFormDialogComponent,
+  RoleFormDialogResult,
+} from './dialogs/role-form-dialog/role-form-dialog.component';
 
-type RoleModal = 'none' | 'create' | 'edit' | 'delete';
 type RoleSortColumn = 'name' | 'description';
 
 @Component({
@@ -44,29 +45,14 @@ export class RolesManagementComponent {
     inject(AppDialogService);
   private readonly _toast: ToastService =
     inject(ToastService);
-  private _dialogRef:
-    | DialogRef<void, RolesManagementDialogComponent>
-    | undefined;
 
   public readonly roles: WritableSignal<AdminRole[]> =
     signal<AdminRole[]>([]);
   public readonly permissions: WritableSignal<
     AdminPermission[]
   > = signal<AdminPermission[]>([]);
-  public readonly selectedRole: WritableSignal<
-    AdminRole | undefined
-  > = signal<AdminRole | undefined>(undefined);
-  public readonly selectedPermissionIds: WritableSignal<
-    number[]
-  > = signal<number[]>([]);
-  public readonly activeModal: WritableSignal<RoleModal> =
-    signal<RoleModal>('none');
   public readonly isLoading: WritableSignal<boolean> =
     signal<boolean>(true);
-  public readonly isSaving: WritableSignal<boolean> =
-    signal<boolean>(false);
-  public readonly isDeleting: WritableSignal<boolean> =
-    signal<boolean>(false);
   public readonly sortColumn: WritableSignal<
     RoleSortColumn | undefined
   > = signal<RoleSortColumn | undefined>('name');
@@ -76,18 +62,6 @@ export class RolesManagementComponent {
 
   public readonly searchControl = new FormControl('', {
     nonNullable: true,
-  });
-  public readonly roleForm = new FormGroup({
-    name: new FormControl('', {
-      nonNullable: true,
-      validators: [
-        Validators.required,
-        Validators.minLength(2),
-      ],
-    }),
-    description: new FormControl('', {
-      nonNullable: true,
-    }),
   });
 
   public readonly filteredRoles = computed(
@@ -151,11 +125,6 @@ export class RolesManagementComponent {
 
   constructor() {
     this.loadData();
-    fromEvent<KeyboardEvent>(document, 'keydown')
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((event: KeyboardEvent): void => {
-        this._handleGlobalModalKeydown(event);
-      });
   }
 
   public loadData(): void {
@@ -215,221 +184,79 @@ export class RolesManagementComponent {
   }
 
   public openCreate(): void {
-    this.selectedRole.set(undefined);
-    this.roleForm.reset({
-      name: '',
-      description: '',
-    });
-    this.selectedPermissionIds.set([]);
-    this.activeModal.set('create');
-    this._openDialog();
+    this._dialogService
+      .open<
+        RoleFormDialogResult,
+        { mode: 'create'; permissions: AdminPermission[] },
+        RoleFormDialogComponent
+      >(RoleFormDialogComponent, {
+        width: 'min(100vw - 2rem, 56rem)',
+        maxWidth: '56rem',
+        data: {
+          mode: 'create',
+          permissions: this.permissions(),
+        },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (result: RoleFormDialogResult | undefined): void => {
+          if (result?.saved) {
+            this.loadData();
+          }
+        },
+      );
   }
 
   public openEdit(role: AdminRole): void {
-    this.selectedRole.set(role);
-    this.roleForm.reset({
-      name: role.name,
-      description: role.description ?? '',
-    });
-    this.selectedPermissionIds.set(
-      role.permissions?.map(
-        (permission: AdminPermission): number =>
-          permission.id,
-      ) ?? [],
-    );
-    this.activeModal.set('edit');
-    this._openDialog();
+    this._dialogService
+      .open<
+        RoleFormDialogResult,
+        {
+          mode: 'edit';
+          role: AdminRole;
+          permissions: AdminPermission[];
+        },
+        RoleFormDialogComponent
+      >(RoleFormDialogComponent, {
+        width: 'min(100vw - 2rem, 56rem)',
+        maxWidth: '56rem',
+        data: {
+          mode: 'edit',
+          role: role,
+          permissions: this.permissions(),
+        },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (result: RoleFormDialogResult | undefined): void => {
+          if (result?.saved) {
+            this.loadData();
+          }
+        },
+      );
   }
 
   public openDelete(role: AdminRole): void {
-    this.selectedRole.set(role);
-    this.activeModal.set('delete');
-    this._openDialog();
-  }
-
-  public closeModal(): void {
-    this.activeModal.set('none');
-    if (this._dialogRef) {
-      const dialogRef = this._dialogRef;
-      this._dialogRef = undefined;
-      dialogRef.close();
-    }
-  }
-
-  private _openDialog(): void {
-    if (this._dialogRef) return;
-
-    this._dialogRef = this._dialogService.open<
-      void,
-      { host: RolesManagementComponent },
-      RolesManagementDialogComponent
-    >(RolesManagementDialogComponent, {
-      width: 'min(100vw - 2rem, 56rem)',
-      maxWidth: '56rem',
-      data: { host: this },
-    });
-
-    this._dialogRef.closed
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((): void => {
-        this._dialogRef = undefined;
-        this.activeModal.set('none');
-      });
-  }
-
-  private _handleGlobalModalKeydown(
-    event: KeyboardEvent,
-  ): void {
-    if (this.activeModal() === 'none') return;
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.closeModal();
-      return;
-    }
-
-    if (
-      event.key === 'Enter' &&
-      this.activeModal() === 'delete'
-    ) {
-      event.preventDefault();
-      this.deleteRole();
-    }
-  }
-
-  public togglePermission(
-    permissionId: number,
-    event: Event,
-  ): void {
-    const target = event.target as HTMLInputElement;
-    const checked = target.checked;
-
-    this.selectedPermissionIds.update(
-      (selectedIds: number[]): number[] => {
-        if (checked) {
-          return Array.from(
-            new Set([...selectedIds, permissionId]),
-          );
-        }
-
-        return selectedIds.filter(
-          (selectedId: number): boolean =>
-            selectedId !== permissionId,
-        );
-      },
-    );
-  }
-
-  public isPermissionSelected(
-    permissionId: number,
-  ): boolean {
-    return this.selectedPermissionIds().includes(
-      permissionId,
-    );
-  }
-
-  public saveRole(): void {
-    const mode = this.activeModal();
-    if (mode !== 'create' && mode !== 'edit') return;
-
-    if (this.roleForm.invalid) {
-      this.roleForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.roleForm.getRawValue();
-    const payload: RoleUpsertPayload = {
-      name: formValue.name.trim(),
-      description:
-        formValue.description.trim() || undefined,
-      permissionIds: this.selectedPermissionIds(),
-    };
-
-    this.isSaving.set(true);
-
-    if (mode === 'create') {
-      this._adminService
-        .createRole(payload)
-        .pipe(takeUntilDestroyed(this._destroyRef))
-        .subscribe({
-          next: (): void => {
-            this.isSaving.set(false);
-            this.closeModal();
-            this._toast.success(
-              'Role created successfully.',
-            );
+    this._dialogService
+      .open<
+        RoleDeleteDialogResult,
+        { role: AdminRole },
+        RoleDeleteDialogComponent
+      >(RoleDeleteDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+        data: { role: role },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: RoleDeleteDialogResult | undefined,
+        ): void => {
+          if (result?.deleted) {
             this.loadData();
-          },
-          error: (error: unknown): void => {
-            this.isSaving.set(false);
-            this._toast.error(
-              this._extractErrorMessage(
-                error,
-                'Unable to create role.',
-              ),
-            );
-          },
-        });
-      return;
-    }
-
-    const selectedRole = this.selectedRole();
-    if (!selectedRole) {
-      this.isSaving.set(false);
-      return;
-    }
-
-    this._adminService
-      .updateRole(selectedRole.id, payload)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isSaving.set(false);
-          this.closeModal();
-          this._toast.success(
-            'Role updated successfully.',
-          );
-          this.loadData();
+          }
         },
-        error: (error: unknown): void => {
-          this.isSaving.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to update role.',
-            ),
-          );
-        },
-      });
-  }
-
-  public deleteRole(): void {
-    const selectedRole = this.selectedRole();
-    if (!selectedRole) return;
-
-    this.isDeleting.set(true);
-    this._adminService
-      .deleteRole(selectedRole.id)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isDeleting.set(false);
-          this.closeModal();
-          this._toast.success(
-            'Role deleted successfully.',
-          );
-          this.loadData();
-        },
-        error: (error: unknown): void => {
-          this.isDeleting.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to delete role.',
-            ),
-          );
-        },
-      });
+      );
   }
 
   public rolePermissionSummary(role: AdminRole): string {

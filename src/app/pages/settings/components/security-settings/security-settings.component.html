@@ -272,16 +272,9 @@
             <button
               class="gap-2 text-sm font-semibold inline-flex items-center text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
               type="button"
-              [disabled]="
-                deletingPasskeyId() === passkey.id
-              "
               (click)="requestDeletePasskey(passkey.id)"
             >
-              {{
-                deletingPasskeyId() === passkey.id
-                  ? 'Removing...'
-                  : 'Remove'
-              }}
+              Remove
             </button>
           </div>
         } @empty {
@@ -317,24 +310,16 @@
           <button
             class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-warning-600 transition-colors hover:bg-warning-700 disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
-            [disabled]="isRevokingOthers()"
             (click)="requestRevokeOtherSessions()"
           >
-            {{
-              isRevokingOthers()
-                ? 'Revoking...'
-                : 'Revoke Others'
-            }}
+            Revoke Others
           </button>
           <button
             class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-error-600 transition-colors hover:bg-error-700 disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
-            [disabled]="isRevokingAll()"
             (click)="requestRevokeAllSessions()"
           >
-            {{
-              isRevokingAll() ? 'Revoking...' : 'Revoke All'
-            }}
+            Revoke All
           </button>
         </div>
       </div>
@@ -437,22 +422,13 @@
                 <button
                   class="text-sm font-semibold text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
                   type="button"
-                  [disabled]="
-                    unlinkingProviderId() ===
-                    provider.provider
-                  "
                   (click)="
                     requestDisconnectProvider(
                       provider.provider
                     )
                   "
                 >
-                  {{
-                    unlinkingProviderId() ===
-                    provider.provider
-                      ? 'Disconnecting...'
-                      : 'Disconnect'
-                  }}
+                  Disconnect
                 </button>
               } @else if (
                 provider.connected &&

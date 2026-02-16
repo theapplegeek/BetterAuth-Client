@@ -1,0 +1,94 @@
+<div class="app-modal-panel max-w-2xl">
+  <div class="space-y-4">
+    <div class="app-modal-header !mb-3">
+      <h3 class="app-modal-title">
+        Sessions for {{ user.name }}
+      </h3>
+      <button
+        class="app-modal-close"
+        type="button"
+        aria-label="Close dialog"
+        (click)="onClose()"
+      >
+        <span
+          class="icon-[heroicons--x-mark] size-5"
+        ></span>
+      </button>
+    </div>
+
+    @if (sessions().length > 0) {
+      <div class="flex justify-end">
+        <button
+          class="app-btn-danger px-3 py-2 text-xs"
+          type="button"
+          [disabled]="isRevokingAllSessions()"
+          (click)="revokeAllSessions()"
+        >
+          {{
+            isRevokingAllSessions()
+              ? 'Revoking...'
+              : 'Revoke All'
+          }}
+        </button>
+      </div>
+    }
+
+    @if (isLoadingSessions()) {
+      <p
+        class="text-sm text-gray-600 dark:text-gray-400"
+      >
+        Loading sessions...
+      </p>
+    } @else {
+      <div class="space-y-2">
+        @for (session of sessions(); track session.id) {
+          <div
+            class="rounded-lg border-gray-200 bg-gray-50 p-3 dark:border-white/10 dark:bg-gray-800/40 flex items-center justify-between border"
+          >
+            <div class="min-w-0">
+              <p
+                class="text-sm font-semibold text-gray-900 dark:text-white truncate"
+              >
+                {{
+                  session.userAgent ||
+                    'Unknown device'
+                }}
+              </p>
+              <p
+                class="text-xs text-gray-600 dark:text-gray-400"
+              >
+                Updated:
+                {{
+                  session.updatedAt
+                    | date: 'dd MMM yyyy, HH:mm'
+                }}
+              </p>
+            </div>
+            <button
+              class="text-sm font-semibold text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+              type="button"
+              [disabled]="
+                revokingSessionToken() ===
+                (session.token || session.id)
+              "
+              (click)="revokeSession(session)"
+            >
+              {{
+                revokingSessionToken() ===
+                (session.token || session.id)
+                  ? 'Revoking...'
+                  : 'Revoke'
+              }}
+            </button>
+          </div>
+        } @empty {
+          <p
+            class="text-sm text-gray-600 dark:text-gray-400"
+          >
+            No active sessions found for this user.
+          </p>
+        }
+      </div>
+    }
+  </div>
+</div>

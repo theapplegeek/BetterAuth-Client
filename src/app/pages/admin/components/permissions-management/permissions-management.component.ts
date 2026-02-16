@@ -6,30 +6,27 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { DialogRef } from '@angular/cdk/dialog';
 import {
   FormControl,
-  FormGroup,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
-import { PermissionsManagementDialogComponent } from '../../../../dialogs/admin/permissions-management-dialog/permissions-management-dialog.component';
 import {
   AdminPermission,
-  PermissionUpsertPayload,
   SortDirection,
 } from '../../../../common/admin/models/admin.model';
+import {
+  PermissionDeleteDialogComponent,
+  PermissionDeleteDialogResult,
+} from './dialogs/permission-delete-dialog/permission-delete-dialog.component';
+import {
+  PermissionFormDialogComponent,
+  PermissionFormDialogResult,
+} from './dialogs/permission-form-dialog/permission-form-dialog.component';
 
-type PermissionModal =
-  | 'none'
-  | 'create'
-  | 'edit'
-  | 'delete';
 type PermissionSortColumn = 'code' | 'name' | 'description';
 
 @Component({
@@ -47,27 +44,12 @@ export class PermissionsManagementComponent {
     inject(AppDialogService);
   private readonly _toast: ToastService =
     inject(ToastService);
-  private _dialogRef:
-    | DialogRef<
-        void,
-        PermissionsManagementDialogComponent
-      >
-    | undefined;
 
   public readonly permissions: WritableSignal<
     AdminPermission[]
   > = signal<AdminPermission[]>([]);
-  public readonly selectedPermission: WritableSignal<
-    AdminPermission | undefined
-  > = signal<AdminPermission | undefined>(undefined);
-  public readonly activeModal: WritableSignal<PermissionModal> =
-    signal<PermissionModal>('none');
   public readonly isLoading: WritableSignal<boolean> =
     signal<boolean>(true);
-  public readonly isSaving: WritableSignal<boolean> =
-    signal<boolean>(false);
-  public readonly isDeleting: WritableSignal<boolean> =
-    signal<boolean>(false);
   public readonly sortColumn: WritableSignal<
     PermissionSortColumn | undefined
   > = signal<PermissionSortColumn | undefined>('code');
@@ -77,19 +59,6 @@ export class PermissionsManagementComponent {
 
   public readonly searchControl = new FormControl('', {
     nonNullable: true,
-  });
-  public readonly permissionForm = new FormGroup({
-    code: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    name: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    description: new FormControl('', {
-      nonNullable: true,
-    }),
   });
 
   public readonly filteredPermissions = computed(
@@ -150,11 +119,6 @@ export class PermissionsManagementComponent {
 
   constructor() {
     this.loadPermissions();
-    fromEvent<KeyboardEvent>(document, 'keydown')
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((event: KeyboardEvent): void => {
-        this._handleGlobalModalKeydown(event);
-      });
   }
 
   public loadPermissions(): void {
@@ -202,185 +166,75 @@ export class PermissionsManagementComponent {
   }
 
   public openCreate(): void {
-    this.selectedPermission.set(undefined);
-    this.permissionForm.reset({
-      code: '',
-      name: '',
-      description: '',
-    });
-    this.activeModal.set('create');
-    this._openDialog();
+    this._dialogService
+      .open<
+        PermissionFormDialogResult,
+        { mode: 'create' },
+        PermissionFormDialogComponent
+      >(PermissionFormDialogComponent, {
+        width: 'min(100vw - 2rem, 46rem)',
+        maxWidth: '46rem',
+        data: { mode: 'create' },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: PermissionFormDialogResult | undefined,
+        ): void => {
+          if (result?.saved) {
+            this.loadPermissions();
+          }
+        },
+      );
   }
 
   public openEdit(permission: AdminPermission): void {
-    this.selectedPermission.set(permission);
-    this.permissionForm.reset({
-      code: permission.code,
-      name: permission.name,
-      description: permission.description ?? '',
-    });
-    this.activeModal.set('edit');
-    this._openDialog();
+    this._dialogService
+      .open<
+        PermissionFormDialogResult,
+        { mode: 'edit'; permission: AdminPermission },
+        PermissionFormDialogComponent
+      >(PermissionFormDialogComponent, {
+        width: 'min(100vw - 2rem, 46rem)',
+        maxWidth: '46rem',
+        data: {
+          mode: 'edit',
+          permission: permission,
+        },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: PermissionFormDialogResult | undefined,
+        ): void => {
+          if (result?.saved) {
+            this.loadPermissions();
+          }
+        },
+      );
   }
 
   public openDelete(permission: AdminPermission): void {
-    this.selectedPermission.set(permission);
-    this.activeModal.set('delete');
-    this._openDialog();
-  }
-
-  public closeModal(): void {
-    this.activeModal.set('none');
-    if (this._dialogRef) {
-      const dialogRef = this._dialogRef;
-      this._dialogRef = undefined;
-      dialogRef.close();
-    }
-  }
-
-  private _openDialog(): void {
-    if (this._dialogRef) return;
-
-    this._dialogRef = this._dialogService.open<
-      void,
-      { host: PermissionsManagementComponent },
-      PermissionsManagementDialogComponent
-    >(PermissionsManagementDialogComponent, {
-      width: 'min(100vw - 2rem, 46rem)',
-      maxWidth: '46rem',
-      data: { host: this },
-    });
-
-    this._dialogRef.closed
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((): void => {
-        this._dialogRef = undefined;
-        this.activeModal.set('none');
-      });
-  }
-
-  private _handleGlobalModalKeydown(
-    event: KeyboardEvent,
-  ): void {
-    if (this.activeModal() === 'none') return;
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.closeModal();
-      return;
-    }
-
-    if (
-      event.key === 'Enter' &&
-      this.activeModal() === 'delete'
-    ) {
-      event.preventDefault();
-      this.deletePermission();
-    }
-  }
-
-  public savePermission(): void {
-    const mode = this.activeModal();
-    if (mode !== 'create' && mode !== 'edit') return;
-
-    if (this.permissionForm.invalid) {
-      this.permissionForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.permissionForm.getRawValue();
-    const payload: PermissionUpsertPayload = {
-      code: formValue.code.trim(),
-      name: formValue.name.trim(),
-      description:
-        formValue.description.trim() || undefined,
-    };
-
-    this.isSaving.set(true);
-
-    if (mode === 'create') {
-      this._adminService
-        .createPermission(payload)
-        .pipe(takeUntilDestroyed(this._destroyRef))
-        .subscribe({
-          next: (): void => {
-            this.isSaving.set(false);
-            this.closeModal();
-            this._toast.success(
-              'Permission created successfully.',
-            );
+    this._dialogService
+      .open<
+        PermissionDeleteDialogResult,
+        { permission: AdminPermission },
+        PermissionDeleteDialogComponent
+      >(PermissionDeleteDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+        data: { permission: permission },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: PermissionDeleteDialogResult | undefined,
+        ): void => {
+          if (result?.deleted) {
             this.loadPermissions();
-          },
-          error: (error: unknown): void => {
-            this.isSaving.set(false);
-            this._toast.error(
-              this._extractErrorMessage(
-                error,
-                'Unable to create permission.',
-              ),
-            );
-          },
-        });
-      return;
-    }
-
-    const selectedPermission = this.selectedPermission();
-    if (!selectedPermission) {
-      this.isSaving.set(false);
-      return;
-    }
-
-    this._adminService
-      .updatePermission(selectedPermission.id, payload)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isSaving.set(false);
-          this.closeModal();
-          this._toast.success(
-            'Permission updated successfully.',
-          );
-          this.loadPermissions();
+          }
         },
-        error: (error: unknown): void => {
-          this.isSaving.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to update permission.',
-            ),
-          );
-        },
-      });
-  }
-
-  public deletePermission(): void {
-    const selectedPermission = this.selectedPermission();
-    if (!selectedPermission) return;
-
-    this.isDeleting.set(true);
-    this._adminService
-      .deletePermission(selectedPermission.id)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isDeleting.set(false);
-          this.closeModal();
-          this._toast.success(
-            'Permission deleted successfully.',
-          );
-          this.loadPermissions();
-        },
-        error: (error: unknown): void => {
-          this.isDeleting.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to delete permission.',
-            ),
-          );
-        },
-      });
+      );
   }
 
   private _extractErrorMessage(

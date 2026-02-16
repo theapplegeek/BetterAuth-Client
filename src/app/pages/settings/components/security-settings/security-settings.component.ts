@@ -14,7 +14,6 @@ import {
 } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { Passkey } from '@better-auth/passkey';
 import {
   AccountSecurityService,
@@ -25,12 +24,24 @@ import {
 import { AuthService } from '../../../../common/auth/auth.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
-import {
-  ConfirmDialogComponent,
-  ConfirmDialogTone,
-} from '../../../../dialogs/confirm-dialog/confirm-dialog.component';
 import { User } from '../../../../common/user/models/user.type';
 import { UserService } from '../../../../common/user/user.service';
+import {
+  DeletePasskeyDialogComponent,
+  DeletePasskeyDialogResult,
+} from './dialogs/delete-passkey-dialog/delete-passkey-dialog.component';
+import {
+  DisconnectProviderDialogComponent,
+  DisconnectProviderDialogResult,
+} from './dialogs/disconnect-provider-dialog/disconnect-provider-dialog.component';
+import {
+  RevokeAllSessionsDialogComponent,
+  RevokeAllSessionsDialogResult,
+} from './dialogs/revoke-all-sessions-dialog/revoke-all-sessions-dialog.component';
+import {
+  RevokeOtherSessionsDialogComponent,
+  RevokeOtherSessionsDialogResult,
+} from './dialogs/revoke-other-sessions-dialog/revoke-other-sessions-dialog.component';
 
 type ProviderId = 'credential' | 'google' | 'discord';
 type ProviderCard = {
@@ -43,17 +54,13 @@ type ProviderCard = {
 
 @Component({
   selector: 'app-security-settings',
-  imports: [
-    ReactiveFormsModule,
-    DatePipe,
-  ],
+  imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './security-settings.component.html',
   styleUrl: './security-settings.component.scss',
 })
 export class SecuritySettingsComponent {
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
-  private readonly _router: Router = inject(Router);
   private readonly _accountSecurityService: AccountSecurityService =
     inject(AccountSecurityService);
   private readonly _authService: AuthService =
@@ -87,17 +94,7 @@ export class SecuritySettingsComponent {
     signal<boolean>(false);
   public readonly isAddingPasskey: WritableSignal<boolean> =
     signal<boolean>(false);
-  public readonly deletingPasskeyId: WritableSignal<
-    string | undefined
-  > = signal<string | undefined>(undefined);
-  public readonly isRevokingOthers: WritableSignal<boolean> =
-    signal<boolean>(false);
-  public readonly isRevokingAll: WritableSignal<boolean> =
-    signal<boolean>(false);
   public readonly linkingProviderId: WritableSignal<
-    ProviderId | undefined
-  > = signal<ProviderId | undefined>(undefined);
-  public readonly unlinkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
 
@@ -363,79 +360,6 @@ export class SecuritySettingsComponent {
       });
   }
 
-  public deletePasskey(passkeyId: string): void {
-    this.deletingPasskeyId.set(passkeyId);
-    this._accountSecurityService
-      .deletePasskey(passkeyId)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.deletingPasskeyId.set(undefined);
-          this._toast.success('Passkey removed.');
-          this._loadPasskeys();
-        },
-        error: (error: unknown): void => {
-          this.deletingPasskeyId.set(undefined);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to delete passkey.',
-            ),
-          );
-        },
-      });
-  }
-
-  public revokeOtherSessions(): void {
-    this.isRevokingOthers.set(true);
-    this._accountSecurityService
-      .revokeOtherSessions()
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isRevokingOthers.set(false);
-          this._toast.success(
-            'Other sessions revoked.',
-          );
-          this._loadSessions();
-        },
-        error: (error: unknown): void => {
-          this.isRevokingOthers.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to revoke other sessions.',
-            ),
-          );
-        },
-      });
-  }
-
-  public revokeAllSessions(): void {
-    this.isRevokingAll.set(true);
-    this._accountSecurityService
-      .revokeAllSessions()
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isRevokingAll.set(false);
-          this._toast.success(
-            'All sessions revoked. Redirecting to sign in...',
-          );
-          this._router.navigate(['/redirect-to-sign-in']);
-        },
-        error: (error: unknown): void => {
-          this.isRevokingAll.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to revoke all sessions.',
-            ),
-          );
-        },
-      });
-  }
-
   public connectProvider(provider: ProviderId): void {
     if (provider === 'credential') {
       this.requestCredentialSetup();
@@ -465,119 +389,90 @@ export class SecuritySettingsComponent {
       });
   }
 
-  public disconnectProvider(provider: ProviderId): void {
-    if (provider === 'credential') return;
-
-    this.unlinkingProviderId.set(provider);
-    this._accountSecurityService
-      .unlinkAccount(provider)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.unlinkingProviderId.set(undefined);
-          this._toast.success(
-            `${provider} account disconnected.`,
-          );
-          this._loadAccounts();
-        },
-        error: (error: unknown): void => {
-          this.unlinkingProviderId.set(undefined);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              `Unable to disconnect ${provider}.`,
-            ),
-          );
-        },
-      });
-  }
-
   public requestDeletePasskey(passkeyId: string): void {
-    this._openConfirm(
-      {
-        title: 'Delete this passkey?',
-        message:
-          'The selected passkey will be removed from your account.',
-        confirmLabel: 'Delete Passkey',
-        tone: 'danger',
-      },
-      (): void => {
-        this.deletePasskey(passkeyId);
-      },
-    );
+    this._dialogService
+      .open<
+        DeletePasskeyDialogResult,
+        { passkeyId: string },
+        DeletePasskeyDialogComponent
+      >(DeletePasskeyDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+        data: { passkeyId: passkeyId },
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: DeletePasskeyDialogResult | undefined,
+        ): void => {
+          if (result?.deleted) {
+            this._loadPasskeys();
+          }
+        },
+      );
   }
 
   public requestRevokeOtherSessions(): void {
-    this._openConfirm(
-      {
-        title: 'Revoke other sessions?',
-        message:
-          'All sessions except the current one will be terminated.',
-        confirmLabel: 'Revoke Others',
-        tone: 'danger',
-      },
-      (): void => {
-        this.revokeOtherSessions();
-      },
-    );
+    this._dialogService
+      .open<
+        RevokeOtherSessionsDialogResult,
+        unknown,
+        RevokeOtherSessionsDialogComponent
+      >(RevokeOtherSessionsDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(
+        (
+          result: RevokeOtherSessionsDialogResult | undefined,
+        ): void => {
+          if (result?.revoked) {
+            this._loadSessions();
+          }
+        },
+      );
   }
 
   public requestRevokeAllSessions(): void {
-    this._openConfirm(
-      {
-        title: 'Revoke all sessions?',
-        message:
-          'You will be signed out and redirected to sign in again.',
-        confirmLabel: 'Revoke All',
-        tone: 'danger',
-      },
-      (): void => {
-        this.revokeAllSessions();
-      },
-    );
+    this._dialogService
+      .open<
+        RevokeAllSessionsDialogResult,
+        unknown,
+        RevokeAllSessionsDialogComponent
+      >(RevokeAllSessionsDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+      })
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe();
   }
 
   public requestDisconnectProvider(provider: ProviderId): void {
     if (provider === 'credential') return;
 
-    this._openConfirm(
-      {
-        title: `Disconnect ${provider}?`,
-        message:
-          'This social account will no longer be linked.',
-        confirmLabel: 'Disconnect',
-        tone: 'danger',
-      },
-      (): void => {
-        this.disconnectProvider(provider);
-      },
-    );
-  }
-
-  private _openConfirm(
-    config: {
-      title: string;
-      message: string;
-      confirmLabel: string;
-      tone: ConfirmDialogTone;
-    },
-    onConfirm: () => void,
-  ): void {
     this._dialogService
-      .open<boolean, unknown, ConfirmDialogComponent>(
-        ConfirmDialogComponent,
-        {
-          width: 'min(100vw - 2rem, 36rem)',
-          maxWidth: '36rem',
-          data: config,
+      .open<
+        DisconnectProviderDialogResult,
+        { provider: 'google' | 'discord' },
+        DisconnectProviderDialogComponent
+      >(DisconnectProviderDialogComponent, {
+        width: 'min(100vw - 2rem, 36rem)',
+        maxWidth: '36rem',
+        data: {
+          provider: provider,
         },
-      )
+      })
       .closed.pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((confirmed: boolean | undefined): void => {
-        if (confirmed) {
-          onConfirm();
-        }
-      });
+      .subscribe(
+        (
+          result: DisconnectProviderDialogResult | undefined,
+        ): void => {
+          if (result?.disconnected) {
+            this._loadAccounts();
+          }
+        },
+      );
   }
 
   private _loadAccounts(): void {
@@ -610,9 +505,7 @@ export class SecuritySettingsComponent {
               secondPasskey: Passkey,
             ): number => {
               return (
-                new Date(
-                  secondPasskey.createdAt,
-                ).getTime() -
+                new Date(secondPasskey.createdAt).getTime() -
                 new Date(firstPasskey.createdAt).getTime()
               );
             },

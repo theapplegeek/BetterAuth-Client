@@ -1,0 +1,43 @@
+<div class="app-modal-panel max-w-xl">
+  <div class="space-y-4">
+    <div class="app-modal-header">
+      <h3 class="app-modal-title">
+        Revoke other sessions?
+      </h3>
+      <button
+        class="app-modal-close"
+        type="button"
+        aria-label="Close dialog"
+        (click)="onClose()"
+      >
+        <span class="icon-[heroicons--x-mark] size-5"></span>
+      </button>
+    </div>
+
+    <p class="text-sm text-slate-200/90">
+      All sessions except the current one will be terminated.
+    </p>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <button
+        class="app-btn-secondary"
+        type="button"
+        (click)="onClose()"
+      >
+        Cancel
+        <span class="app-kbd">ESC</span>
+      </button>
+      <button
+        class="app-btn-danger"
+        type="button"
+        [disabled]="isSaving()"
+        (click)="confirmRevoke()"
+      >
+        {{ isSaving() ? 'Revoking...' : 'Revoke Others' }}
+        @if (!isSaving()) {
+          <span class="app-kbd">ENTER</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>
