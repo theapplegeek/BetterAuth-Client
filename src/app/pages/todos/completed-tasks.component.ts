@@ -1,16 +1,21 @@
 import {
   Component,
   computed,
+  DestroyRef,
   inject,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppDialogService } from '../../common/services/app-dialog.service';
-import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import {
   TodoItem,
   TodoPriority,
   TodoService,
 } from '../../common/todo/todo.service';
+import {
+  ClearCompletedDialogComponent,
+  ClearCompletedDialogResult,
+} from './dialogs/clear-completed-dialog/clear-completed-dialog.component';
 
 @Component({
   selector: 'app-completed-tasks',
@@ -19,6 +24,8 @@ import {
   styleUrl: './completed-tasks.component.scss',
 })
 export class CompletedTasksComponent {
+  private readonly _destroyRef: DestroyRef =
+    inject(DestroyRef);
   private readonly _todoService: TodoService =
     inject(TodoService);
   private readonly _dialogService: AppDialogService =
@@ -43,31 +50,22 @@ export class CompletedTasksComponent {
 
   public openClearCompletedDialog(): void {
     this._dialogService
-      .open<boolean, unknown, ConfirmDialogComponent>(
-        ConfirmDialogComponent,
+      .open<
+        ClearCompletedDialogResult,
+        { completedCount: number },
+        ClearCompletedDialogComponent
+      >(
+        ClearCompletedDialogComponent,
         {
           width: 'min(100vw - 2rem, 36rem)',
           maxWidth: '36rem',
           data: {
-            title: 'Delete all completed tasks?',
-            message:
-              'All completed tasks will be permanently removed.',
-            confirmLabel: 'Clear Completed',
-            tone: 'danger',
+            completedCount: this.completedTasks().length,
           },
         },
-      )
-      .closed.subscribe(
-        (confirmed: boolean | undefined): void => {
-          if (confirmed) {
-            this.clearCompleted();
-          }
-        },
-      );
-  }
-
-  public clearCompleted(): void {
-    this._todoService.clearCompleted();
+      ).closed
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe();
   }
 
   public priorityClass(priority: TodoPriority): string {
