@@ -9,6 +9,7 @@ import {
 import {
   RouterLink,
   RouterLinkActive,
+  Router,
   RouterOutlet,
 } from '@angular/router';
 import { NavItem } from './models/sidebar-item.type';
@@ -31,6 +32,7 @@ import { UserService } from '../../common/user/user.service';
 export class SidebarComponent {
   private readonly _userService: UserService =
     inject(UserService);
+  private readonly _router: Router = inject(Router);
 
   public sidebarVisible: WritableSignal<boolean> =
     signal(false);
@@ -43,6 +45,7 @@ export class SidebarComponent {
       label: 'Dashboard',
       icon: 'icon-[heroicons--squares-2x2]',
       route: '/home',
+      exact: true,
     },
     {
       id: 'todos',
@@ -50,6 +53,7 @@ export class SidebarComponent {
       label: 'My Tasks',
       icon: 'icon-[heroicons--check-badge]',
       route: '/todos',
+      exact: true,
     },
     {
       id: 'completed',
@@ -57,6 +61,7 @@ export class SidebarComponent {
       label: 'Completed',
       icon: 'icon-[heroicons--archive-box]',
       route: '/todos/completed',
+      exact: true,
     },
     {
       id: 'settings',
@@ -78,6 +83,7 @@ export class SidebarComponent {
           label: 'Users',
           icon: 'icon-[heroicons--users]',
           route: '/admin/users',
+          exact: true,
           roles: ['admin'],
         },
         {
@@ -85,6 +91,7 @@ export class SidebarComponent {
           label: 'Roles',
           icon: 'icon-[heroicons--lock-open]',
           route: '/admin/roles',
+          exact: true,
           roles: ['admin'],
         },
         {
@@ -92,6 +99,7 @@ export class SidebarComponent {
           label: 'Permissions',
           icon: 'icon-[heroicons--key]',
           route: '/admin/permissions',
+          exact: true,
           roles: ['admin'],
         },
       ],
@@ -146,7 +154,36 @@ export class SidebarComponent {
   }
 
   public isGroupOpen(label: string): boolean {
-    return this.openGroups()[label];
+    return this.openGroups()[label] ?? false;
+  }
+
+  public isRouteActive(
+    route: string | undefined,
+    exact = false,
+  ): boolean {
+    if (!route) return false;
+
+    if (exact) {
+      return this._router.url === route;
+    }
+
+    return (
+      this._router.url === route ||
+      this._router.url.startsWith(`${route}/`)
+    );
+  }
+
+  public isGroupActive(item: NavItem): boolean {
+    if (item.type !== 'group') return false;
+
+    return (
+      item.children?.some((child) =>
+        this.isRouteActive(
+          child.route,
+          child.exact ?? true,
+        ),
+      ) ?? false
+    );
   }
 
   private _canAccess(requiredRoles?: string[]): boolean {

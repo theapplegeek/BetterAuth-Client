@@ -87,8 +87,11 @@
                   @if (item.type === 'link') {
                     <li>
                       <a
-                        class="group gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex"
+                        class="group gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex cursor-pointer"
                         routerLinkActive="bg-primary-600 text-white hover:!bg-primary-500"
+                        [routerLinkActiveOptions]="{
+                          exact: item.exact ?? false,
+                        }"
                         [routerLink]="item.route"
                         (click)="closeSidebar()"
                       >
@@ -111,10 +114,10 @@
                   @if (item.type === 'group') {
                     <li>
                       <button
-                        class="group rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex w-full items-center justify-between"
+                        class="group rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white flex w-full cursor-pointer items-center justify-between"
                         type="button"
-                        routerLinkActive="!text-white"
-                        [routerLink]="item.route"
+                        [class.text-white]="isGroupActive(item)"
+                        [class.bg-gray-800]="isGroupActive(item)"
                         (click)="toggleGroup(item.id)"
                       >
                         <span
@@ -171,8 +174,12 @@
                               track child.id) {
                               <li>
                                 <a
-                                  class="rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white block"
+                                  class="rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white block cursor-pointer"
                                   routerLinkActive="bg-primary-600 text-white hover:!bg-primary-500"
+                                  [routerLinkActiveOptions]="{
+                                    exact:
+                                      child.exact ?? true,
+                                  }"
                                   [routerLink]="child.route"
                                   (click)="closeSidebar()"
                                 >
@@ -207,7 +214,7 @@
   <!-- =======================================================
     CONTENT COLUMN
   ======================================================== -->
-  <div class="min-w-0">
+  <div class="min-w-0 h-screen flex flex-col">
     <header
       class="top-0 h-16 gap-x-4 border-gray-900/5 dark:border-white/5 bg-white dark:bg-gray-900 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8 sticky z-30 flex shrink-0 items-center border-b"
     >
@@ -272,8 +279,8 @@
       </div>
     </header>
 
-    <main>
-      <div class="p-4 sm:p-6 lg:p-8">
+    <main class="flex-1 min-h-0">
+      <div class="p-4 sm:p-6 lg:p-8 h-full">
         <router-outlet></router-outlet>
       </div>
     </main>
