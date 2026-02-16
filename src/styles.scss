@@ -85,6 +85,41 @@
   --color-success-900: hsl(142, 70%, 18%);
 }
 
+@layer base {
+  a,
+  button,
+  summary,
+  [role='button'],
+  label[for],
+  input[type='checkbox'],
+  input[type='radio'],
+  select {
+    @apply cursor-pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    @apply cursor-not-allowed;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+  select,
+  textarea {
+    @apply rounded-lg border border-secondary-300 bg-white px-3 py-2 text-sm text-secondary-900 transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none dark:border-secondary-700 dark:bg-secondary-900 dark:text-white;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    @apply size-4 border border-secondary-300 text-primary-600 accent-primary-600 focus:ring-2 focus:ring-primary-500/35 focus:outline-none dark:border-secondary-600;
+  }
+
+  button {
+    @apply transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/35 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900;
+  }
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
