@@ -124,7 +124,7 @@
   .app-admin-surface input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
   .app-admin-surface select,
   .app-admin-surface textarea {
-    @apply !w-full !rounded-lg !border !border-gray-300 !bg-white !px-4 !py-3 !text-sm !text-gray-900 !placeholder-gray-500 transition !focus:border-transparent !focus:ring-2 !focus:ring-primary-500 !focus:outline-none !dark:border-gray-600 !dark:bg-gray-700 !dark:text-white !dark:placeholder-gray-400;
+    @apply w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-500 transition focus:border-transparent focus:ring-2 focus:ring-primary-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400;
   }
 
   .app-modal-overlay {
@@ -132,7 +132,13 @@
   }
 
   .app-modal-panel {
-    @apply hide-scrollbar w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-[#6a7194] bg-[#121b3d] p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    @apply w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-[#6a7194] bg-[#121b3d] p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .app-modal-panel::-webkit-scrollbar {
+    display: none;
   }
 
   .app-modal-header {
