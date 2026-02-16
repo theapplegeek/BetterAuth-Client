@@ -1,0 +1,56 @@
+<section
+  class="rounded-2xl border-gray-200/80 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900 relative h-full overflow-hidden border"
+>
+  <div
+    class="inset-0 pointer-events-none absolute bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.1),transparent_52%)]"
+  ></div>
+
+  <div class="p-4 sm:p-6 relative h-full overflow-y-auto">
+    <header class="mb-6">
+      <p
+        class="text-xs font-semibold tracking-[0.16em] text-success-700 uppercase dark:text-success-300"
+      >
+        Administration
+      </p>
+      <h1
+        class="mt-2 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl"
+      >
+        Admin Center
+      </h1>
+      <p
+        class="mt-2 text-sm text-gray-600 dark:text-gray-400"
+      >
+        Manage users, roles and permissions for this demo
+        environment.
+      </p>
+    </header>
+
+    <div class="mb-4 gap-2 flex flex-wrap">
+      @for (tab of tabs; track tab.id) {
+        <a
+          class="rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 border border-transparent transition-colors"
+          routerLinkActive="!border-primary-300 !bg-primary-100/70 !text-primary-700 dark:!border-primary-700 dark:!bg-primary-900/30 dark:!text-primary-300"
+          [routerLink]="tab.route"
+        >
+          {{ tab.label }}
+        </a>
+      }
+    </div>
+
+    <p
+      class="mb-5 text-xs text-gray-500 dark:text-gray-400"
+    >
+      @for (tab of tabs; track tab.id) {
+        <span class="mr-3"
+          >{{ tab.label }}: {{ tab.description }}</span
+        >
+      }
+    </p>
+
+    <section
+      class="rounded-xl border-gray-200/90 bg-white p-4 shadow-xs dark:border-white/10 dark:bg-gray-900/70 sm:p-6 border"
+    >
+      <router-outlet></router-outlet>
+    </section>
+  </div>
+</section>

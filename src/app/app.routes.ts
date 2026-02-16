@@ -3,6 +3,7 @@ import { LayoutsComponent } from './layouts/layouts.component';
 import { inject } from '@angular/core';
 import { authGuard } from './common/auth/guards/auth.guard';
 import { noAuthGuard } from './common/auth/guards/no-auth.guard';
+import { betterAuthAdminGuard } from './common/auth/guards/better-auth-admin.guard';
 
 export const routes: Routes = [
   {
@@ -91,6 +92,14 @@ export const routes: Routes = [
         path: 'settings',
         loadChildren: () =>
           import('./pages/settings/settings.routes').then(
+            (m) => m.routes,
+          ),
+      },
+      {
+        path: 'admin',
+        canActivate: [betterAuthAdminGuard],
+        loadChildren: () =>
+          import('./pages/admin/admin.routes').then(
             (m) => m.routes,
           ),
       },

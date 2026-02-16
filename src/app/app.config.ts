@@ -4,6 +4,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideEnvironmentInitializer,
 } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import {
   provideRouter,
   withComponentInputBinding,
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideEnvironmentInitializer(() =>
       inject(ThemeService),
     ),
+    provideHttpClient(),
     provideRouter(routes, withComponentInputBinding()),
   ],
 };
