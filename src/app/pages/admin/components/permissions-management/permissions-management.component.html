@@ -162,11 +162,11 @@
 
 @if (activeModal() !== 'none') {
   <div
-    class="inset-0 bg-black/50 p-4 fixed z-50 flex items-center justify-center"
+    class="app-modal-overlay"
     (click)="closeModal()"
   >
     <div
-      class="max-w-xl rounded-xl border-gray-200 bg-white p-5 shadow-xl dark:border-white/10 dark:bg-gray-900 max-h-[90vh] w-full overflow-y-auto border"
+      class="app-modal-panel max-w-xl"
       (click)="$event.stopPropagation()"
     >
       @if (
@@ -178,15 +178,25 @@
           [formGroup]="permissionForm"
           (ngSubmit)="savePermission()"
         >
-          <h3
-            class="text-lg font-semibold text-gray-900 dark:text-white"
-          >
-            {{
-              activeModal() === 'create'
-                ? 'Create Permission'
-                : 'Edit Permission'
-            }}
-          </h3>
+          <div class="app-modal-header">
+            <h3 class="app-modal-title">
+              {{
+                activeModal() === 'create'
+                  ? 'Create Permission'
+                  : 'Edit Permission'
+              }}
+            </h3>
+            <button
+              class="app-modal-close"
+              type="button"
+              aria-label="Close dialog"
+              (click)="closeModal()"
+            >
+              <span
+                class="icon-[heroicons--x-mark] size-5"
+              ></span>
+            </button>
+          </div>
           <div>
             <label
               class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 block"
@@ -225,14 +235,14 @@
           </div>
           <div class="gap-2 flex justify-end">
             <button
-              class="rounded-lg border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300 border"
+              class="app-btn-secondary"
               type="button"
               (click)="closeModal()"
             >
               Cancel
             </button>
             <button
-              class="rounded-lg px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-60"
+              class="app-btn-primary"
               type="submit"
               [disabled]="isSaving()"
             >
@@ -246,13 +256,23 @@
         activeModal() === 'delete' && selectedPermission()
       ) {
         <div class="space-y-4">
-          <h3
-            class="text-lg font-semibold text-gray-900 dark:text-white"
-          >
-            Delete permission "{{
-              selectedPermission()!.code
-            }}"?
-          </h3>
+          <div class="app-modal-header">
+            <h3 class="app-modal-title">
+              Delete permission "{{
+                selectedPermission()!.code
+              }}"?
+            </h3>
+            <button
+              class="app-modal-close"
+              type="button"
+              aria-label="Close dialog"
+              (click)="closeModal()"
+            >
+              <span
+                class="icon-[heroicons--x-mark] size-5"
+              ></span>
+            </button>
+          </div>
           <p
             class="text-sm text-gray-600 dark:text-gray-400"
           >
@@ -260,14 +280,14 @@
           </p>
           <div class="gap-2 flex justify-end">
             <button
-              class="rounded-lg border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300 border"
+              class="app-btn-secondary"
               type="button"
               (click)="closeModal()"
             >
               Cancel
             </button>
             <button
-              class="rounded-lg px-4 py-2 text-sm font-semibold text-white bg-error-600 hover:bg-error-700 disabled:opacity-60"
+              class="app-btn-danger"
               type="button"
               [disabled]="isDeleting()"
               (click)="deletePermission()"
