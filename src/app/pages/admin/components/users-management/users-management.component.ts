@@ -34,6 +34,7 @@ type UserModal =
   | 'edit'
   | 'password'
   | 'ban'
+  | 'impersonate'
   | 'sessions'
   | 'delete';
 type UserSortColumn = 'name' | 'email' | 'role';
@@ -363,6 +364,19 @@ export class UsersManagementComponent {
     this.activeModal.set('delete');
   }
 
+  public openImpersonateModal(user: AdminUser): void {
+    this.closeActionMenu();
+    if (user.banned) {
+      this._toast.warning(
+        'Cannot impersonate a banned user.',
+      );
+      return;
+    }
+
+    this.selectedUser.set(user);
+    this.activeModal.set('impersonate');
+  }
+
   public closeModal(): void {
     this.activeModal.set('none');
     this.sessions.set([]);
@@ -622,27 +636,19 @@ export class UsersManagementComponent {
       });
   }
 
-  public impersonateUser(user: AdminUser): void {
-    this.closeActionMenu();
-    if (user.banned) {
-      this._toast.warning(
-        'Cannot impersonate a banned user.',
-      );
-      return;
-    }
-
-    const shouldImpersonate: boolean = window.confirm(
-      `Impersonate ${user.name}?`,
-    );
-    if (!shouldImpersonate) return;
+  public confirmImpersonation(): void {
+    const selectedUser: AdminUser | undefined =
+      this.selectedUser();
+    if (!selectedUser) return;
 
     this.isImpersonatingUser.set(true);
     this._adminService
-      .impersonateUser(user.id)
+      .impersonateUser(selectedUser.id)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (): void => {
           this.isImpersonatingUser.set(false);
+          this.closeModal();
           this._authService
             .getJwtToken()
             .pipe(takeUntilDestroyed(this._destroyRef))
