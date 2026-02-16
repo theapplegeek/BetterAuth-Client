@@ -128,7 +128,7 @@
   }
 
   .app-modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-[#020817]/75 p-4 backdrop-blur-[3px];
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-gray-900/55 p-4 backdrop-blur-[2px] dark:bg-black/65;
   }
 
   .app-modal-panel {
