@@ -145,7 +145,7 @@
   }
 
   .app-modal-panel {
-    @apply w-full max-h-[90vh] overflow-y-auto rounded-3xl border p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    @apply mx-auto w-full max-h-[90vh] overflow-y-auto rounded-3xl border p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
     border-color: rgba(148, 163, 184, 0.3) !important;
     background: rgba(30, 41, 59, 0.92) !important;
     -ms-overflow-style: none;
@@ -176,6 +176,12 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
+  }
+
+  .app-cdk-dialog-panel .cdk-dialog-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   .app-modal-header {
