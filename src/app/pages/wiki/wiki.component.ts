@@ -1,5 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import {
   TodoItem,
   TodoPriority,
@@ -8,13 +15,15 @@ import {
 
 @Component({
   selector: 'app-wiki',
-  imports: [DatePipe],
+  imports: [DatePipe, ConfirmDialogComponent],
   templateUrl: './wiki.component.html',
   styleUrl: './wiki.component.scss',
 })
 export class WikiComponent {
   private readonly _todoService: TodoService =
     inject(TodoService);
+  public readonly isClearDialogOpen: WritableSignal<boolean> =
+    signal<boolean>(false);
 
   public readonly completedTasks = computed(
     (): TodoItem[] =>
@@ -33,11 +42,16 @@ export class WikiComponent {
     this._todoService.deleteTask(taskId);
   }
 
+  public openClearCompletedDialog(): void {
+    this.isClearDialogOpen.set(true);
+  }
+
+  public closeClearCompletedDialog(): void {
+    this.isClearDialogOpen.set(false);
+  }
+
   public clearCompleted(): void {
-    const shouldClear: boolean = window.confirm(
-      'Delete all completed tasks?',
-    );
-    if (!shouldClear) return;
+    this.isClearDialogOpen.set(false);
     this._todoService.clearCompleted();
   }
 

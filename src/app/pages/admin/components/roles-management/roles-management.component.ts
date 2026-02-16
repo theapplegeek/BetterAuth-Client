@@ -13,6 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { ToastService } from '../../../../common/services/toast.service';
 import {
@@ -142,6 +143,11 @@ export class RolesManagementComponent {
 
   constructor() {
     this.loadData();
+    fromEvent<KeyboardEvent>(document, 'keydown')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((event: KeyboardEvent): void => {
+        this._handleGlobalModalKeydown(event);
+      });
   }
 
   public loadData(): void {
@@ -234,7 +240,11 @@ export class RolesManagementComponent {
     this.activeModal.set('none');
   }
 
-  public onModalKeydown(event: KeyboardEvent): void {
+  private _handleGlobalModalKeydown(
+    event: KeyboardEvent,
+  ): void {
+    if (this.activeModal() === 'none') return;
+
     if (event.key === 'Escape') {
       event.preventDefault();
       this.closeModal();

@@ -22,7 +22,7 @@
         <button
           class="rounded-lg px-4 py-2 text-xs font-semibold text-white bg-error-600 transition-colors hover:bg-error-700"
           type="button"
-          (click)="clearCompleted()"
+          (click)="openClearCompletedDialog()"
         >
           Clear Completed
         </button>
@@ -94,3 +94,13 @@
     </div>
   </section>
 </section>
+
+<app-confirm-dialog
+  [open]="isClearDialogOpen()"
+  title="Delete all completed tasks?"
+  message="All completed tasks will be permanently removed."
+  confirmLabel="Clear Completed"
+  tone="danger"
+  (cancel)="closeClearCompletedDialog()"
+  (confirm)="clearCompleted()"
+></app-confirm-dialog>

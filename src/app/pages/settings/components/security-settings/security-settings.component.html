@@ -275,7 +275,7 @@
               [disabled]="
                 deletingPasskeyId() === passkey.id
               "
-              (click)="deletePasskey(passkey.id)"
+              (click)="requestDeletePasskey(passkey.id)"
             >
               {{
                 deletingPasskeyId() === passkey.id
@@ -318,7 +318,7 @@
             class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-warning-600 transition-colors hover:bg-warning-700 disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
             [disabled]="isRevokingOthers()"
-            (click)="revokeOtherSessions()"
+            (click)="requestRevokeOtherSessions()"
           >
             {{
               isRevokingOthers()
@@ -330,7 +330,7 @@
             class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-error-600 transition-colors hover:bg-error-700 disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
             [disabled]="isRevokingAll()"
-            (click)="revokeAllSessions()"
+            (click)="requestRevokeAllSessions()"
           >
             {{
               isRevokingAll() ? 'Revoking...' : 'Revoke All'
@@ -442,7 +442,9 @@
                     provider.provider
                   "
                   (click)="
-                    disconnectProvider(provider.provider)
+                    requestDisconnectProvider(
+                      provider.provider
+                    )
                   "
                 >
                   {{
@@ -490,3 +492,13 @@
     </section>
   }
 </div>
+
+<app-confirm-dialog
+  [open]="confirmDialog() !== undefined"
+  [title]="confirmDialog()?.title ?? ''"
+  [message]="confirmDialog()?.message ?? ''"
+  [confirmLabel]="confirmDialog()?.confirmLabel ?? 'Confirm'"
+  [tone]="confirmDialog()?.tone ?? 'danger'"
+  (cancel)="closeConfirmDialog()"
+  (confirm)="confirmDialogAction()"
+></app-confirm-dialog>

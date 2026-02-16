@@ -15,8 +15,10 @@ import {
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { AuthService } from '../../../../common/auth/auth.service';
+import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../../../common/services/toast.service';
 import {
   AdminRole,
@@ -38,10 +40,23 @@ type UserModal =
   | 'sessions'
   | 'delete';
 type UserSortColumn = 'name' | 'email' | 'role';
+type UserConfirmDialog = {
+  action: 'unban' | 'revoke-session' | 'revoke-all-sessions';
+  title: string;
+  message: string;
+  confirmLabel: string;
+  tone: 'primary' | 'danger';
+  userId?: string;
+  sessionToken?: string;
+};
 
 @Component({
   selector: 'app-users-management',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [
+    ReactiveFormsModule,
+    DatePipe,
+    ConfirmDialogComponent,
+  ],
   templateUrl: './users-management.component.html',
   styleUrl: './users-management.component.scss',
 })
@@ -72,6 +87,9 @@ export class UsersManagementComponent {
   public readonly openActionMenuUserId: WritableSignal<
     string | undefined
   > = signal<string | undefined>(undefined);
+  public readonly confirmDialog: WritableSignal<
+    UserConfirmDialog | undefined
+  > = signal<UserConfirmDialog | undefined>(undefined);
   public readonly activeModal: WritableSignal<UserModal> =
     signal<UserModal>('none');
 
@@ -191,6 +209,11 @@ export class UsersManagementComponent {
 
   constructor() {
     this.loadInitialState();
+    fromEvent<KeyboardEvent>(document, 'keydown')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((event: KeyboardEvent): void => {
+        this._handleGlobalModalKeydown(event);
+      });
   }
 
   public loadInitialState(): void {
@@ -379,6 +402,7 @@ export class UsersManagementComponent {
 
   public closeModal(): void {
     this.activeModal.set('none');
+    this.confirmDialog.set(undefined);
     this.sessions.set([]);
     this.passwordForm.reset({
       newPassword: '',
@@ -387,35 +411,6 @@ export class UsersManagementComponent {
       reason: '',
       durationHours: 0,
     });
-  }
-
-  public onModalKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.closeModal();
-      return;
-    }
-
-    if (event.key !== 'Enter') return;
-    if (event.target instanceof HTMLTextAreaElement) {
-      return;
-    }
-
-    const activeModal = this.activeModal();
-    if (activeModal === 'detail') {
-      event.preventDefault();
-      this.closeModal();
-      return;
-    }
-    if (activeModal === 'delete') {
-      event.preventDefault();
-      this.deleteSelectedUser();
-      return;
-    }
-    if (activeModal === 'impersonate') {
-      event.preventDefault();
-      this.confirmImpersonation();
-    }
   }
 
   public toggleActionMenu(
@@ -431,6 +426,37 @@ export class UsersManagementComponent {
 
   public closeActionMenu(): void {
     this.openActionMenuUserId.set(undefined);
+  }
+
+  public closeConfirmDialog(): void {
+    this.confirmDialog.set(undefined);
+  }
+
+  public confirmDialogAction(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+
+    this.confirmDialog.set(undefined);
+
+    if (dialog.action === 'unban' && dialog.userId) {
+      this._executeUnban(dialog.userId);
+      return;
+    }
+
+    if (
+      dialog.action === 'revoke-session' &&
+      dialog.sessionToken
+    ) {
+      this._executeRevokeSession(dialog.sessionToken);
+      return;
+    }
+
+    if (
+      dialog.action === 'revoke-all-sessions' &&
+      dialog.userId
+    ) {
+      this._executeRevokeAllSessions(dialog.userId);
+    }
   }
 
   public toggleRoleSelection(
@@ -638,31 +664,15 @@ export class UsersManagementComponent {
 
   public unbanUser(user: AdminUser): void {
     this.closeActionMenu();
-    const shouldUnban: boolean = window.confirm(
-      `Unban ${user.name}?`,
-    );
-    if (!shouldUnban) return;
-
-    this.updatingBanUserId.set(user.id);
-    this._adminService
-      .unbanUser(user.id)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.updatingBanUserId.set(undefined);
-          this._toast.success('User unbanned.');
-          this.loadUsers();
-        },
-        error: (error: unknown): void => {
-          this.updatingBanUserId.set(undefined);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to unban user.',
-            ),
-          );
-        },
-      });
+    this.confirmDialog.set({
+      action: 'unban',
+      title: `Unban ${user.name}?`,
+      message:
+        'This user will regain access immediately.',
+      confirmLabel: 'Unban User',
+      tone: 'primary',
+      userId: user.id,
+    });
   }
 
   public confirmImpersonation(): void {
@@ -726,62 +736,32 @@ export class UsersManagementComponent {
   }
 
   public revokeSession(session: AdminUserSession): void {
-    const shouldRevoke: boolean = window.confirm(
-      'Revoke this session?',
-    );
-    if (!shouldRevoke) return;
-
     const sessionToken: string =
       session.token || session.id;
-    this.revokingSessionToken.set(sessionToken);
-    this._adminService
-      .revokeUserSession(sessionToken)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.revokingSessionToken.set(undefined);
-          this._loadSessionsForSelectedUser();
-        },
-        error: (error: unknown): void => {
-          this.revokingSessionToken.set(undefined);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to revoke session.',
-            ),
-          );
-        },
-      });
+    this.confirmDialog.set({
+      action: 'revoke-session',
+      title: 'Revoke this session?',
+      message:
+        'The selected device will be signed out.',
+      confirmLabel: 'Revoke Session',
+      tone: 'danger',
+      sessionToken: sessionToken,
+    });
   }
 
   public revokeAllSessions(): void {
     const selectedUser = this.selectedUser();
     if (!selectedUser) return;
 
-    const shouldRevokeAll: boolean = window.confirm(
-      'Revoke all sessions for this user?',
-    );
-    if (!shouldRevokeAll) return;
-
-    this.isRevokingAllSessions.set(true);
-    this._adminService
-      .revokeUserSessions(selectedUser.id)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe({
-        next: (): void => {
-          this.isRevokingAllSessions.set(false);
-          this._loadSessionsForSelectedUser();
-        },
-        error: (error: unknown): void => {
-          this.isRevokingAllSessions.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to revoke all user sessions.',
-            ),
-          );
-        },
-      });
+    this.confirmDialog.set({
+      action: 'revoke-all-sessions',
+      title: `Revoke all sessions for ${selectedUser.name}?`,
+      message:
+        'All active sessions for this user will be terminated.',
+      confirmLabel: 'Revoke All Sessions',
+      tone: 'danger',
+      userId: selectedUser.id,
+    });
   }
 
   public banStatusClass(user: AdminUser): string {
@@ -841,6 +821,113 @@ export class UsersManagementComponent {
           );
         },
       });
+  }
+
+  private _executeUnban(userId: string): void {
+    this.updatingBanUserId.set(userId);
+    this._adminService
+      .unbanUser(userId)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (): void => {
+          this.updatingBanUserId.set(undefined);
+          this._toast.success('User unbanned.');
+          this.loadUsers();
+        },
+        error: (error: unknown): void => {
+          this.updatingBanUserId.set(undefined);
+          this._toast.error(
+            this._extractErrorMessage(
+              error,
+              'Unable to unban user.',
+            ),
+          );
+        },
+      });
+  }
+
+  private _executeRevokeSession(
+    sessionToken: string,
+  ): void {
+    this.revokingSessionToken.set(sessionToken);
+    this._adminService
+      .revokeUserSession(sessionToken)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (): void => {
+          this.revokingSessionToken.set(undefined);
+          this._loadSessionsForSelectedUser();
+        },
+        error: (error: unknown): void => {
+          this.revokingSessionToken.set(undefined);
+          this._toast.error(
+            this._extractErrorMessage(
+              error,
+              'Unable to revoke session.',
+            ),
+          );
+        },
+      });
+  }
+
+  private _executeRevokeAllSessions(userId: string): void {
+    this.isRevokingAllSessions.set(true);
+    this._adminService
+      .revokeUserSessions(userId)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (): void => {
+          this.isRevokingAllSessions.set(false);
+          this._loadSessionsForSelectedUser();
+        },
+        error: (error: unknown): void => {
+          this.isRevokingAllSessions.set(false);
+          this._toast.error(
+            this._extractErrorMessage(
+              error,
+              'Unable to revoke all user sessions.',
+            ),
+          );
+        },
+      });
+  }
+
+  private _handleGlobalModalKeydown(
+    event: KeyboardEvent,
+  ): void {
+    if (this.activeModal() === 'none') return;
+    if (this.confirmDialog()) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+
+    if (
+      event.key !== 'Enter' ||
+      event.defaultPrevented ||
+      event.target instanceof HTMLTextAreaElement
+    ) {
+      return;
+    }
+
+    if (this.activeModal() === 'detail') {
+      event.preventDefault();
+      this.closeModal();
+      return;
+    }
+
+    if (this.activeModal() === 'delete') {
+      event.preventDefault();
+      this.deleteSelectedUser();
+      return;
+    }
+
+    if (this.activeModal() === 'impersonate') {
+      event.preventDefault();
+      this.confirmImpersonation();
+    }
   }
 
   private _resetUserForm(): void {

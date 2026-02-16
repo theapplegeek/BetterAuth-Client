@@ -145,8 +145,6 @@
 @if (activeModal() !== 'none') {
   <div
     class="app-modal-overlay"
-    tabindex="0"
-    (keydown)="onModalKeydown($event)"
     (click)="closeModal()"
   >
     <div

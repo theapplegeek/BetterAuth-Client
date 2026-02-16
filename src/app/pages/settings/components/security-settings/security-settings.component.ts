@@ -16,6 +16,7 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Passkey } from '@better-auth/passkey';
+import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog/confirm-dialog.component';
 import {
   AccountSecurityService,
   LinkedAccount,
@@ -35,10 +36,31 @@ type ProviderCard = {
   connected: boolean;
   canDisconnect: boolean;
 };
+type SecurityConfirmDialog = {
+  action:
+    | {
+        type: 'delete-passkey';
+        passkeyId: string;
+      }
+    | { type: 'revoke-other-sessions' }
+    | { type: 'revoke-all-sessions' }
+    | {
+        type: 'disconnect-provider';
+        provider: ProviderId;
+      };
+  title: string;
+  message: string;
+  confirmLabel: string;
+  tone: 'primary' | 'danger';
+};
 
 @Component({
   selector: 'app-security-settings',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [
+    ReactiveFormsModule,
+    DatePipe,
+    ConfirmDialogComponent,
+  ],
   templateUrl: './security-settings.component.html',
   styleUrl: './security-settings.component.scss',
 })
@@ -90,6 +112,9 @@ export class SecuritySettingsComponent {
   public readonly unlinkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
+  public readonly confirmDialog: WritableSignal<
+    SecurityConfirmDialog | undefined
+  > = signal<SecurityConfirmDialog | undefined>(undefined);
 
   public readonly passkeys: WritableSignal<Passkey[]> =
     signal<Passkey[]>([]);
@@ -354,11 +379,6 @@ export class SecuritySettingsComponent {
   }
 
   public deletePasskey(passkeyId: string): void {
-    const shouldDelete: boolean = window.confirm(
-      'Delete this passkey?',
-    );
-    if (!shouldDelete) return;
-
     this.deletingPasskeyId.set(passkeyId);
     this._accountSecurityService
       .deletePasskey(passkeyId)
@@ -382,11 +402,6 @@ export class SecuritySettingsComponent {
   }
 
   public revokeOtherSessions(): void {
-    const shouldRevoke: boolean = window.confirm(
-      'Revoke all sessions except the current one?',
-    );
-    if (!shouldRevoke) return;
-
     this.isRevokingOthers.set(true);
     this._accountSecurityService
       .revokeOtherSessions()
@@ -412,11 +427,6 @@ export class SecuritySettingsComponent {
   }
 
   public revokeAllSessions(): void {
-    const shouldRevoke: boolean = window.confirm(
-      'Revoke all sessions? You will need to sign in again.',
-    );
-    if (!shouldRevoke) return;
-
     this.isRevokingAll.set(true);
     this._accountSecurityService
       .revokeAllSessions()
@@ -473,11 +483,6 @@ export class SecuritySettingsComponent {
   public disconnectProvider(provider: ProviderId): void {
     if (provider === 'credential') return;
 
-    const shouldDisconnect: boolean = window.confirm(
-      `Disconnect ${provider} from your account?`,
-    );
-    if (!shouldDisconnect) return;
-
     this.unlinkingProviderId.set(provider);
     this._accountSecurityService
       .unlinkAccount(provider)
@@ -500,6 +505,87 @@ export class SecuritySettingsComponent {
           );
         },
       });
+  }
+
+  public requestDeletePasskey(passkeyId: string): void {
+    this.confirmDialog.set({
+      action: {
+        type: 'delete-passkey',
+        passkeyId: passkeyId,
+      },
+      title: 'Delete this passkey?',
+      message:
+        'The selected passkey will be removed from your account.',
+      confirmLabel: 'Delete Passkey',
+      tone: 'danger',
+    });
+  }
+
+  public requestRevokeOtherSessions(): void {
+    this.confirmDialog.set({
+      action: { type: 'revoke-other-sessions' },
+      title: 'Revoke other sessions?',
+      message:
+        'All sessions except the current one will be terminated.',
+      confirmLabel: 'Revoke Others',
+      tone: 'danger',
+    });
+  }
+
+  public requestRevokeAllSessions(): void {
+    this.confirmDialog.set({
+      action: { type: 'revoke-all-sessions' },
+      title: 'Revoke all sessions?',
+      message:
+        'You will be signed out and redirected to sign in again.',
+      confirmLabel: 'Revoke All',
+      tone: 'danger',
+    });
+  }
+
+  public requestDisconnectProvider(provider: ProviderId): void {
+    if (provider === 'credential') return;
+
+    this.confirmDialog.set({
+      action: {
+        type: 'disconnect-provider',
+        provider: provider,
+      },
+      title: `Disconnect ${provider}?`,
+      message:
+        'This social account will no longer be linked.',
+      confirmLabel: 'Disconnect',
+      tone: 'danger',
+    });
+  }
+
+  public closeConfirmDialog(): void {
+    this.confirmDialog.set(undefined);
+  }
+
+  public confirmDialogAction(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+
+    this.confirmDialog.set(undefined);
+    const action = dialog.action;
+
+    if (action.type === 'delete-passkey') {
+      this.deletePasskey(action.passkeyId);
+      return;
+    }
+
+    if (action.type === 'revoke-other-sessions') {
+      this.revokeOtherSessions();
+      return;
+    }
+
+    if (action.type === 'revoke-all-sessions') {
+      this.revokeAllSessions();
+      return;
+    }
+
+    this.disconnectProvider(action.provider);
   }
 
   private _loadAccounts(): void {
