@@ -6,6 +6,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
+import { DialogRef } from '@angular/cdk/dialog';
 import {
   FormControl,
   FormGroup,
@@ -18,8 +19,13 @@ import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
 import { AuthService } from '../../../../common/auth/auth.service';
-import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog/confirm-dialog.component';
+import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogTone,
+} from '../../../../dialogs/confirm-dialog/confirm-dialog.component';
+import { UsersManagementDialogComponent } from '../../../../dialogs/admin/users-management-dialog/users-management-dialog.component';
 import {
   AdminRole,
   AdminUser,
@@ -40,22 +46,12 @@ type UserModal =
   | 'sessions'
   | 'delete';
 type UserSortColumn = 'name' | 'email' | 'role';
-type UserConfirmDialog = {
-  action: 'unban' | 'revoke-session' | 'revoke-all-sessions';
-  title: string;
-  message: string;
-  confirmLabel: string;
-  tone: 'primary' | 'danger';
-  userId?: string;
-  sessionToken?: string;
-};
 
 @Component({
   selector: 'app-users-management',
   imports: [
     ReactiveFormsModule,
     DatePipe,
-    ConfirmDialogComponent,
   ],
   templateUrl: './users-management.component.html',
   styleUrl: './users-management.component.scss',
@@ -68,8 +64,13 @@ export class UsersManagementComponent {
   private readonly _authService: AuthService =
     inject(AuthService);
   private readonly _router: Router = inject(Router);
+  private readonly _dialogService: AppDialogService =
+    inject(AppDialogService);
   private readonly _toast: ToastService =
     inject(ToastService);
+  private _dialogRef:
+    | DialogRef<void, UsersManagementDialogComponent>
+    | undefined;
 
   public readonly users: WritableSignal<AdminUser[]> =
     signal<AdminUser[]>([]);
@@ -87,9 +88,6 @@ export class UsersManagementComponent {
   public readonly openActionMenuUserId: WritableSignal<
     string | undefined
   > = signal<string | undefined>(undefined);
-  public readonly confirmDialog: WritableSignal<
-    UserConfirmDialog | undefined
-  > = signal<UserConfirmDialog | undefined>(undefined);
   public readonly activeModal: WritableSignal<UserModal> =
     signal<UserModal>('none');
 
@@ -328,6 +326,7 @@ export class UsersManagementComponent {
     this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('detail');
+    this._openDialog();
   }
 
   public openCreate(): void {
@@ -335,6 +334,7 @@ export class UsersManagementComponent {
     this.selectedUser.set(undefined);
     this._resetUserForm();
     this.activeModal.set('create');
+    this._openDialog();
   }
 
   public openEdit(user: AdminUser): void {
@@ -353,6 +353,7 @@ export class UsersManagementComponent {
       user.roles.map((role: AdminRole): number => role.id),
     );
     this.activeModal.set('edit');
+    this._openDialog();
   }
 
   public openPasswordEditor(user: AdminUser): void {
@@ -362,6 +363,7 @@ export class UsersManagementComponent {
       newPassword: '',
     });
     this.activeModal.set('password');
+    this._openDialog();
   }
 
   public openBanModal(user: AdminUser): void {
@@ -372,12 +374,14 @@ export class UsersManagementComponent {
       durationHours: 0,
     });
     this.activeModal.set('ban');
+    this._openDialog();
   }
 
   public openSessions(user: AdminUser): void {
     this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('sessions');
+    this._openDialog();
     this._loadSessionsForSelectedUser();
   }
 
@@ -385,6 +389,7 @@ export class UsersManagementComponent {
     this.closeActionMenu();
     this.selectedUser.set(user);
     this.activeModal.set('delete');
+    this._openDialog();
   }
 
   public openImpersonateModal(user: AdminUser): void {
@@ -398,19 +403,16 @@ export class UsersManagementComponent {
 
     this.selectedUser.set(user);
     this.activeModal.set('impersonate');
+    this._openDialog();
   }
 
   public closeModal(): void {
-    this.activeModal.set('none');
-    this.confirmDialog.set(undefined);
-    this.sessions.set([]);
-    this.passwordForm.reset({
-      newPassword: '',
-    });
-    this.banForm.reset({
-      reason: '',
-      durationHours: 0,
-    });
+    this._resetModalState();
+    if (this._dialogRef) {
+      const dialogRef = this._dialogRef;
+      this._dialogRef = undefined;
+      dialogRef.close();
+    }
   }
 
   public toggleActionMenu(
@@ -426,37 +428,6 @@ export class UsersManagementComponent {
 
   public closeActionMenu(): void {
     this.openActionMenuUserId.set(undefined);
-  }
-
-  public closeConfirmDialog(): void {
-    this.confirmDialog.set(undefined);
-  }
-
-  public confirmDialogAction(): void {
-    const dialog = this.confirmDialog();
-    if (!dialog) return;
-
-    this.confirmDialog.set(undefined);
-
-    if (dialog.action === 'unban' && dialog.userId) {
-      this._executeUnban(dialog.userId);
-      return;
-    }
-
-    if (
-      dialog.action === 'revoke-session' &&
-      dialog.sessionToken
-    ) {
-      this._executeRevokeSession(dialog.sessionToken);
-      return;
-    }
-
-    if (
-      dialog.action === 'revoke-all-sessions' &&
-      dialog.userId
-    ) {
-      this._executeRevokeAllSessions(dialog.userId);
-    }
   }
 
   public toggleRoleSelection(
@@ -664,15 +635,18 @@ export class UsersManagementComponent {
 
   public unbanUser(user: AdminUser): void {
     this.closeActionMenu();
-    this.confirmDialog.set({
-      action: 'unban',
-      title: `Unban ${user.name}?`,
-      message:
-        'This user will regain access immediately.',
-      confirmLabel: 'Unban User',
-      tone: 'primary',
-      userId: user.id,
-    });
+    this._openConfirm(
+      {
+        title: `Unban ${user.name}?`,
+        message:
+          'This user will regain access immediately.',
+        confirmLabel: 'Unban User',
+        tone: 'primary',
+      },
+      (): void => {
+        this._executeUnban(user.id);
+      },
+    );
   }
 
   public confirmImpersonation(): void {
@@ -738,30 +712,36 @@ export class UsersManagementComponent {
   public revokeSession(session: AdminUserSession): void {
     const sessionToken: string =
       session.token || session.id;
-    this.confirmDialog.set({
-      action: 'revoke-session',
-      title: 'Revoke this session?',
-      message:
-        'The selected device will be signed out.',
-      confirmLabel: 'Revoke Session',
-      tone: 'danger',
-      sessionToken: sessionToken,
-    });
+    this._openConfirm(
+      {
+        title: 'Revoke this session?',
+        message:
+          'The selected device will be signed out.',
+        confirmLabel: 'Revoke Session',
+        tone: 'danger',
+      },
+      (): void => {
+        this._executeRevokeSession(sessionToken);
+      },
+    );
   }
 
   public revokeAllSessions(): void {
     const selectedUser = this.selectedUser();
     if (!selectedUser) return;
 
-    this.confirmDialog.set({
-      action: 'revoke-all-sessions',
-      title: `Revoke all sessions for ${selectedUser.name}?`,
-      message:
-        'All active sessions for this user will be terminated.',
-      confirmLabel: 'Revoke All Sessions',
-      tone: 'danger',
-      userId: selectedUser.id,
-    });
+    this._openConfirm(
+      {
+        title: `Revoke all sessions for ${selectedUser.name}?`,
+        message:
+          'All active sessions for this user will be terminated.',
+        confirmLabel: 'Revoke All Sessions',
+        tone: 'danger',
+      },
+      (): void => {
+        this._executeRevokeAllSessions(selectedUser.id);
+      },
+    );
   }
 
   public banStatusClass(user: AdminUser): string {
@@ -769,6 +749,65 @@ export class UsersManagementComponent {
       return 'bg-error-100 text-error-700 dark:bg-error-900/30 dark:text-error-300';
     }
     return 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300';
+  }
+
+  private _openConfirm(
+    config: {
+      title: string;
+      message: string;
+      confirmLabel: string;
+      tone: ConfirmDialogTone;
+    },
+    onConfirm: () => void,
+  ): void {
+    this._dialogService
+      .open<boolean, unknown, ConfirmDialogComponent>(
+        ConfirmDialogComponent,
+        {
+          width: 'min(100vw - 2rem, 36rem)',
+          maxWidth: '36rem',
+          data: config,
+        },
+      )
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((confirmed: boolean | undefined): void => {
+        if (confirmed) {
+          onConfirm();
+        }
+      });
+  }
+
+  private _openDialog(): void {
+    if (this._dialogRef) return;
+
+    this._dialogRef = this._dialogService.open<
+      void,
+      { host: UsersManagementComponent },
+      UsersManagementDialogComponent
+    >(UsersManagementDialogComponent, {
+      width: 'min(100vw - 2rem, 64rem)',
+      maxWidth: '64rem',
+      data: { host: this },
+    });
+
+    this._dialogRef.closed
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((): void => {
+        this._dialogRef = undefined;
+        this._resetModalState();
+      });
+  }
+
+  private _resetModalState(): void {
+    this.activeModal.set('none');
+    this.sessions.set([]);
+    this.passwordForm.reset({
+      newPassword: '',
+    });
+    this.banForm.reset({
+      reason: '',
+      durationHours: 0,
+    });
   }
 
   private _loadRoles(): void {
@@ -896,7 +935,6 @@ export class UsersManagementComponent {
     event: KeyboardEvent,
   ): void {
     if (this.activeModal() === 'none') return;
-    if (this.confirmDialog()) return;
 
     if (event.key === 'Escape') {
       event.preventDefault();

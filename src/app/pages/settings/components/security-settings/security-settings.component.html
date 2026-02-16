@@ -492,13 +492,3 @@
     </section>
   }
 </div>
-
-<app-confirm-dialog
-  [open]="confirmDialog() !== undefined"
-  [title]="confirmDialog()?.title ?? ''"
-  [message]="confirmDialog()?.message ?? ''"
-  [confirmLabel]="confirmDialog()?.confirmLabel ?? 'Confirm'"
-  [tone]="confirmDialog()?.tone ?? 'danger'"
-  (cancel)="closeConfirmDialog()"
-  (confirm)="confirmDialogAction()"
-></app-confirm-dialog>

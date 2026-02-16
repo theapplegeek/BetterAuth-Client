@@ -16,7 +16,6 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Passkey } from '@better-auth/passkey';
-import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog/confirm-dialog.component';
 import {
   AccountSecurityService,
   LinkedAccount,
@@ -24,7 +23,12 @@ import {
   UserSession,
 } from '../../../../common/auth/account-security.service';
 import { AuthService } from '../../../../common/auth/auth.service';
+import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogTone,
+} from '../../../../dialogs/confirm-dialog/confirm-dialog.component';
 import { User } from '../../../../common/user/models/user.type';
 import { UserService } from '../../../../common/user/user.service';
 
@@ -36,30 +40,12 @@ type ProviderCard = {
   connected: boolean;
   canDisconnect: boolean;
 };
-type SecurityConfirmDialog = {
-  action:
-    | {
-        type: 'delete-passkey';
-        passkeyId: string;
-      }
-    | { type: 'revoke-other-sessions' }
-    | { type: 'revoke-all-sessions' }
-    | {
-        type: 'disconnect-provider';
-        provider: ProviderId;
-      };
-  title: string;
-  message: string;
-  confirmLabel: string;
-  tone: 'primary' | 'danger';
-};
 
 @Component({
   selector: 'app-security-settings',
   imports: [
     ReactiveFormsModule,
     DatePipe,
-    ConfirmDialogComponent,
   ],
   templateUrl: './security-settings.component.html',
   styleUrl: './security-settings.component.scss',
@@ -74,6 +60,8 @@ export class SecuritySettingsComponent {
     inject(AuthService);
   private readonly _userService: UserService =
     inject(UserService);
+  private readonly _dialogService: AppDialogService =
+    inject(AppDialogService);
   private readonly _toast: ToastService =
     inject(ToastService);
 
@@ -112,9 +100,6 @@ export class SecuritySettingsComponent {
   public readonly unlinkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
-  public readonly confirmDialog: WritableSignal<
-    SecurityConfirmDialog | undefined
-  > = signal<SecurityConfirmDialog | undefined>(undefined);
 
   public readonly passkeys: WritableSignal<Passkey[]> =
     signal<Passkey[]>([]);
@@ -508,84 +493,91 @@ export class SecuritySettingsComponent {
   }
 
   public requestDeletePasskey(passkeyId: string): void {
-    this.confirmDialog.set({
-      action: {
-        type: 'delete-passkey',
-        passkeyId: passkeyId,
+    this._openConfirm(
+      {
+        title: 'Delete this passkey?',
+        message:
+          'The selected passkey will be removed from your account.',
+        confirmLabel: 'Delete Passkey',
+        tone: 'danger',
       },
-      title: 'Delete this passkey?',
-      message:
-        'The selected passkey will be removed from your account.',
-      confirmLabel: 'Delete Passkey',
-      tone: 'danger',
-    });
+      (): void => {
+        this.deletePasskey(passkeyId);
+      },
+    );
   }
 
   public requestRevokeOtherSessions(): void {
-    this.confirmDialog.set({
-      action: { type: 'revoke-other-sessions' },
-      title: 'Revoke other sessions?',
-      message:
-        'All sessions except the current one will be terminated.',
-      confirmLabel: 'Revoke Others',
-      tone: 'danger',
-    });
+    this._openConfirm(
+      {
+        title: 'Revoke other sessions?',
+        message:
+          'All sessions except the current one will be terminated.',
+        confirmLabel: 'Revoke Others',
+        tone: 'danger',
+      },
+      (): void => {
+        this.revokeOtherSessions();
+      },
+    );
   }
 
   public requestRevokeAllSessions(): void {
-    this.confirmDialog.set({
-      action: { type: 'revoke-all-sessions' },
-      title: 'Revoke all sessions?',
-      message:
-        'You will be signed out and redirected to sign in again.',
-      confirmLabel: 'Revoke All',
-      tone: 'danger',
-    });
+    this._openConfirm(
+      {
+        title: 'Revoke all sessions?',
+        message:
+          'You will be signed out and redirected to sign in again.',
+        confirmLabel: 'Revoke All',
+        tone: 'danger',
+      },
+      (): void => {
+        this.revokeAllSessions();
+      },
+    );
   }
 
   public requestDisconnectProvider(provider: ProviderId): void {
     if (provider === 'credential') return;
 
-    this.confirmDialog.set({
-      action: {
-        type: 'disconnect-provider',
-        provider: provider,
+    this._openConfirm(
+      {
+        title: `Disconnect ${provider}?`,
+        message:
+          'This social account will no longer be linked.',
+        confirmLabel: 'Disconnect',
+        tone: 'danger',
       },
-      title: `Disconnect ${provider}?`,
-      message:
-        'This social account will no longer be linked.',
-      confirmLabel: 'Disconnect',
-      tone: 'danger',
-    });
+      (): void => {
+        this.disconnectProvider(provider);
+      },
+    );
   }
 
-  public closeConfirmDialog(): void {
-    this.confirmDialog.set(undefined);
-  }
-
-  public confirmDialogAction(): void {
-    const dialog = this.confirmDialog();
-    if (!dialog) return;
-
-    this.confirmDialog.set(undefined);
-    const action = dialog.action;
-
-    if (action.type === 'delete-passkey') {
-      this.deletePasskey(action.passkeyId);
-      return;
-    }
-
-    if (action.type === 'revoke-other-sessions') {
-      this.revokeOtherSessions();
-      return;
-    }
-
-    if (action.type === 'revoke-all-sessions') {
-      this.revokeAllSessions();
-      return;
-    }
-
-    this.disconnectProvider(action.provider);
+  private _openConfirm(
+    config: {
+      title: string;
+      message: string;
+      confirmLabel: string;
+      tone: ConfirmDialogTone;
+    },
+    onConfirm: () => void,
+  ): void {
+    this._dialogService
+      .open<boolean, unknown, ConfirmDialogComponent>(
+        ConfirmDialogComponent,
+        {
+          width: 'min(100vw - 2rem, 36rem)',
+          maxWidth: '36rem',
+          data: config,
+        },
+      )
+      .closed.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((confirmed: boolean | undefined): void => {
+        if (confirmed) {
+          onConfirm();
+        }
+      });
   }
 
   private _loadAccounts(): void {

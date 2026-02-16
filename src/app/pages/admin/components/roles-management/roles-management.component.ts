@@ -6,6 +6,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
+import { DialogRef } from '@angular/cdk/dialog';
 import {
   FormControl,
   FormGroup,
@@ -15,7 +16,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 import { AdminService } from '../../../../common/admin/admin.service';
+import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
+import { RolesManagementDialogComponent } from '../../../../dialogs/admin/roles-management-dialog/roles-management-dialog.component';
 import {
   AdminPermission,
   AdminRole,
@@ -37,8 +40,13 @@ export class RolesManagementComponent {
     inject(DestroyRef);
   private readonly _adminService: AdminService =
     inject(AdminService);
+  private readonly _dialogService: AppDialogService =
+    inject(AppDialogService);
   private readonly _toast: ToastService =
     inject(ToastService);
+  private _dialogRef:
+    | DialogRef<void, RolesManagementDialogComponent>
+    | undefined;
 
   public readonly roles: WritableSignal<AdminRole[]> =
     signal<AdminRole[]>([]);
@@ -214,6 +222,7 @@ export class RolesManagementComponent {
     });
     this.selectedPermissionIds.set([]);
     this.activeModal.set('create');
+    this._openDialog();
   }
 
   public openEdit(role: AdminRole): void {
@@ -229,15 +238,43 @@ export class RolesManagementComponent {
       ) ?? [],
     );
     this.activeModal.set('edit');
+    this._openDialog();
   }
 
   public openDelete(role: AdminRole): void {
     this.selectedRole.set(role);
     this.activeModal.set('delete');
+    this._openDialog();
   }
 
   public closeModal(): void {
     this.activeModal.set('none');
+    if (this._dialogRef) {
+      const dialogRef = this._dialogRef;
+      this._dialogRef = undefined;
+      dialogRef.close();
+    }
+  }
+
+  private _openDialog(): void {
+    if (this._dialogRef) return;
+
+    this._dialogRef = this._dialogService.open<
+      void,
+      { host: RolesManagementComponent },
+      RolesManagementDialogComponent
+    >(RolesManagementDialogComponent, {
+      width: 'min(100vw - 2rem, 56rem)',
+      maxWidth: '56rem',
+      data: { host: this },
+    });
+
+    this._dialogRef.closed
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((): void => {
+        this._dialogRef = undefined;
+        this.activeModal.set('none');
+      });
   }
 
   private _handleGlobalModalKeydown(

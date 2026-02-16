@@ -94,13 +94,3 @@
     </div>
   </section>
 </section>
-
-<app-confirm-dialog
-  [open]="isClearDialogOpen()"
-  title="Delete all completed tasks?"
-  message="All completed tasks will be permanently removed."
-  confirmLabel="Clear Completed"
-  tone="danger"
-  (cancel)="closeClearCompletedDialog()"
-  (confirm)="clearCompleted()"
-></app-confirm-dialog>

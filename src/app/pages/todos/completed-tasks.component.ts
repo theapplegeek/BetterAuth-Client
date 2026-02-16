@@ -2,11 +2,10 @@ import {
   Component,
   computed,
   inject,
-  signal,
-  WritableSignal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
+import { AppDialogService } from '../../common/services/app-dialog.service';
+import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import {
   TodoItem,
   TodoPriority,
@@ -15,15 +14,15 @@ import {
 
 @Component({
   selector: 'app-completed-tasks',
-  imports: [DatePipe, ConfirmDialogComponent],
+  imports: [DatePipe],
   templateUrl: './completed-tasks.component.html',
   styleUrl: './completed-tasks.component.scss',
 })
 export class CompletedTasksComponent {
   private readonly _todoService: TodoService =
     inject(TodoService);
-  public readonly isClearDialogOpen: WritableSignal<boolean> =
-    signal<boolean>(false);
+  private readonly _dialogService: AppDialogService =
+    inject(AppDialogService);
 
   public readonly completedTasks = computed(
     (): TodoItem[] =>
@@ -43,15 +42,31 @@ export class CompletedTasksComponent {
   }
 
   public openClearCompletedDialog(): void {
-    this.isClearDialogOpen.set(true);
-  }
-
-  public closeClearCompletedDialog(): void {
-    this.isClearDialogOpen.set(false);
+    this._dialogService
+      .open<boolean, unknown, ConfirmDialogComponent>(
+        ConfirmDialogComponent,
+        {
+          width: 'min(100vw - 2rem, 36rem)',
+          maxWidth: '36rem',
+          data: {
+            title: 'Delete all completed tasks?',
+            message:
+              'All completed tasks will be permanently removed.',
+            confirmLabel: 'Clear Completed',
+            tone: 'danger',
+          },
+        },
+      )
+      .closed.subscribe(
+        (confirmed: boolean | undefined): void => {
+          if (confirmed) {
+            this.clearCompleted();
+          }
+        },
+      );
   }
 
   public clearCompleted(): void {
-    this.isClearDialogOpen.set(false);
     this._todoService.clearCompleted();
   }
 
