@@ -176,3 +176,13 @@ When working on admin/security-heavy Angular apps like this one, prefer:
 - centralized toast service for success/error/warning/info
 
 These patterns are strongly recommended as a baseline for future projects.
+
+## 14. Project Structure Conventions (Reusable)
+
+Use these conventions as default for Angular enterprise projects unless repo-specific rules override them:
+
+- Documentation must use project-relative paths (repo root based), never local machine absolute paths.
+- Keep feature-specific services inside the feature page domain (`src/app/pages/<feature>/...`), not in `common`.
+- Keep `common` only for truly cross-feature reusable utilities/services.
+- If a service performs HTTP requests with `HttpClient`, place it under a feature `http/` folder and name it with `HttpService` suffix (example: `admin-http.service.ts`, class `AdminHttpService`).
+- For pages with one root page component plus subviews (example: todos), keep only the main page component at `pages/<feature>/` root and move sub-components under `pages/<feature>/components/`.
