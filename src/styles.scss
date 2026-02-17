@@ -135,7 +135,7 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    background: rgba(15, 23, 42, 0.6) !important;
+    background: rgba(15, 23, 42, 0.5) !important;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
@@ -145,9 +145,9 @@
   }
 
   .app-modal-panel {
-    @apply mx-auto w-full max-h-[90vh] overflow-y-auto rounded-3xl border p-6 text-slate-100 shadow-[0_25px_75px_rgba(2,8,23,0.75)];
-    border-color: rgba(148, 163, 184, 0.3) !important;
-    background: rgba(30, 41, 59, 0.92) !important;
+    @apply mx-auto w-full max-h-[90vh] overflow-y-auto rounded-3xl border p-6 text-gray-900 dark:text-slate-100 shadow-[0_22px_60px_rgba(15,23,42,0.24)] dark:shadow-[0_25px_75px_rgba(2,8,23,0.75)];
+    border-color: rgba(148, 163, 184, 0.4) !important;
+    background: rgba(248, 250, 252, 0.96) !important;
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
@@ -162,7 +162,7 @@
   }
 
   .app-cdk-dialog-backdrop {
-    background: rgba(15, 23, 42, 0.6) !important;
+    background: rgba(15, 23, 42, 0.5) !important;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
@@ -189,15 +189,15 @@
   }
 
   .app-modal-title {
-    @apply text-2xl font-semibold text-slate-100;
+    @apply text-2xl font-semibold text-gray-900 dark:text-slate-100;
   }
 
   .app-modal-close {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-600 bg-gray-800 text-slate-100 transition hover:bg-gray-700;
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-secondary-300 bg-white text-secondary-700 transition hover:bg-secondary-100 dark:border-gray-600 dark:bg-gray-800 dark:text-slate-100 dark:hover:bg-gray-700;
   }
 
   .app-btn-secondary {
-    @apply inline-flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-800 px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:bg-gray-700;
+    @apply inline-flex items-center gap-2 rounded-xl border border-secondary-300 bg-white px-5 py-2.5 text-sm font-semibold text-secondary-700 transition hover:bg-secondary-100 dark:border-gray-600 dark:bg-gray-800 dark:text-slate-100 dark:hover:bg-gray-700;
   }
 
   .app-btn-primary {
@@ -209,7 +209,7 @@
   }
 
   .app-kbd {
-    @apply rounded-lg border border-white/15 bg-white/10 px-2 py-0.5 text-[11px] font-bold tracking-wide text-white/90;
+    @apply rounded-lg border border-secondary-300 bg-secondary-100 px-2 py-0.5 text-[11px] font-bold tracking-wide text-secondary-700 dark:border-white/15 dark:bg-white/10 dark:text-white/90;
   }
 
   .app-toast {
