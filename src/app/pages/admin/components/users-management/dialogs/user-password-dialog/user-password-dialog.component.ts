@@ -17,7 +17,7 @@ import {
 } from '@angular/cdk/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
-import { AdminService } from '../../../../../../common/admin/admin.service';
+import { AdminHttpService } from '../../../../http/admin-http.service';
 import { AdminUser } from '../../../../../../common/admin/models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
 
@@ -37,8 +37,8 @@ export type UserPasswordDialogResult = {
 export class UserPasswordDialogComponent {
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
-  private readonly _adminService: AdminService =
-    inject(AdminService);
+  private readonly _adminService: AdminHttpService =
+    inject(AdminHttpService);
   private readonly _toast: ToastService =
     inject(ToastService);
   private readonly _dialogRef: DialogRef<

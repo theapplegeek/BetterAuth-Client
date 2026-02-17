@@ -6,12 +6,12 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AppDialogService } from '../../common/services/app-dialog.service';
+import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import {
   TodoItem,
   TodoPriority,
   TodoService,
-} from '../../common/todo/todo.service';
+} from '../../services/todo.service';
 import {
   ClearCompletedDialogComponent,
   ClearCompletedDialogResult,

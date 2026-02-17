@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { from, map, Observable, tap } from 'rxjs';
-import { BetterAuthClientService } from './better-auth/better-auth-client.service';
+import { BetterAuthClientService } from '../../../common/auth/better-auth/better-auth-client.service';
 import { Session } from 'better-auth';
-import { User } from '../user/models/user.type';
-import { UserService } from '../user/user.service';
+import { User } from '../../../common/user/models/user.type';
+import { UserService } from '../../../common/user/user.service';
 import { Passkey } from '@better-auth/passkey';
 
 type BetterAuthError = {

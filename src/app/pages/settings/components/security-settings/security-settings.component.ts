@@ -20,7 +20,7 @@ import {
   LinkedAccount,
   SocialProvider,
   UserSession,
-} from '../../../../common/auth/account-security.service';
+} from '../../services/account-security.service';
 import { AuthService } from '../../../../common/auth/auth.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';

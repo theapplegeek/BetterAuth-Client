@@ -14,7 +14,7 @@ import {
 } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AccountSecurityService } from '../../../../common/auth/account-security.service';
+import { AccountSecurityService } from '../../services/account-security.service';
 import { ToastService } from '../../../../common/services/toast.service';
 import { UserService } from '../../../../common/user/user.service';
 import { User } from '../../../../common/user/models/user.type';

@@ -13,7 +13,7 @@ import {
 } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AdminService } from '../../../../common/admin/admin.service';
+import { AdminHttpService } from '../../http/admin-http.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
 import {
@@ -60,8 +60,8 @@ type UserSortColumn = 'name' | 'email' | 'role';
 export class UsersManagementComponent {
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
-  private readonly _adminService: AdminService =
-    inject(AdminService);
+  private readonly _adminService: AdminHttpService =
+    inject(AdminHttpService);
   private readonly _dialogService: AppDialogService =
     inject(AppDialogService);
   private readonly _toast: ToastService =

@@ -11,7 +11,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AdminService } from '../../../../common/admin/admin.service';
+import { AdminHttpService } from '../../http/admin-http.service';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
 import {
@@ -39,8 +39,8 @@ type RoleSortColumn = 'name' | 'description';
 export class RolesManagementComponent {
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
-  private readonly _adminService: AdminService =
-    inject(AdminService);
+  private readonly _adminService: AdminHttpService =
+    inject(AdminHttpService);
   private readonly _dialogService: AppDialogService =
     inject(AppDialogService);
   private readonly _toast: ToastService =

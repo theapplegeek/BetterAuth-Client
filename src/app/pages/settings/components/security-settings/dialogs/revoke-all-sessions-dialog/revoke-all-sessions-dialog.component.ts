@@ -9,7 +9,7 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
-import { AccountSecurityService } from '../../../../../../common/auth/account-security.service';
+import { AccountSecurityService } from '../../../../services/account-security.service';
 import { ToastService } from '../../../../../../common/services/toast.service';
 
 export type RevokeAllSessionsDialogResult = {

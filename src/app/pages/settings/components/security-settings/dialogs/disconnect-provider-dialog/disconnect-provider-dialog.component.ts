@@ -14,7 +14,7 @@ import { fromEvent } from 'rxjs';
 import {
   AccountSecurityService,
   SocialProvider,
-} from '../../../../../../common/auth/account-security.service';
+} from '../../../../services/account-security.service';
 import { ToastService } from '../../../../../../common/services/toast.service';
 
 export type DisconnectProviderDialogData = {

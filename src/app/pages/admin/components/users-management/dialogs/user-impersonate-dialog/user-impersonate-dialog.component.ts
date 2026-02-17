@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
-import { AdminService } from '../../../../../../common/admin/admin.service';
+import { AdminHttpService } from '../../../../http/admin-http.service';
 import { AuthService } from '../../../../../../common/auth/auth.service';
 import { AdminUser } from '../../../../../../common/admin/models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
@@ -32,8 +32,8 @@ export type UserImpersonateDialogResult = {
 export class UserImpersonateDialogComponent {
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
-  private readonly _adminService: AdminService =
-    inject(AdminService);
+  private readonly _adminService: AdminHttpService =
+    inject(AdminHttpService);
   private readonly _authService: AuthService =
     inject(AuthService);
   private readonly _router: Router = inject(Router);

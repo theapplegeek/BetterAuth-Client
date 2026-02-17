@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { from, map, Observable } from 'rxjs';
-import { BetterAuthClientService } from '../auth/better-auth/better-auth-client.service';
+import { BetterAuthClientService } from '../../../common/auth/better-auth/better-auth-client.service';
 import {
   AdminPermission,
   AdminRole,
@@ -12,7 +12,7 @@ import {
   PermissionUpsertPayload,
   RoleUpsertPayload,
   UserUpsertPayload,
-} from './models/admin.model';
+} from '../../../common/admin/models/admin.model';
 
 type BetterAuthError = {
   message?: string;
@@ -29,7 +29,7 @@ type BetterAuthResult<TData> = {
 @Injectable({
   providedIn: 'root',
 })
-export class AdminService {
+export class AdminHttpService {
   private readonly _http: HttpClient = inject(HttpClient);
   private readonly _authClient = inject(
     BetterAuthClientService,

@@ -10,7 +10,7 @@ import {
   TodoItem,
   TodoPriority,
   TodoService,
-} from '../../common/todo/todo.service';
+} from './services/todo.service';
 
 @Component({
   selector: 'app-my-tasks',

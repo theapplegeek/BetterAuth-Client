@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import {
   TodoItem,
   TodoService,
-} from '../../common/todo/todo.service';
+} from '../todos/services/todo.service';
 
 @Component({
   selector: 'app-home',

@@ -9,7 +9,7 @@ import {
 } from '@angular/cdk/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
-import { TodoService } from '../../../../common/todo/todo.service';
+import { TodoService } from '../../../../services/todo.service';
 
 export type ClearCompletedDialogData = {
   completedCount: number;
