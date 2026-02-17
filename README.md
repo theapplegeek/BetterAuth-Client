@@ -141,7 +141,7 @@ Component:
 
 Service:
 
-- `src/app/common/auth/account-security.service.ts`
+- `src/app/pages/settings/services/account-security.service.ts`
 
 ## 5.4 Admin Center
 
@@ -200,7 +200,7 @@ Persistence:
 
 Service:
 
-- `src/app/common/todo/todo.service.ts`
+- `src/app/pages/todos/services/todo.service.ts`
 
 ## 6. UI Infrastructure
 
@@ -224,7 +224,7 @@ Dialog folders examples:
 - `src/app/pages/admin/components/roles-management/dialogs/`
 - `src/app/pages/admin/components/permissions-management/dialogs/`
 - `src/app/pages/settings/components/security-settings/dialogs/`
-- `src/app/pages/todos/dialogs/`
+- `src/app/pages/todos/components/completed-tasks/dialogs/`
 
 ## 6.2 Toast System
 
@@ -415,8 +415,9 @@ Frontend:
 
 - `src/app/app.routes.ts`
 - `src/app/common/auth/auth.service.ts`
-- `src/app/common/auth/account-security.service.ts`
-- `src/app/common/admin/admin.service.ts`
+- `src/app/pages/settings/services/account-security.service.ts`
+- `src/app/pages/admin/http/admin.http.server.ts`
+- `src/app/pages/admin/models/admin.model.ts`
 - `src/app/common/services/app-dialog.service.ts`
 - `src/app/common/services/toast.service.ts`
 - `src/app/layouts/sidebar/sidebar.component.ts`
@@ -432,3 +433,9 @@ Backend:
 - `src/admin/service/*.ts`
 - `src/db/schema/auth-schema.ts`
 - `src/db/schema/rbac-schema.ts`
+
+## 15. Code Organization Conventions
+
+- Feature-specific services and models live under `src/app/pages/<feature>/...`.
+- `common` is reserved for truly shared cross-feature modules (example: user models).
+- Services using `HttpClient` live under `http/` and use file naming `<feature>.http.server.ts`.

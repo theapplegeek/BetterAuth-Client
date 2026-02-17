@@ -4,7 +4,7 @@ import {
   DIALOG_DATA,
   DialogRef,
 } from '@angular/cdk/dialog';
-import { AdminUser } from '../../../../../../common/admin/models/admin.model';
+import { AdminUser } from '../../../../models/admin.model';
 
 export type UserDetailDialogData = {
   user: AdminUser;

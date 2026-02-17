@@ -12,7 +12,7 @@ import {
   PermissionUpsertPayload,
   RoleUpsertPayload,
   UserUpsertPayload,
-} from '../../../common/admin/models/admin.model';
+} from '../models/admin.model';
 
 type BetterAuthError = {
   message?: string;

@@ -12,9 +12,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { fromEvent } from 'rxjs';
-import { AdminHttpService } from '../../../../http/admin-http.service';
+import { AdminHttpService } from '../../../../http/admin.http.server';
 import { AuthService } from '../../../../../../common/auth/auth.service';
-import { AdminUser } from '../../../../../../common/admin/models/admin.model';
+import { AdminUser } from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
 
 export type UserImpersonateDialogData = {

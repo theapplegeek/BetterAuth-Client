@@ -11,14 +11,14 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AdminHttpService } from '../../http/admin-http.service';
+import { AdminHttpService } from '../../http/admin.http.server';
 import { AppDialogService } from '../../../../common/services/app-dialog.service';
 import { ToastService } from '../../../../common/services/toast.service';
 import {
   AdminPermission,
   AdminRole,
   SortDirection,
-} from '../../../../common/admin/models/admin.model';
+} from '../../models/admin.model';
 import {
   RoleDeleteDialogComponent,
   RoleDeleteDialogResult,

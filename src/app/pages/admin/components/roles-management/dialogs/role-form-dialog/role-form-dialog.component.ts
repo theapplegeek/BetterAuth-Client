@@ -17,12 +17,12 @@ import {
 } from '@angular/cdk/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
-import { AdminHttpService } from '../../../../http/admin-http.service';
+import { AdminHttpService } from '../../../../http/admin.http.server';
 import {
   AdminPermission,
   AdminRole,
   RoleUpsertPayload,
-} from '../../../../../../common/admin/models/admin.model';
+} from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
 
 export type RoleFormDialogData =

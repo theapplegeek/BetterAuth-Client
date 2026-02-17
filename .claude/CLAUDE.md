@@ -183,6 +183,7 @@ Use these conventions as default for Angular enterprise projects unless repo-spe
 
 - Documentation must use project-relative paths (repo root based), never local machine absolute paths.
 - Keep feature-specific services inside the feature page domain (`src/app/pages/<feature>/...`), not in `common`.
-- Keep `common` only for truly cross-feature reusable utilities/services.
-- If a service performs HTTP requests with `HttpClient`, place it under a feature `http/` folder and name it with `HttpService` suffix (example: `admin-http.service.ts`, class `AdminHttpService`).
+- Keep feature-specific models inside the feature page domain (`src/app/pages/<feature>/models/...`), not in `common`.
+- Keep `common` only for truly cross-feature reusable utilities/services/models (for example user models used app-wide).
+- If a service performs HTTP requests with `HttpClient`, place it under a feature `http/` folder and use file naming `<feature>.http.server.ts` (example: `admin.http.server.ts`, class `AdminHttpService`).
 - For pages with one root page component plus subviews (example: todos), keep only the main page component at `pages/<feature>/` root and move sub-components under `pages/<feature>/components/`.
