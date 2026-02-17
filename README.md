@@ -55,6 +55,7 @@ Main app routes:
 
 - `/auth/*`
 - `/home`
+- `/profile`
 - `/todos`
 - `/settings/*`
 - `/admin/*`
@@ -201,6 +202,28 @@ Persistence:
 Service:
 
 - `src/app/pages/todos/services/todo.service.ts`
+
+## 5.6 Profile Page
+
+Route:
+
+- `/profile`
+
+Features:
+
+- user identity overview (name, email, initials avatar, role badges)
+- account snapshot (user id, created/updated dates, roles)
+- security posture score (email verification, 2FA, account status)
+- productivity widgets based on todo data (open/completed/completion rate)
+- recent completed tasks timeline
+- quick actions to Account Settings, Security Settings, and Task Board
+
+Files:
+
+- `src/app/pages/profile/profile.component.ts`
+- `src/app/pages/profile/profile.component.html`
+- `src/app/pages/profile/profile.component.scss`
+- `src/app/pages/profile/profile.routes.ts`
 
 ## 6. UI Infrastructure
 
@@ -421,6 +444,7 @@ Frontend:
 - `src/app/common/services/app-dialog.service.ts`
 - `src/app/common/services/toast.service.ts`
 - `src/app/layouts/sidebar/sidebar.component.ts`
+- `src/app/pages/profile/**`
 - `src/app/pages/settings/**`
 - `src/app/pages/admin/**`
 
