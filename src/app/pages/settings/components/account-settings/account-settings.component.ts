@@ -26,6 +26,8 @@ import { User } from '../../../../common/user/models/user.type';
   styleUrl: './account-settings.component.scss',
 })
 export class AccountSettingsComponent {
+  private readonly _changeEmailNeutralMessage =
+    'Check your current email inbox to confirm this change. If the request is valid, you will receive instructions there.';
   private readonly _destroyRef: DestroyRef =
     inject(DestroyRef);
   private readonly _accountSecurityService: AccountSecurityService =
@@ -162,17 +164,14 @@ export class AccountSettingsComponent {
       .subscribe({
         next: (): void => {
           this.isSavingEmail.set(false);
-          this._toast.success(
-            'Verification email sent. Confirm your new address from inbox.',
+          this._toast.info(
+            this._changeEmailNeutralMessage,
           );
         },
-        error: (error: unknown): void => {
+        error: (): void => {
           this.isSavingEmail.set(false);
-          this._toast.error(
-            this._extractErrorMessage(
-              error,
-              'Unable to request email update.',
-            ),
+          this._toast.info(
+            this._changeEmailNeutralMessage,
           );
         },
       });
@@ -255,4 +254,5 @@ export class AccountSettingsComponent {
       candidate.message ?? candidate.statusText ?? fallback
     );
   }
+
 }
