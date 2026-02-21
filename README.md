@@ -1,21 +1,21 @@
-# Better Auth Demo - Complete Technical Documentation
+# BetterAuth Demo - Complete Technical Documentation
 
 Last updated: **February 16, 2026**
 
 ## 1. Overview
 
-This repository contains the frontend application for a full-stack Better Auth demo.
+This repository contains the frontend application for a full-stack BetterAuth demo.
 The complete solution validates authentication, account security, RBAC administration, and a simple business module (Todo) in a realistic enterprise-style setup.
 
 The full system is composed of:
 
 - **Frontend** Angular 21 (`better-auth-client`) running on `http://localhost:4200`
-- **Backend** Hono + Better Auth (`better-auth-server`) running on `http://localhost:3000`
-- **Database** PostgreSQL (Better Auth schema + custom RBAC schema)
+- **Backend** Hono + BetterAuth (`better-auth-server`) running on `http://localhost:3000`
+- **Database** PostgreSQL (BetterAuth schema + custom RBAC schema)
 
 ## 2. Project Goals
 
-1. Deliver a production-style Angular frontend for Better Auth capabilities.
+1. Deliver a production-style Angular frontend for BetterAuth capabilities.
 2. Cover complete account lifecycle and security lifecycle flows.
 3. Provide an admin center for users, roles, and permissions.
 4. Keep architecture maintainable, scalable, and reusable.
@@ -24,9 +24,9 @@ The full system is composed of:
 
 - Angular client communicates with backend via credentialed HTTP requests.
 - Backend exposes:
-  - Better Auth under `/api/auth/*`
+  - BetterAuth under `/api/auth/*`
   - custom admin API under `/api/admin/*`
-- Better Auth uses Drizzle with PostgreSQL.
+- BetterAuth uses Drizzle with PostgreSQL.
 - RBAC data from custom tables enriches user session/JWT with `roles` and `permissions`.
 
 ## 4. Technology Stack
@@ -37,13 +37,13 @@ The full system is composed of:
 - Angular CDK (dialog system)
 - RxJS
 - Tailwind CSS v4 + Iconify
-- Better Auth client + plugins (`admin`, `jwt`, `magic-link`, `two-factor`, `passkey`)
+- BetterAuth client + plugins (`admin`, `jwt`, `magic-link`, `two-factor`, `passkey`)
 
 ## 4.2 Backend (integrated project)
 
 - Bun runtime
 - Hono
-- Better Auth
+- BetterAuth
 - Drizzle ORM + PostgreSQL
 - Valibot
 
@@ -305,7 +305,7 @@ Auth user model includes:
 
 Backend key entrypoints (from integrated server project):
 
-- Better Auth handler: `/api/auth/*`
+- BetterAuth handler: `/api/auth/*`
 - Admin API: `/api/admin/*`
 - Health check: `/health`
 
@@ -386,7 +386,7 @@ npm run start
 ## 11.1 Magic Link sign-in
 
 1. User submits email on sign-in page.
-2. Frontend calls Better Auth magic-link API.
+2. Frontend calls BetterAuth magic-link API.
 3. Backend sends sign-in link email.
 4. Callback finalizes session.
 

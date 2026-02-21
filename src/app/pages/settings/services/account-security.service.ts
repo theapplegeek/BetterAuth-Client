@@ -289,7 +289,7 @@ export class AccountSecurityService {
 
           if (result.data === null) {
             throw new Error(
-              'Empty response from Better Auth',
+              'Empty response from BetterAuth',
             );
           }
 
