@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../common/auth/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-sign-in',
@@ -41,13 +42,23 @@ export class SignInComponent {
     signal<boolean>(false);
   public magicLinkCooldown: WritableSignal<number> =
     signal<number>(0);
+  public isSendingMagicLink: WritableSignal<boolean> =
+    signal<boolean>(false);
 
   public onSignInWithMagicLink(): void {
     if (this.magicLinkCooldown() > 0) return;
+    if (this.isSendingMagicLink()) return;
     if (this.form.controls['email'].invalid) return;
+
+    this.isSendingMagicLink.set(true);
 
     this._authService
       .signInWithMagicLink(this.form.value.email)
+      .pipe(
+        finalize((): void => {
+          this.isSendingMagicLink.set(false);
+        }),
+      )
       .subscribe({
         next: (): void => {
           this.successMessage.set(

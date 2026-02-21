@@ -75,13 +75,14 @@
           <button
             class="py-3 px-4 text-white font-semibold rounded-lg focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:bg-gray-400 disabled:text-gray-200 dark:disabled:bg-gray-600 dark:disabled:text-gray-400 gap-2 flex w-full cursor-pointer items-center justify-center bg-primary-600 transition duration-200 hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed"
             type="submit"
-            [disabled]="magicLinkCooldown() > 0"
-            (click)="onSignInWithMagicLink()"
+            [disabled]="magicLinkCooldown() > 0 || isSendingMagicLink()"
           >
             <span
               class="size-5 icon-[heroicons--envelope]"
             ></span>
-            @if (magicLinkCooldown() > 0) {
+            @if (isSendingMagicLink()) {
+              Sending...
+            } @else if (magicLinkCooldown() > 0) {
               Resend in {{ magicLinkCooldown() }}s
             } @else {
               Get a Magic Link
