@@ -24,7 +24,8 @@ export class AdminComponent {
       id: 'users',
       route: 'users',
       label: 'Users',
-      description: 'Manage users and account lifecycle',
+      description:
+        'Manage account lifecycle, app roles, and admin access',
     },
     {
       id: 'roles',

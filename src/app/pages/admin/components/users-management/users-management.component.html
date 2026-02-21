@@ -40,8 +40,8 @@
 
     <div class="flex items-center justify-between">
       <p class="text-xs text-gray-600 dark:text-gray-400">
-        Manage application users with role and account
-        lifecycle controls.
+        BetterAuth role controls admin center access.
+        Application roles are managed separately.
       </p>
       <button
         class="rounded-lg px-4 py-2 text-sm font-semibold text-white bg-success-600 transition-colors hover:bg-success-700"
@@ -57,7 +57,7 @@
     class="rounded-xl border-gray-200 dark:border-white/10 overflow-x-auto hide-scrollbar border"
   >
     <table
-      class="divide-gray-200 dark:divide-white/10 w-full min-w-[980px] divide-y"
+      class="divide-gray-200 dark:divide-white/10 w-full min-w-[1120px] divide-y"
     >
       <thead class="bg-gray-50 dark:bg-gray-800/40">
         <tr>
@@ -104,12 +104,17 @@
           <th
             class="px-4 py-3 text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-300 text-left uppercase"
           >
+            Application Roles
+          </th>
+          <th
+            class="px-4 py-3 text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-300 text-left uppercase"
+          >
             <button
               class="gap-1 inline-flex items-center"
               type="button"
               (click)="toggleSort('role')"
             >
-              Role
+              Admin Panel Access
               @if (sortColumn() === 'role') {
                 <span>{{
                   sortDirection() === 'asc'
@@ -145,7 +150,7 @@
           <tr>
             <td
               class="px-4 py-6 text-sm text-gray-600 dark:text-gray-400"
-              colspan="6"
+              colspan="7"
             >
               Loading users...
             </td>
@@ -157,14 +162,6 @@
                 class="px-4 py-4 text-sm text-gray-900 dark:text-white"
               >
                 <p class="font-semibold">{{ user.name }}</p>
-                @if (user.roles.length > 0) {
-                  <p
-                    class="mt-1 text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    Roles:
-                    {{ formatRoleList(user) }}
-                  </p>
-                }
               </td>
               <td
                 class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
@@ -174,7 +171,44 @@
               <td
                 class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
               >
-                {{ user.role }}
+                @if (user.roles.length > 0) {
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (role of user.roles; track role.id) {
+                      <span
+                        class="inline-flex rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:border-primary-700/60 dark:bg-primary-900/30 dark:text-primary-300"
+                      >
+                        {{ role.name }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <span
+                    class="text-xs text-gray-500 dark:text-gray-400"
+                  >
+                    No app roles
+                  </span>
+                }
+              </td>
+              <td class="px-4 py-4 text-sm">
+                @if (isBetterAuthAdmin(user)) {
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full bg-success-100 px-2 py-1 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-300"
+                  >
+                    <span
+                      class="icon-[heroicons--shield-check] size-3.5"
+                    ></span>
+                    Can manage users & permissions
+                  </span>
+                } @else {
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                  >
+                    <span
+                      class="icon-[heroicons--no-symbol] size-3.5"
+                    ></span>
+                    No admin panel access
+                  </span>
+                }
               </td>
               <td class="px-4 py-4 text-sm">
                 <span
@@ -311,7 +345,7 @@
             <tr>
               <td
                 class="px-4 py-6 text-sm text-gray-600 dark:text-gray-400"
-                colspan="6"
+                colspan="7"
               >
                 No users found.
               </td>

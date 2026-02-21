@@ -436,10 +436,8 @@ export class UsersManagementComponent {
     this.openActionMenuUserId.set(undefined);
   }
 
-  public formatRoleList(user: AdminUser): string {
-    return user.roles
-      .map((role: AdminRole): string => role.name)
-      .join(', ');
+  public isBetterAuthAdmin(user: AdminUser): boolean {
+    return user.role === 'admin';
   }
 
   public banStatusClass(user: AdminUser): string {

@@ -52,20 +52,6 @@
         <label
           class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 block"
         >
-          Role
-        </label>
-        <select
-          class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border"
-          formControlName="role"
-        >
-          <option value="user">user</option>
-          <option value="admin">admin</option>
-        </select>
-      </div>
-      <div>
-        <label
-          class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 block"
-        >
           Image URL
         </label>
         <input
@@ -73,6 +59,25 @@
           formControlName="image"
           type="url"
         />
+      </div>
+      <div class="sm:col-span-2">
+        <label
+          class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300 block"
+        >
+          BetterAuth admin access
+        </label>
+        <label
+          class="inline-flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+        >
+          <input
+            class="mt-0.5 size-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            formControlName="canManageUsersPermissions"
+            type="checkbox"
+          />
+          <span>
+            Can manage users, roles and permissions in Admin Center.
+          </span>
+        </label>
       </div>
       <div class="sm:col-span-2">
         <label
@@ -106,7 +111,13 @@
       <p
         class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
       >
-        RBAC Roles
+        Application roles
+      </p>
+      <p
+        class="mb-3 text-xs text-gray-500 dark:text-gray-400"
+      >
+        These roles are application-level roles, separate
+        from BetterAuth admin access.
       </p>
       <div class="gap-2 sm:grid-cols-2 grid">
         @for (role of roles; track role.id) {

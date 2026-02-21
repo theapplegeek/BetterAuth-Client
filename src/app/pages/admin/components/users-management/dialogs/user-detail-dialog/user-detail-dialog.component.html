@@ -43,12 +43,42 @@
         <dt
           class="text-xs text-gray-500 dark:text-gray-400"
         >
-          Role
+          Application roles
         </dt>
         <dd
           class="text-sm text-gray-900 dark:text-white"
         >
-          {{ user.role }}
+          {{ formatApplicationRoles() }}
+        </dd>
+      </div>
+      <div>
+        <dt
+          class="text-xs text-gray-500 dark:text-gray-400"
+        >
+          Admin panel access
+        </dt>
+        <dd
+          class="text-sm text-gray-900 dark:text-white"
+        >
+          @if (isBetterAuthAdmin()) {
+            <span
+              class="inline-flex items-center gap-1 rounded-full bg-success-100 px-2 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-300"
+            >
+              <span
+                class="icon-[heroicons--shield-check] size-3.5"
+              ></span>
+              Can manage users & permissions
+            </span>
+          } @else {
+            <span
+              class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+            >
+              <span
+                class="icon-[heroicons--no-symbol] size-3.5"
+              ></span>
+              No admin panel access
+            </span>
+          }
         </dd>
       </div>
       <div>

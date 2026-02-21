@@ -4,7 +4,10 @@ import {
   DIALOG_DATA,
   DialogRef,
 } from '@angular/cdk/dialog';
-import { AdminUser } from '../../../../models/admin.model';
+import {
+  AdminRole,
+  AdminUser,
+} from '../../../../models/admin.model';
 
 export type UserDetailDialogData = {
   user: AdminUser;
@@ -27,5 +30,19 @@ export class UserDetailDialogComponent {
 
   public onClose(): void {
     this._dialogRef.close();
+  }
+
+  public isBetterAuthAdmin(): boolean {
+    return this.user.role === 'admin';
+  }
+
+  public formatApplicationRoles(): string {
+    if (this.user.roles.length === 0) {
+      return 'No app roles';
+    }
+
+    return this.user.roles
+      .map((role: AdminRole): string => role.name)
+      .join(', ');
   }
 }

@@ -96,13 +96,10 @@ export class UserFormDialogComponent {
         validators: [Validators.required, Validators.email],
       },
     ),
-    role: new FormControl<'user' | 'admin'>(
-      this._editingUser?.role === 'admin'
-        ? 'admin'
-        : 'user',
+    canManageUsersPermissions: new FormControl(
+      this._editingUser?.role === 'admin',
       {
         nonNullable: true,
-        validators: [Validators.required],
       },
     ),
     image: new FormControl(
@@ -179,7 +176,9 @@ export class UserFormDialogComponent {
       email: formValue.email.trim(),
       emailVerified: formValue.emailVerified,
       image: formValue.image.trim() || undefined,
-      role: formValue.role,
+      role: formValue.canManageUsersPermissions
+        ? 'admin'
+        : 'user',
       roleIds: this.selectedRoleIds(),
     };
 
