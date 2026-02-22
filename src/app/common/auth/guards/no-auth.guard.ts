@@ -15,15 +15,22 @@ export const noAuthGuard: CanActivateFn = (
   return authService.getSession().pipe(
     map(
       (res: { session: Session; user: User }): boolean => {
-        if (
-          state.url === '/auth/sign-in/two-factor-enable'
-        ) {
+        const allowsAuthenticatedAccess: boolean =
+          state.url.startsWith(
+            '/auth/sign-in/two-factor-enable',
+          ) ||
+          state.url.startsWith('/auth/reset-password');
+
+        if (allowsAuthenticatedAccess) {
           return true;
         }
+
         if (res) {
           router.navigate(['/redirect-to-home']);
+          return false;
         }
-        return !res;
+
+        return true;
       },
     ),
     catchError((_) => {
