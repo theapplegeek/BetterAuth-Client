@@ -48,12 +48,16 @@ import {
   UserUnbanDialogComponent,
   UserUnbanDialogResult,
 } from './dialogs/user-unban-dialog/user-unban-dialog.component';
+import {
+  ConnectedPosition,
+  OverlayModule,
+} from '@angular/cdk/overlay';
 
 type UserSortColumn = 'name' | 'email' | 'role';
 
 @Component({
   selector: 'app-users-management',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, OverlayModule],
   templateUrl: './users-management.component.html',
   styleUrl: './users-management.component.scss',
 })
@@ -93,6 +97,37 @@ export class UsersManagementComponent {
   public readonly pageSizeOptions: number[] = [
     5, 10, 20, 50,
   ];
+  public readonly actionMenuPositions: ConnectedPosition[] =
+    [
+      {
+        originX: 'start',
+        originY: 'bottom',
+        overlayX: 'start',
+        overlayY: 'top',
+        offsetY: 8,
+      },
+      {
+        originX: 'end',
+        originY: 'bottom',
+        overlayX: 'end',
+        overlayY: 'top',
+        offsetY: 8,
+      },
+      {
+        originX: 'start',
+        originY: 'top',
+        overlayX: 'start',
+        overlayY: 'bottom',
+        offsetY: -8,
+      },
+      {
+        originX: 'end',
+        originY: 'top',
+        overlayX: 'end',
+        overlayY: 'bottom',
+        offsetY: -8,
+      },
+    ];
 
   public readonly totalPages = computed((): number =>
     Math.max(

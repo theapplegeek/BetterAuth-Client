@@ -38,13 +38,15 @@
       </button>
     </form>
 
-    <div class="flex items-center justify-between">
+    <div
+      class="gap-3 flex flex-col sm:flex-row sm:items-center sm:justify-between"
+    >
       <p class="text-xs text-gray-600 dark:text-gray-400">
         BetterAuth role controls admin center access.
         Application roles are managed separately.
       </p>
       <button
-        class="rounded-lg px-4 py-2 text-sm font-semibold text-white bg-success-600 transition-colors hover:bg-success-700"
+        class="rounded-lg px-4 py-2 text-sm font-semibold text-white bg-success-600 transition-colors hover:bg-success-700 self-start sm:self-auto"
         type="button"
         (click)="openCreate()"
       >
@@ -227,13 +229,15 @@
                 class="px-4 py-4 text-left text-sm"
               >
                 <div
-                  class="relative inline-flex"
+                  class="inline-flex"
                   (click)="$event.stopPropagation()"
                 >
                   <button
                     class="inline-flex items-center gap-1 rounded-lg border border-secondary-300 bg-white px-3 py-1.5 text-xs font-semibold text-secondary-700 transition hover:bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-secondary-800"
                     type="button"
                     aria-label="Open user actions menu"
+                    cdkOverlayOrigin
+                    #actionOrigin="cdkOverlayOrigin"
                     (click)="
                       toggleActionMenu(user.id, $event)
                     "
@@ -247,96 +251,115 @@
                   @if (
                     openActionMenuUserId() === user.id
                   ) {
-                    <div
-                      class="absolute left-0 top-10 z-30 w-52 rounded-lg border border-secondary-200 bg-white p-1 shadow-xl dark:border-secondary-700 dark:bg-secondary-900"
+                    <ng-template
+                      cdkConnectedOverlay
+                      [cdkConnectedOverlayOpen]="
+                        openActionMenuUserId() === user.id
+                      "
+                      [cdkConnectedOverlayOrigin]="
+                        actionOrigin
+                      "
+                      [cdkConnectedOverlayPositions]="
+                        actionMenuPositions
+                      "
+                      [cdkConnectedOverlayHasBackdrop]="true"
+                      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                      (backdropClick)="closeActionMenu()"
+                      (overlayOutsideClick)="closeActionMenu()"
+                      (detach)="closeActionMenu()"
                     >
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
-                        type="button"
-                        (click)="openDetail(user)"
+                      <div
+                        class="z-40 w-52 rounded-lg border border-secondary-200 bg-white p-1 shadow-xl dark:border-secondary-700 dark:bg-secondary-900"
+                        (click)="$event.stopPropagation()"
                       >
-                        <span
-                          class="icon-[heroicons--eye] size-4"
-                        ></span>
-                        Detail
-                      </button>
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
-                        type="button"
-                        (click)="openEdit(user)"
-                      >
-                        <span
-                          class="icon-[heroicons--pencil-square] size-4"
-                        ></span>
-                        Edit
-                      </button>
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
-                        type="button"
-                        (click)="openPasswordEditor(user)"
-                      >
-                        <span
-                          class="icon-[heroicons--key] size-4"
-                        ></span>
-                        Set Password
-                      </button>
-                      @if (user.banned) {
                         <button
-                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-success-700 hover:bg-success-100 dark:text-success-300 dark:hover:bg-success-900/20"
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
                           type="button"
-                          (click)="unbanUser(user)"
+                          (click)="openDetail(user)"
                         >
                           <span
-                            class="icon-[heroicons--check-circle] size-4"
+                            class="icon-[heroicons--eye] size-4"
                           ></span>
-                          Unban
+                          Detail
                         </button>
-                      } @else {
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                          type="button"
+                          (click)="openEdit(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--pencil-square] size-4"
+                          ></span>
+                          Edit
+                        </button>
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                          type="button"
+                          (click)="openPasswordEditor(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--key] size-4"
+                          ></span>
+                          Set Password
+                        </button>
+                        @if (user.banned) {
+                          <button
+                            class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-success-700 hover:bg-success-100 dark:text-success-300 dark:hover:bg-success-900/20"
+                            type="button"
+                            (click)="unbanUser(user)"
+                          >
+                            <span
+                              class="icon-[heroicons--check-circle] size-4"
+                            ></span>
+                            Unban
+                          </button>
+                        } @else {
+                          <button
+                            class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-error-700 hover:bg-error-100 dark:text-error-300 dark:hover:bg-error-900/20"
+                            type="button"
+                            (click)="openBanModal(user)"
+                          >
+                            <span
+                              class="icon-[heroicons--no-symbol] size-4"
+                            ></span>
+                            Ban
+                          </button>
+                        }
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-warning-700 hover:bg-warning-100 dark:text-warning-300 dark:hover:bg-warning-900/20"
+                          type="button"
+                          (click)="openImpersonateModal(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--user-circle] size-4"
+                          ></span>
+                          Impersonate
+                        </button>
+                        <button
+                          class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
+                          type="button"
+                          (click)="openSessions(user)"
+                        >
+                          <span
+                            class="icon-[heroicons--computer-desktop] size-4"
+                          ></span>
+                          Sessions
+                        </button>
+                        <div
+                          class="my-1 h-px bg-secondary-200 dark:bg-secondary-700"
+                        ></div>
                         <button
                           class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-error-700 hover:bg-error-100 dark:text-error-300 dark:hover:bg-error-900/20"
                           type="button"
-                          (click)="openBanModal(user)"
+                          (click)="openDelete(user)"
                         >
                           <span
-                            class="icon-[heroicons--no-symbol] size-4"
+                            class="icon-[heroicons--trash] size-4"
                           ></span>
-                          Ban
+                          Delete
                         </button>
-                      }
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-warning-700 hover:bg-warning-100 dark:text-warning-300 dark:hover:bg-warning-900/20"
-                        type="button"
-                        (click)="openImpersonateModal(user)"
-                      >
-                        <span
-                          class="icon-[heroicons--user-circle] size-4"
-                        ></span>
-                        Impersonate
-                      </button>
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800"
-                        type="button"
-                        (click)="openSessions(user)"
-                      >
-                        <span
-                          class="icon-[heroicons--computer-desktop] size-4"
-                        ></span>
-                        Sessions
-                      </button>
-                      <div
-                        class="my-1 h-px bg-secondary-200 dark:bg-secondary-700"
-                      ></div>
-                      <button
-                        class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-error-700 hover:bg-error-100 dark:text-error-300 dark:hover:bg-error-900/20"
-                        type="button"
-                        (click)="openDelete(user)"
-                      >
-                        <span
-                          class="icon-[heroicons--trash] size-4"
-                        ></span>
-                        Delete
-                      </button>
-                    </div>
+                      </div>
+                    </ng-template>
                   }
                 </div>
               </td>
@@ -385,7 +408,7 @@
       </label>
     </div>
 
-    <div class="gap-2 flex items-center">
+    <div class="gap-2 flex flex-wrap items-center sm:justify-end">
       <button
         class="rounded-md border-gray-300 px-3 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border disabled:opacity-40"
         type="button"
