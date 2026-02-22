@@ -15,6 +15,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { ToastService } from '../../../../common/services/toast.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -29,6 +30,8 @@ export class ResetPasswordComponent {
   private readonly _router: Router = inject(Router);
   private readonly _authService: AuthService =
     inject(AuthService);
+  private readonly _toastService: ToastService =
+    inject(ToastService);
 
   public errorMessage: WritableSignal<string> =
     signal<string>('');
@@ -56,7 +59,10 @@ export class ResetPasswordComponent {
   constructor() {
     effect((): void => {
       if (!this.token() || this.token() === '') {
-        this._router.navigate(['auth/sign-in']);
+        this._toastService.error(
+          'Invalid or missing reset token. Request a new reset link.',
+        );
+        this._router.navigate(['/redirect-to-home']);
       }
     });
   }
