@@ -98,7 +98,7 @@ export class ResetPasswordComponent {
       });
   }
 
-  public onBackToSignIn(): void {
-    this._router.navigate(['auth/sign-in']);
+  public onBackToHome(): void {
+    this._router.navigate(['/redirect-to-home']);
   }
 }
