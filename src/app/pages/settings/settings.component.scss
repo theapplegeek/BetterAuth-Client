@@ -17,24 +17,44 @@
 }
 
 .settings-primary-tab {
-  border-color: transparent;
-  background: transparent;
+  border-color: rgb(203 213 225 / 0.55);
+  background: rgb(248 250 252 / 0.55);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .settings-primary-tab-icon {
-  color: rgb(100 116 139);
+  color: rgb(71 85 105);
+  transition: color 0.2s ease;
 }
 
 .settings-primary-tab-title {
-  color: rgb(15 23 42);
+  color: rgb(30 41 59);
+  transition: color 0.2s ease;
 }
 
 .settings-primary-tab-description {
-  color: rgb(100 116 139);
+  color: rgb(71 85 105 / 0.85);
+  transition: color 0.2s ease;
 }
 
 .settings-primary-tab:hover {
-  background: rgb(241 245 249 / 0.8);
+  border-color: rgb(167 139 250 / 0.6);
+  background: rgb(243 232 255 / 0.9);
+}
+
+.settings-primary-tab:hover .settings-primary-tab-icon {
+  color: rgb(109 40 217);
+}
+
+.settings-primary-tab:hover .settings-primary-tab-title {
+  color: rgb(76 29 149);
+}
+
+.settings-primary-tab:hover .settings-primary-tab-description {
+  color: rgb(91 33 182 / 0.9);
 }
 
 .settings-primary-tab:focus-visible {
@@ -60,7 +80,7 @@
 }
 
 [data-theme='dark'] .settings-primary-tab-icon {
-  color: rgb(148 163 184);
+  color: rgb(203 213 225);
 }
 
 [data-theme='dark'] .settings-primary-tab-title {
@@ -68,11 +88,29 @@
 }
 
 [data-theme='dark'] .settings-primary-tab-description {
-  color: rgb(148 163 184);
+  color: rgb(148 163 184 / 0.95);
+}
+
+[data-theme='dark'] .settings-primary-tab {
+  border-color: rgb(71 85 105 / 0.8);
+  background: rgb(15 23 42 / 0.55);
 }
 
 [data-theme='dark'] .settings-primary-tab:hover {
-  background: rgb(30 41 59 / 0.7);
+  border-color: rgb(129 140 248 / 0.6);
+  background: rgb(67 56 202 / 0.2);
+}
+
+[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-icon {
+  color: rgb(221 214 254);
+}
+
+[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-title {
+  color: rgb(243 232 255);
+}
+
+[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-description {
+  color: rgb(233 213 255 / 0.9);
 }
 
 [data-theme='dark'] .settings-primary-tab-active {
