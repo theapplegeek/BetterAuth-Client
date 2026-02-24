@@ -79,53 +79,65 @@
   color: rgb(109 40 217 / 0.8);
 }
 
-[data-theme='dark'] .settings-primary-tab-icon {
+:host-context([data-theme='dark']) .settings-primary-tab,
+:host-context(.dark) .settings-primary-tab {
+  border-color: rgb(71 85 105 / 0.9);
+  background: rgb(15 23 42 / 0.78);
+}
+
+:host-context([data-theme='dark']) .settings-primary-tab-icon,
+:host-context(.dark) .settings-primary-tab-icon {
   color: rgb(203 213 225);
 }
 
-[data-theme='dark'] .settings-primary-tab-title {
-  color: rgb(226 232 240);
+:host-context([data-theme='dark']) .settings-primary-tab-title,
+:host-context(.dark) .settings-primary-tab-title {
+  color: rgb(241 245 249);
 }
 
-[data-theme='dark'] .settings-primary-tab-description {
-  color: rgb(148 163 184 / 0.95);
+:host-context([data-theme='dark']) .settings-primary-tab-description,
+:host-context(.dark) .settings-primary-tab-description {
+  color: rgb(203 213 225 / 0.92);
 }
 
-[data-theme='dark'] .settings-primary-tab {
-  border-color: rgb(71 85 105 / 0.8);
-  background: rgb(15 23 42 / 0.55);
+:host-context([data-theme='dark']) .settings-primary-tab:hover,
+:host-context(.dark) .settings-primary-tab:hover {
+  border-color: rgb(167 139 250 / 0.8);
+  background: rgb(76 29 149 / 0.34);
 }
 
-[data-theme='dark'] .settings-primary-tab:hover {
-  border-color: rgb(129 140 248 / 0.6);
-  background: rgb(67 56 202 / 0.2);
+:host-context([data-theme='dark']) .settings-primary-tab:hover .settings-primary-tab-icon,
+:host-context(.dark) .settings-primary-tab:hover .settings-primary-tab-icon {
+  color: rgb(233 213 255);
 }
 
-[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-icon {
-  color: rgb(221 214 254);
+:host-context([data-theme='dark']) .settings-primary-tab:hover .settings-primary-tab-title,
+:host-context(.dark) .settings-primary-tab:hover .settings-primary-tab-title {
+  color: rgb(250 245 255);
 }
 
-[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-title {
-  color: rgb(243 232 255);
+:host-context([data-theme='dark']) .settings-primary-tab:hover .settings-primary-tab-description,
+:host-context(.dark) .settings-primary-tab:hover .settings-primary-tab-description {
+  color: rgb(243 232 255 / 0.92);
 }
 
-[data-theme='dark'] .settings-primary-tab:hover .settings-primary-tab-description {
-  color: rgb(233 213 255 / 0.9);
+:host-context([data-theme='dark']) .settings-primary-tab-active,
+:host-context(.dark) .settings-primary-tab-active {
+  border-color: rgb(129 140 248 / 0.8) !important;
+  background: rgb(67 56 202 / 0.36) !important;
 }
 
-[data-theme='dark'] .settings-primary-tab-active {
-  border-color: rgb(91 33 182 / 0.85) !important;
-  background: rgb(76 29 149 / 0.4) !important;
+:host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-icon,
+:host-context(.dark) .settings-primary-tab-active .settings-primary-tab-icon {
+  color: rgb(238 242 255) !important;
 }
 
-[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-icon {
-  color: rgb(216 180 254);
+:host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-title,
+:host-context(.dark) .settings-primary-tab-active .settings-primary-tab-title {
+  color: rgb(248 250 252) !important;
 }
 
-[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-title {
-  color: rgb(243 232 255);
-}
-
-[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-description {
-  color: rgb(233 213 255 / 0.85);
+:host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-description,
+:host-context(.dark) .settings-primary-tab-active .settings-primary-tab-description {
+  color: rgb(224 231 255 / 0.95) !important;
 }
