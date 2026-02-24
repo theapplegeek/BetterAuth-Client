@@ -12,7 +12,7 @@
   DESKTOP LAYOUT: animate grid columns
 ========================================================== -->
 <div
-  class="lg:grid lg:grid-rows-1 ease-out min-h-[100dvh] overflow-x-hidden transition-[grid-template-columns] duration-300"
+  class="lg:grid lg:grid-rows-1 ease-out min-h-[100svh] lg:min-h-[100dvh] overflow-x-hidden transition-[grid-template-columns] duration-300"
   [class]="{
     'lg:grid-cols-[18rem_1fr]': desktopSidebarOpen(),
     'lg:grid-cols-[0rem_1fr]': !desktopSidebarOpen(),
@@ -28,7 +28,7 @@
     >
       <!-- Fade/disable inner content on desktop collapse (keeps animations) -->
       <div
-        class="gap-y-5 px-6 ease-out flex h-[100dvh] grow flex-col overflow-y-auto transition-[opacity,transform] duration-300"
+        class="gap-y-5 px-6 ease-out flex h-[100svh] lg:h-[100dvh] grow flex-col overflow-y-auto transition-[opacity,transform] duration-300"
         [class]="{
           'lg:opacity-100 lg:translate-x-0 lg:pointer-events-auto':
             desktopSidebarOpen(),
@@ -227,7 +227,7 @@
   <!-- =======================================================
     CONTENT COLUMN
   ======================================================== -->
-  <div class="min-w-0 flex h-[100dvh] flex-col overflow-hidden">
+  <div class="min-w-0 flex h-[100svh] lg:h-[100dvh] flex-col overflow-hidden">
     <header
       class="top-0 h-16 gap-x-4 border-gray-900/5 dark:border-white/5 bg-white dark:bg-gray-900 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8 sticky z-30 flex shrink-0 items-center border-b"
     >
@@ -294,7 +294,7 @@
 
     <main
       #contentScrollContainer
-      class="hide-scrollbar flex-1 min-h-0 overflow-y-auto"
+      class="hide-scrollbar flex-1 min-h-0 overflow-y-auto overscroll-y-contain"
     >
       <div class="app-route-content p-4 sm:p-6 lg:p-8 min-h-full">
         <router-outlet></router-outlet>

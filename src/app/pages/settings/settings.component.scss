@@ -4,6 +4,12 @@
 
 .settings-shell {
   display: block;
+  min-height: 0;
+}
+
+.settings-content {
+  min-height: 0;
+  min-width: 0;
 }
 
 .settings-primary-tabs {
