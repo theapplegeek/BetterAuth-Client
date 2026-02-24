@@ -20,6 +20,19 @@ import { UserService } from '../../../../common/user/user.service';
 import { User } from '../../../../common/user/models/user.type';
 import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
+type AccountPanelId =
+  | 'overview'
+  | 'username'
+  | 'email'
+  | 'danger';
+
+type AccountPanelTab = {
+  id: AccountPanelId;
+  label: string;
+  shortLabel: string;
+  icon: string;
+};
+
 @Component({
   selector: 'app-account-settings',
   imports: [ReactiveFormsModule, DatePipe],
@@ -51,6 +64,34 @@ export class AccountSettingsComponent {
     signal<boolean>(false);
   public readonly isDeletingAccount: WritableSignal<boolean> =
     signal<boolean>(false);
+  public readonly activeAccountPanel: WritableSignal<AccountPanelId> =
+    signal<AccountPanelId>('overview');
+  public readonly accountPanelTabs: AccountPanelTab[] = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      shortLabel: 'Overview',
+      icon: 'icon-[heroicons--identification]',
+    },
+    {
+      id: 'username',
+      label: 'Username',
+      shortLabel: 'Username',
+      icon: 'icon-[heroicons--user-circle]',
+    },
+    {
+      id: 'email',
+      label: 'Email',
+      shortLabel: 'Email',
+      icon: 'icon-[heroicons--envelope]',
+    },
+    {
+      id: 'danger',
+      label: 'Danger Zone',
+      shortLabel: 'Danger',
+      icon: 'icon-[heroicons--exclamation-triangle]',
+    },
+  ];
 
   public readonly profileForm = new FormGroup({
     name: new FormControl('', {
@@ -82,6 +123,18 @@ export class AccountSettingsComponent {
 
   constructor() {
     this.loadSession();
+  }
+
+  public setActiveAccountPanel(
+    panelId: AccountPanelId,
+  ): void {
+    this.activeAccountPanel.set(panelId);
+  }
+
+  public isAccountPanelActive(
+    panelId: AccountPanelId,
+  ): boolean {
+    return this.activeAccountPanel() === panelId;
   }
 
   public loadSession(): void {
@@ -264,5 +317,4 @@ export class AccountSettingsComponent {
       candidate.message ?? candidate.statusText ?? fallback
     );
   }
-
 }
