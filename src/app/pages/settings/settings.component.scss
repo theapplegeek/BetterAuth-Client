@@ -126,21 +126,29 @@
 
 :host-context([data-theme='dark']) .settings-primary-tab-active,
 :host-context(.dark) .settings-primary-tab-active {
-  border-color: rgb(129 140 248 / 0.8) !important;
-  background: rgb(67 56 202 / 0.36) !important;
+  border-color: rgb(196 181 253 / 0.95) !important;
+  background: linear-gradient(
+      135deg,
+      rgb(109 40 217 / 0.62),
+      rgb(79 70 229 / 0.66)
+    )
+    !important;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.08),
+    0 10px 20px rgb(15 23 42 / 0.45);
 }
 
 :host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-icon,
 :host-context(.dark) .settings-primary-tab-active .settings-primary-tab-icon {
-  color: rgb(238 242 255) !important;
+  color: rgb(255 255 255) !important;
 }
 
 :host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-title,
 :host-context(.dark) .settings-primary-tab-active .settings-primary-tab-title {
-  color: rgb(248 250 252) !important;
+  color: rgb(255 255 255) !important;
 }
 
 :host-context([data-theme='dark']) .settings-primary-tab-active .settings-primary-tab-description,
 :host-context(.dark) .settings-primary-tab-active .settings-primary-tab-description {
-  color: rgb(224 231 255 / 0.95) !important;
+  color: rgb(238 242 255 / 0.95) !important;
 }
