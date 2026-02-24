@@ -21,6 +21,18 @@
   background: transparent;
 }
 
+.settings-primary-tab-icon {
+  color: rgb(100 116 139);
+}
+
+.settings-primary-tab-title {
+  color: rgb(15 23 42);
+}
+
+.settings-primary-tab-description {
+  color: rgb(100 116 139);
+}
+
 .settings-primary-tab:hover {
   background: rgb(241 245 249 / 0.8);
 }
@@ -32,7 +44,31 @@
 
 .settings-primary-tab-active {
   border-color: rgb(196 181 253 / 0.85) !important;
-  background: rgb(237 233 254 / 0.9) !important;
+  background: rgb(237 233 254 / 0.92) !important;
+}
+
+.settings-primary-tab-active .settings-primary-tab-icon {
+  color: rgb(109 40 217);
+}
+
+.settings-primary-tab-active .settings-primary-tab-title {
+  color: rgb(76 29 149);
+}
+
+.settings-primary-tab-active .settings-primary-tab-description {
+  color: rgb(109 40 217 / 0.8);
+}
+
+[data-theme='dark'] .settings-primary-tab-icon {
+  color: rgb(148 163 184);
+}
+
+[data-theme='dark'] .settings-primary-tab-title {
+  color: rgb(226 232 240);
+}
+
+[data-theme='dark'] .settings-primary-tab-description {
+  color: rgb(148 163 184);
 }
 
 [data-theme='dark'] .settings-primary-tab:hover {
@@ -42,4 +78,16 @@
 [data-theme='dark'] .settings-primary-tab-active {
   border-color: rgb(91 33 182 / 0.85) !important;
   background: rgb(76 29 149 / 0.4) !important;
+}
+
+[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-icon {
+  color: rgb(216 180 254);
+}
+
+[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-title {
+  color: rgb(243 232 255);
+}
+
+[data-theme='dark'] .settings-primary-tab-active .settings-primary-tab-description {
+  color: rgb(233 213 255 / 0.85);
 }
