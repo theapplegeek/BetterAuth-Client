@@ -9,6 +9,7 @@ type SettingsNavItem = {
   id: 'account' | 'security';
   route: string;
   label: string;
+  shortLabel: string;
   description: string;
   icon: string;
 };
@@ -25,6 +26,7 @@ export class SettingsComponent {
       id: 'account',
       route: 'account',
       label: 'My Account',
+      shortLabel: 'Account',
       description: 'Profile, email and account deletion',
       icon: 'icon-[heroicons--user-circle]',
     },
@@ -32,6 +34,7 @@ export class SettingsComponent {
       id: 'security',
       route: 'security',
       label: 'Security Settings',
+      shortLabel: 'Security',
       description:
         'Password, 2FA, passkeys and linked accounts',
       icon: 'icon-[heroicons--shield-check]',
