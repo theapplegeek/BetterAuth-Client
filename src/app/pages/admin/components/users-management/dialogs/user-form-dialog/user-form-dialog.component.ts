@@ -24,6 +24,7 @@ import {
   UserUpsertPayload,
 } from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
+import { trimControls } from '../../../../../../common/forms/input-normalizer.util';
 
 export type UserFormDialogData =
   | {
@@ -165,6 +166,8 @@ export class UserFormDialogComponent {
   }
 
   public saveUser(): void {
+    trimControls(this.userForm, ['name', 'email', 'image']);
+
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
       return;
@@ -185,7 +188,7 @@ export class UserFormDialogComponent {
     this.isSavingUser.set(true);
 
     if (this.mode === 'create') {
-      if (!formValue.password.trim()) {
+      if (!formValue.password) {
         this.isSavingUser.set(false);
         this._toast.warning(
           'Password is required for new users.',
@@ -193,7 +196,7 @@ export class UserFormDialogComponent {
         return;
       }
 
-      payload.password = formValue.password.trim();
+      payload.password = formValue.password;
       this._adminService
         .createUser(payload)
         .pipe(takeUntilDestroyed(this._destroyRef))

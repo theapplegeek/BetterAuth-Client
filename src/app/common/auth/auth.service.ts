@@ -48,11 +48,18 @@ export class AuthService {
     email: string;
     password: string;
   }) {
+    const normalizedName: string = this._normalizeText(
+      userData.name,
+    );
+    const normalizedEmail: string = this._normalizeEmail(
+      userData.email,
+    );
+
     return from(
       this._authClient.signUp.email({
-        email: userData.email,
+        email: normalizedEmail,
         password: userData.password,
-        name: userData.name,
+        name: normalizedName,
         callbackURL: `${window.location.origin}/redirect-to-home`,
       }),
     ).pipe(
@@ -74,9 +81,13 @@ export class AuthService {
     email: string;
     password: string;
   }) {
+    const normalizedEmail: string = this._normalizeEmail(
+      credentials.email,
+    );
+
     return from(
       this._authClient.signIn.email({
-        email: credentials.email,
+        email: normalizedEmail,
         password: credentials.password,
       }),
     ).pipe(
@@ -131,9 +142,11 @@ export class AuthService {
   }
 
   public verifyTwoFactorTOTP(code: string) {
+    const normalizedCode: string = this._normalizeText(code);
+
     return from(
       this._authClient.twoFactor.verifyTotp({
-        code: code,
+        code: normalizedCode,
       }),
     ).pipe(
       map((res) => {
@@ -151,9 +164,11 @@ export class AuthService {
   }
 
   public verifyTwoFactorBackupCode(code: string) {
+    const normalizedCode: string = this._normalizeText(code);
+
     return from(
       this._authClient.twoFactor.verifyBackupCode({
-        code: code,
+        code: normalizedCode,
       }),
     ).pipe(
       map((res) => {
@@ -204,9 +219,12 @@ export class AuthService {
   // Magic Link Authentication Methods
   // ==========================================================================
   public signInWithMagicLink(email: string) {
+    const normalizedEmail: string =
+      this._normalizeEmail(email);
+
     return from(
       this._authClient.signIn.magicLink({
-        email: email,
+        email: normalizedEmail,
         callbackURL: `${window.location.origin}/redirect-to-home`,
         newUserCallbackURL: `${window.location.origin}/redirect-to-home`,
         errorCallbackURL: `${window.location.origin}/redirect-to-sign-in`,
@@ -304,9 +322,12 @@ export class AuthService {
   // Password Reset Methods
   // ==========================================================================
   public requestResetPassword(email: string) {
+    const normalizedEmail: string =
+      this._normalizeEmail(email);
+
     return from(
       this._authClient.requestPasswordReset({
-        email: email,
+        email: normalizedEmail,
         redirectTo: `${window.location.origin}/redirect-to-reset-password`,
       }),
     ).pipe(
@@ -322,10 +343,12 @@ export class AuthService {
   }
 
   public resetPassword(newPassword: string, token: string) {
+    const normalizedToken: string = this._normalizeText(token);
+
     return from(
       this._authClient.resetPassword({
         newPassword: newPassword,
-        token: token,
+        token: normalizedToken,
       }),
     ).pipe(
       map((res) => {
@@ -358,5 +381,13 @@ export class AuthService {
         return throwError(() => err);
       }),
     );
+  }
+
+  private _normalizeEmail(email: string): string {
+    return this._normalizeText(email);
+  }
+
+  private _normalizeText(value: string): string {
+    return value.trim();
   }
 }

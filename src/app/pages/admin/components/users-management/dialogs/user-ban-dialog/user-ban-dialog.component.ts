@@ -20,6 +20,7 @@ import { fromEvent } from 'rxjs';
 import { AdminHttpService } from '../../../../http/admin.http.server';
 import { AdminUser } from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
+import { trimControl } from '../../../../../../common/forms/input-normalizer.util';
 
 export type UserBanDialogData = {
   user: AdminUser;
@@ -81,6 +82,8 @@ export class UserBanDialogComponent {
   }
 
   public banUser(): void {
+    trimControl(this.banForm.controls.reason);
+
     if (this.banForm.invalid) {
       this.banForm.markAllAsTouched();
       return;
@@ -97,7 +100,7 @@ export class UserBanDialogComponent {
     this._adminService
       .banUser(
         this.user.id,
-        this.banForm.controls.reason.value.trim(),
+        this.banForm.controls.reason.value,
         expiresInSeconds,
       )
       .pipe(takeUntilDestroyed(this._destroyRef))

@@ -18,6 +18,7 @@ import { AccountSecurityService } from '../../services/account-security.service'
 import { ToastService } from '../../../../common/services/toast.service';
 import { UserService } from '../../../../common/user/user.service';
 import { User } from '../../../../common/user/models/user.type';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-account-settings',
@@ -104,6 +105,8 @@ export class AccountSettingsComponent {
   }
 
   public saveProfile(): void {
+    trimControl(this.profileForm.controls.name);
+
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
@@ -141,6 +144,8 @@ export class AccountSettingsComponent {
   }
 
   public saveEmail(): void {
+    trimControl(this.emailForm.controls.email);
+
     if (this.emailForm.invalid) {
       this.emailForm.markAllAsTouched();
       return;
@@ -180,6 +185,8 @@ export class AccountSettingsComponent {
   public deleteAccount(): void {
     const currentUser: User | undefined = this.user();
     if (!currentUser) return;
+
+    trimControl(this.deleteForm.controls.confirmationEmail);
 
     if (this.deleteForm.invalid) {
       this.deleteForm.markAllAsTouched();

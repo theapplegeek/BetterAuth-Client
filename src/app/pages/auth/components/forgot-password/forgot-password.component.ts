@@ -12,6 +12,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-forgot-password',
@@ -41,11 +42,19 @@ export class ForgotPasswordComponent {
   public onSubmit(): void {
     if (this.resetPasswordCooldown() > 0) return;
 
+    const emailControl = this.form.controls['email'];
+    trimControl(emailControl);
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.errorMessage.set('');
     this.successMessage.set('');
 
     this._authService
-      .requestResetPassword(this.form.value.email)
+      .requestResetPassword(emailControl.value)
       .subscribe({
         next: (data): void => {
           this.successMessage.set(

@@ -24,6 +24,7 @@ import {
   RoleUpsertPayload,
 } from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
+import { trimControls } from '../../../../../../common/forms/input-normalizer.util';
 
 export type RoleFormDialogData =
   | {
@@ -140,6 +141,8 @@ export class RoleFormDialogComponent {
   }
 
   public saveRole(): void {
+    trimControls(this.roleForm, ['name', 'description']);
+
     if (this.roleForm.invalid) {
       this.roleForm.markAllAsTouched();
       return;

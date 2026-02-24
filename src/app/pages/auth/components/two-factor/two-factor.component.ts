@@ -12,6 +12,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-two-factor',
@@ -34,9 +35,12 @@ export class TwoFactorComponent {
     signal<string>('');
 
   public onVerify(): void {
+    const codeControl = this.form.controls['code'];
+    trimControl(codeControl);
+
     if (this.form.invalid) return;
     this._authService
-      .verifyTwoFactorTOTP(this.form.value.code)
+      .verifyTwoFactorTOTP(codeControl.value)
       .subscribe({
         next: (): void => {
           this.errorMessage.set('');
@@ -51,9 +55,12 @@ export class TwoFactorComponent {
   }
 
   public onVerifyWithBackupCode(): void {
+    const codeControl = this.form.controls['code'];
+    trimControl(codeControl);
+
     if (this.form.invalid) return;
     this._authService
-      .verifyTwoFactorBackupCode(this.form.value.code)
+      .verifyTwoFactorBackupCode(codeControl.value)
       .subscribe({
         next: (): void => {
           this.errorMessage.set('');

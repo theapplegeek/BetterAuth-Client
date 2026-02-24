@@ -23,6 +23,7 @@ import {
   PermissionUpsertPayload,
 } from '../../../../models/admin.model';
 import { ToastService } from '../../../../../../common/services/toast.service';
+import { trimControls } from '../../../../../../common/forms/input-normalizer.util';
 
 export type PermissionFormDialogData =
   | { mode: 'create' }
@@ -101,6 +102,12 @@ export class PermissionFormDialogComponent {
   }
 
   public savePermission(): void {
+    trimControls(this.permissionForm, [
+      'code',
+      'name',
+      'description',
+    ]);
+
     if (this.permissionForm.invalid) {
       this.permissionForm.markAllAsTouched();
       return;

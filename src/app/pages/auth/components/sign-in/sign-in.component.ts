@@ -13,6 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../common/auth/auth.service';
 import { finalize } from 'rxjs';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-sign-in',
@@ -47,14 +48,17 @@ export class SignInComponent {
     signal<boolean>(false);
 
   public onSignInWithMagicLink(): void {
+    const emailControl = this.form.controls['email'];
+    trimControl(emailControl);
+
     if (this.magicLinkCooldown() > 0) return;
     if (this.isSendingMagicLink()) return;
-    if (this.form.controls['email'].invalid) return;
+    if (emailControl.invalid) return;
 
     this.isSendingMagicLink.set(true);
 
     this._authService
-      .signInWithMagicLink(this.form.value.email)
+      .signInWithMagicLink(emailControl.value)
       .pipe(
         finalize((): void => {
           this.isSendingMagicLink.set(false);
@@ -91,9 +95,16 @@ export class SignInComponent {
   }
 
   public onSignInWithPassword(): void {
+    const emailControl = this.form.controls['email'];
+    trimControl(emailControl);
+
     if (this.form.invalid) return;
+
     this._authService
-      .signInWithPassword(this.form.value)
+      .signInWithPassword({
+        email: emailControl.value,
+        password: this.form.controls['password'].value,
+      })
       .subscribe({
         error: (err: any): void => {
           this.errorMessage.set(

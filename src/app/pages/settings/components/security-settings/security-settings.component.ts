@@ -42,6 +42,7 @@ import {
   RevokeOtherSessionsDialogComponent,
   RevokeOtherSessionsDialogResult,
 } from './dialogs/revoke-other-sessions-dialog/revoke-other-sessions-dialog.component';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 type ProviderId = 'credential' | 'google' | 'discord';
 type ProviderCard = {
@@ -330,8 +331,15 @@ export class SecuritySettingsComponent {
   }
 
   public addPasskey(): void {
+    trimControl(this.passkeyForm.controls.name);
+
+    if (this.passkeyForm.invalid) {
+      this.passkeyForm.markAllAsTouched();
+      return;
+    }
+
     const passkeyName: string =
-      this.passkeyForm.controls.name.value.trim();
+      this.passkeyForm.controls.name.value;
 
     this.isAddingPasskey.set(true);
     this._accountSecurityService

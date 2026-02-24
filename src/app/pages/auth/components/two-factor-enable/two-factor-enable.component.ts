@@ -14,6 +14,7 @@ import {
 } from '@angular/forms';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ClipboardService } from '../../../../common/services/clipboard.service';
+import { trimControl } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-two-factor-enable',
@@ -51,8 +52,16 @@ export class TwoFactorEnableComponent {
   }
 
   public onVerify(): void {
+    const codeControl = this.form.controls['code'];
+    trimControl(codeControl);
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.authService
-      .verifyTwoFactorTOTP(this.form.value.code)
+      .verifyTwoFactorTOTP(codeControl.value)
       .subscribe({
         next: (): void => {
           this.errorMessage.set('');

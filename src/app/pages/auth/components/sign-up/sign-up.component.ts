@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../../../common/auth/auth.service';
 import { Router } from '@angular/router';
+import { trimControls } from '../../../../common/forms/input-normalizer.util';
 
 @Component({
   selector: 'app-sign-up',
@@ -38,9 +39,17 @@ export class SignUpComponent {
     signal<string>('');
 
   public onSignUp(): void {
+    trimControls(this.form, ['name', 'email']);
+
     if (this.form.invalid) return;
-    const data: any = this.form.value;
-    this._authService.signUp(data).subscribe({
+
+    this._authService
+      .signUp({
+        name: this.form.controls['name'].value,
+        email: this.form.controls['email'].value,
+        password: this.form.controls['password'].value,
+      })
+      .subscribe({
       next: (): void => {
         this.successMessage.set(
           'Check your email for verify your account',
@@ -53,7 +62,7 @@ export class SignUpComponent {
         );
         this.successMessage.set('');
       },
-    });
+      });
   }
 
   public onSignIn(): void {
