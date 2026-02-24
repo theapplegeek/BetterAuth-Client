@@ -47,9 +47,9 @@ export class ForgotPasswordComponent {
     this._authService
       .requestResetPassword(this.form.value.email)
       .subscribe({
-        next: (): void => {
+        next: (data): void => {
           this.successMessage.set(
-            'Password reset link sent to your email',
+            data.message || 'If this email exists in our system, check your email for the reset link ',
           );
           this.startResetPasswordCooldown();
         },
@@ -75,6 +75,6 @@ export class ForgotPasswordComponent {
   }
 
   public onBackToSignIn(): void {
-    this._router.navigate(['auth/sign-in']);
+    this._router.navigate(['/redirect-to-sign-in']);
   }
 }

@@ -32,6 +32,7 @@ export class SignInComponent {
     ]),
     password: new FormControl('', [Validators.required]),
   });
+
   public passkeyAutofillEnabled: WritableSignal<boolean> =
     signal<boolean>(false);
   public errorMessage: WritableSignal<string> =
