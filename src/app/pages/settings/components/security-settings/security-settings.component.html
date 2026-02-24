@@ -1,470 +1,539 @@
-<div class="space-y-6">
+<div class="security-settings space-y-4 sm:space-y-5">
   @if (isLoading()) {
     <div
-      class="rounded-lg border-gray-200 bg-gray-50 p-5 dark:border-white/10 dark:bg-gray-800/40 border"
+      class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 sm:p-5"
     >
       <p class="text-sm text-gray-600 dark:text-gray-400">
         Loading security data...
       </p>
     </div>
   } @else {
-    <section
-      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
+    <nav
+      class="security-panel-tabs sticky top-0 z-20 rounded-xl border border-gray-200/90 bg-white/90 p-2 shadow-xs dark:border-white/10 dark:bg-gray-900/85"
+      aria-label="Security settings sections"
+      role="tablist"
     >
-      <h2
-        class="text-lg font-semibold text-gray-900 dark:text-white"
+      <div
+        class="security-panel-tabs-scroll hide-scrollbar overflow-x-auto"
       >
-        Password Management
-      </h2>
-      <p
-        class="mt-1 text-sm text-gray-600 dark:text-gray-400"
-      >
-        Keep your credentials up to date.
-      </p>
-
-      @if (!hasCredentialAccount()) {
         <div
-          class="mt-4 rounded-lg p-4 text-sm border border-warning-200 bg-warning-100/70 text-warning-800 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-200"
+          class="security-panel-tabs-row flex min-w-max items-center gap-2"
         >
-          This account has no credential login yet. Set a
-          password first to enable password changes and 2FA.
-        </div>
-
-        <div class="mt-4">
-          <button
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-            type="button"
-            [disabled]="isRequestingCredentialSetup()"
-            (click)="requestCredentialSetup()"
-          >
-            {{
-              isRequestingCredentialSetup()
-                ? 'Sending...'
-                : 'Send Reset Password Link'
-            }}
-          </button>
-        </div>
-      } @else {
-        <form
-          class="mt-5 gap-4 md:grid-cols-2 grid"
-          [formGroup]="changePasswordForm"
-          (ngSubmit)="changePassword()"
-        >
-          <div>
-            <label
-              class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
-              for="current-password"
-            >
-              Current password
-            </label>
-            <input
-              id="current-password"
-              class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
-              formControlName="currentPassword"
-              type="password"
-            />
-          </div>
-
-          <div>
-            <label
-              class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
-              for="new-password"
-            >
-              New password
-            </label>
-            <input
-              id="new-password"
-              class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
-              formControlName="newPassword"
-              type="password"
-            />
-          </div>
-
-          <label
-            class="md:col-span-2 gap-2 text-sm text-gray-700 dark:text-gray-300 flex items-center"
-          >
-            <input
-              class="size-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              formControlName="revokeOtherSessions"
-              type="checkbox"
-            />
-            Revoke all other active sessions
-          </label>
-
-          <div class="md:col-span-2">
+          @for (
+            panel of securityPanelTabs;
+            track panel.id
+          ) {
             <button
-              class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-              type="submit"
-              [disabled]="
-                changePasswordForm.invalid ||
-                isChangingPassword()
+              class="security-panel-tab inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors"
+              type="button"
+              role="tab"
+              [attr.id]="'security-tab-' + panel.id"
+              [class.security-panel-tab-active]="
+                isSecurityPanelActive(panel.id)
               "
+              [attr.aria-selected]="
+                isSecurityPanelActive(panel.id)
+              "
+              [attr.aria-controls]="
+                'security-panel-' + panel.id
+              "
+              [attr.tabindex]="
+                isSecurityPanelActive(panel.id)
+                  ? 0
+                  : -1
+              "
+              (click)="setActiveSecurityPanel(panel.id)"
+            >
+              <span
+                class="size-4.5 sm:size-5"
+                [class]="panel.icon"
+              ></span>
+              <span class="sm:hidden">
+                {{ panel.shortLabel }}
+              </span>
+              <span class="hidden sm:inline">
+                {{ panel.label }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    </nav>
+
+    @if (isSecurityPanelActive('password')) {
+      <section
+        class="security-panel-card rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 sm:p-5"
+        id="security-panel-password"
+        role="tabpanel"
+        aria-labelledby="security-tab-password"
+      >
+        <h2
+          class="text-lg font-semibold text-gray-900 dark:text-white"
+        >
+          Password Management
+        </h2>
+        <p
+          class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+        >
+          Keep your credentials up to date.
+        </p>
+
+        @if (!hasCredentialAccount()) {
+          <div
+            class="mt-4 rounded-lg border border-warning-200 bg-warning-100/70 p-4 text-sm text-warning-800 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-200"
+          >
+            This account has no credential login yet. Set a
+            password first to enable password changes and 2FA.
+          </div>
+
+          <div class="mt-4">
+            <button
+              class="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60 sm:w-auto"
+              type="button"
+              [disabled]="isRequestingCredentialSetup()"
+              (click)="requestCredentialSetup()"
             >
               {{
-                isChangingPassword()
-                  ? 'Updating...'
-                  : 'Change Password'
+                isRequestingCredentialSetup()
+                  ? 'Sending...'
+                  : 'Send Reset Password Link'
               }}
             </button>
           </div>
-        </form>
-      }
-    </section>
+        } @else {
+          <form
+            class="mt-4 grid gap-4 sm:mt-5 md:grid-cols-2"
+            [formGroup]="changePasswordForm"
+            (ngSubmit)="changePassword()"
+          >
+            <div>
+              <label
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="current-password"
+              >
+                Current password
+              </label>
+              <input
+                id="current-password"
+                class="w-full"
+                formControlName="currentPassword"
+                type="password"
+              />
+            </div>
 
-    <section
-      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
-    >
-      <div
-        class="gap-3 sm:flex-row sm:items-center sm:justify-between flex flex-col"
+            <div>
+              <label
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="new-password"
+              >
+                New password
+              </label>
+              <input
+                id="new-password"
+                class="w-full"
+                formControlName="newPassword"
+                type="password"
+              />
+            </div>
+
+            <label
+              class="flex items-center gap-2 text-sm text-gray-700 md:col-span-2 dark:text-gray-300"
+            >
+              <input
+                formControlName="revokeOtherSessions"
+                type="checkbox"
+              />
+              Revoke all other active sessions
+            </label>
+
+            <div class="md:col-span-2">
+              <button
+                class="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60 sm:w-auto"
+                type="submit"
+                [disabled]="
+                  changePasswordForm.invalid ||
+                  isChangingPassword()
+                "
+              >
+                {{
+                  isChangingPassword()
+                    ? 'Updating...'
+                    : 'Change Password'
+                }}
+              </button>
+            </div>
+          </form>
+        }
+      </section>
+    }
+
+    @if (isSecurityPanelActive('two-factor')) {
+      <section
+        class="security-panel-card rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 sm:p-5"
+        id="security-panel-two-factor"
+        role="tabpanel"
+        aria-labelledby="security-tab-two-factor"
       >
-        <div>
-          <h2
-            class="text-lg font-semibold text-gray-900 dark:text-white"
-          >
-            Two-Factor Authentication
-          </h2>
-          <p
-            class="mt-1 text-sm text-gray-600 dark:text-gray-400"
-          >
-            Protect your account with an extra verification
-            step.
-          </p>
-        </div>
-
-        <span
-          class="px-3 py-1 text-xs font-semibold inline-flex w-fit rounded-full uppercase"
-          [class]="{
-            'bg-success-100 text-success-700 dark:bg-success-900/20 dark:text-success-300':
-              user()?.twoFactorEnabled,
-            'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300':
-              !user()?.twoFactorEnabled,
-          }"
-        >
-          {{
-            user()?.twoFactorEnabled
-              ? 'Enabled'
-              : 'Disabled'
-          }}
-        </span>
-      </div>
-
-      @if (!hasCredentialAccount()) {
         <div
-          class="mt-4 rounded-lg p-4 text-sm border border-warning-200 bg-warning-100/70 text-warning-800 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-200"
-        >
-          Credential login is required to enable or disable
-          2FA.
-        </div>
-      } @else {
-        <form
-          class="mt-5 space-y-4"
-          [formGroup]="twoFactorForm"
-          (ngSubmit)="updateTwoFactor()"
+          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
-            <label
-              class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 block"
-              for="two-factor-password"
+            <h2
+              class="text-lg font-semibold text-gray-900 dark:text-white"
             >
-              Confirm password
-            </label>
-            <input
-              id="two-factor-password"
-              class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
-              formControlName="password"
-              type="password"
-            />
+              Two-Factor Authentication
+            </h2>
+            <p
+              class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+            >
+              Protect your account with an extra verification step.
+            </p>
           </div>
 
-          <button
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-white inline-flex items-center transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
+          <span
+            class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase"
             [class]="{
-              'bg-primary-600 hover:bg-primary-700':
-                !user()?.twoFactorEnabled,
-              'bg-error-600 hover:bg-error-700':
+              'bg-success-100 text-success-700 dark:bg-success-900/20 dark:text-success-300':
                 user()?.twoFactorEnabled,
+              'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300':
+                !user()?.twoFactorEnabled,
             }"
+          >
+            {{
+              user()?.twoFactorEnabled
+                ? 'Enabled'
+                : 'Disabled'
+            }}
+          </span>
+        </div>
+
+        @if (!hasCredentialAccount()) {
+          <div
+            class="mt-4 rounded-lg border border-warning-200 bg-warning-100/70 p-4 text-sm text-warning-800 dark:border-warning-800 dark:bg-warning-900/20 dark:text-warning-200"
+          >
+            Credential login is required to enable or disable 2FA.
+          </div>
+        } @else {
+          <form
+            class="mt-4 space-y-4 sm:mt-5"
+            [formGroup]="twoFactorForm"
+            (ngSubmit)="updateTwoFactor()"
+          >
+            <div>
+              <label
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="two-factor-password"
+              >
+                Confirm password
+              </label>
+              <input
+                id="two-factor-password"
+                class="w-full"
+                formControlName="password"
+                type="password"
+              />
+            </div>
+
+            <button
+              class="inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-60 sm:w-auto"
+              type="submit"
+              [class]="{
+                'bg-primary-600 hover:bg-primary-700':
+                  !user()?.twoFactorEnabled,
+                'bg-error-600 hover:bg-error-700':
+                  user()?.twoFactorEnabled,
+              }"
+              [disabled]="
+                twoFactorForm.invalid || isUpdatingTwoFactor()
+              "
+            >
+              @if (isUpdatingTwoFactor()) {
+                Updating...
+              } @else {
+                {{
+                  user()?.twoFactorEnabled
+                    ? 'Disable 2FA'
+                    : 'Enable 2FA'
+                }}
+              }
+            </button>
+          </form>
+        }
+      </section>
+    }
+
+    @if (isSecurityPanelActive('passkeys')) {
+      <section
+        class="security-panel-card rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 sm:p-5"
+        id="security-panel-passkeys"
+        role="tabpanel"
+        aria-labelledby="security-tab-passkeys"
+      >
+        <h2
+          class="text-lg font-semibold text-gray-900 dark:text-white"
+        >
+          Passkeys
+        </h2>
+        <p
+          class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+        >
+          Register secure passkeys for passwordless sign in.
+        </p>
+
+        <form
+          class="mb-5 mt-4 grid gap-3 sm:mt-5 sm:grid-cols-[minmax(0,1fr)_auto]"
+          [formGroup]="passkeyForm"
+          (ngSubmit)="addPasskey()"
+        >
+          <input
+            class="w-full"
+            formControlName="name"
+            placeholder="Optional passkey name"
+            type="text"
+          />
+          <button
+            class="inline-flex w-full min-w-32 items-center justify-center whitespace-nowrap rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60 sm:w-auto"
+            type="submit"
             [disabled]="
-              twoFactorForm.invalid || isUpdatingTwoFactor()
+              passkeyForm.invalid || isAddingPasskey()
             "
           >
-            @if (isUpdatingTwoFactor()) {
-              Updating...
-            } @else {
-              {{
-                user()?.twoFactorEnabled
-                  ? 'Disable 2FA'
-                  : 'Enable 2FA'
-              }}
-            }
+            {{
+              isAddingPasskey() ? 'Adding...' : 'Add Passkey'
+            }}
           </button>
         </form>
-      }
-    </section>
 
-    <section
-      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
-    >
-      <div
-        class="mb-5 gap-3 sm:flex-row sm:items-center sm:justify-between flex flex-col"
-      >
-        <div>
-          <h2
-            class="text-lg font-semibold text-gray-900 dark:text-white"
-          >
-            Passkeys
-          </h2>
-          <p
-            class="mt-1 text-sm text-gray-600 dark:text-gray-400"
-          >
-            Register secure passkeys for passwordless sign
-            in.
-          </p>
+        <div class="space-y-3">
+          @for (passkey of passkeys(); track passkey.id) {
+            <div
+              class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div class="min-w-0">
+                <p
+                  class="truncate text-sm font-semibold text-gray-900 dark:text-white"
+                >
+                  {{ passkey.name || 'Unnamed passkey' }}
+                </p>
+                <p
+                  class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+                >
+                  Created:
+                  {{
+                    passkey.createdAt
+                      | date: 'dd MMM yyyy, HH:mm'
+                  }}
+                </p>
+              </div>
+              <button
+                class="inline-flex items-center gap-2 text-sm font-semibold text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+                type="button"
+                (click)="requestDeletePasskey(passkey.id)"
+              >
+                Remove
+              </button>
+            </div>
+          } @empty {
+            <p
+              class="text-sm text-gray-600 dark:text-gray-400"
+            >
+              No passkeys configured yet.
+            </p>
+          }
         </div>
-      </div>
+      </section>
+    }
 
-      <form
-        class="mb-5 gap-3 sm:flex-row flex flex-col"
-        [formGroup]="passkeyForm"
-        (ngSubmit)="addPasskey()"
+    @if (isSecurityPanelActive('sessions')) {
+      <section
+        class="security-panel-card rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 sm:p-5"
+        id="security-panel-sessions"
+        role="tabpanel"
+        aria-labelledby="security-tab-sessions"
       >
-        <input
-          class="rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white w-full border focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25 focus:outline-none"
-          formControlName="name"
-          placeholder="Optional passkey name"
-          type="text"
-        />
-        <button
-          class="min-w-32 whitespace-nowrap rounded-lg px-5 py-2 text-sm font-semibold text-white inline-flex items-center justify-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-          type="submit"
-          [disabled]="
-            passkeyForm.invalid || isAddingPasskey()
-          "
+        <div
+          class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          {{
-            isAddingPasskey() ? 'Adding...' : 'Add Passkey'
-          }}
-        </button>
-      </form>
+          <div>
+            <h2
+              class="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              Active Sessions
+            </h2>
+            <p
+              class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+            >
+              BetterAuth allows revoking all sessions, or all except the
+              current one.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="inline-flex items-center rounded-lg bg-warning-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-warning-700 disabled:opacity-60"
+              type="button"
+              [disabled]="sessions().length === 0"
+              (click)="requestRevokeOtherSessions()"
+            >
+              Revoke Others
+            </button>
+            <button
+              class="inline-flex items-center rounded-lg bg-error-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-error-700 disabled:opacity-60"
+              type="button"
+              [disabled]="sessions().length === 0"
+              (click)="requestRevokeAllSessions()"
+            >
+              Revoke All
+            </button>
+          </div>
+        </div>
 
-      <div class="space-y-3">
-        @for (passkey of passkeys(); track passkey.id) {
-          <div
-            class="gap-3 rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 sm:flex-row sm:items-center sm:justify-between flex flex-col border"
-          >
-            <div class="min-w-0">
+        <div class="space-y-3">
+          @for (session of sessions(); track session.id) {
+            <div
+              class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40"
+            >
+              <div class="flex items-center gap-2">
+                <p
+                  class="text-sm font-semibold text-gray-900 break-words dark:text-white"
+                >
+                  {{ session.userAgent || 'Unknown device' }}
+                </p>
+                @if (session.id === currentSessionId()) {
+                  <span
+                    class="inline-flex rounded-full bg-success-100 px-2 py-0.5 text-[10px] font-semibold text-success-700 uppercase dark:bg-success-900/20 dark:text-success-300"
+                  >
+                    Current
+                  </span>
+                }
+              </div>
               <p
-                class="text-sm font-semibold text-gray-900 dark:text-white truncate"
+                class="text-xs text-gray-600 dark:text-gray-400"
               >
-                {{ passkey.name || 'Unnamed passkey' }}
-              </p>
-              <p
-                class="mt-1 text-xs text-gray-600 dark:text-gray-400"
-              >
-                Created:
+                Last activity:
                 {{
-                  passkey.createdAt
+                  session.updatedAt
                     | date: 'dd MMM yyyy, HH:mm'
                 }}
               </p>
             </div>
-            <button
-              class="gap-2 text-sm font-semibold inline-flex items-center text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
-              type="button"
-              (click)="requestDeletePasskey(passkey.id)"
-            >
-              Remove
-            </button>
-          </div>
-        } @empty {
-          <p
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
-            No passkeys configured yet.
-          </p>
-        }
-      </div>
-    </section>
-
-    <section
-      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
-    >
-      <div
-        class="mb-5 gap-3 sm:flex-row sm:items-center sm:justify-between flex flex-col"
-      >
-        <div>
-          <h2
-            class="text-lg font-semibold text-gray-900 dark:text-white"
-          >
-            Active Sessions
-          </h2>
-          <p
-            class="mt-1 text-sm text-gray-600 dark:text-gray-400"
-          >
-            BetterAuth allows revoking all sessions, or all
-            except the current one.
-          </p>
-        </div>
-        <div class="gap-2 flex flex-wrap">
-          <button
-            class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-warning-600 transition-colors hover:bg-warning-700 disabled:cursor-not-allowed disabled:opacity-60"
-            type="button"
-            (click)="requestRevokeOtherSessions()"
-          >
-            Revoke Others
-          </button>
-          <button
-            class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-error-600 transition-colors hover:bg-error-700 disabled:cursor-not-allowed disabled:opacity-60"
-            type="button"
-            (click)="requestRevokeAllSessions()"
-          >
-            Revoke All
-          </button>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        @for (session of sessions(); track session.id) {
-          <div
-            class="gap-2 rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 flex flex-col border"
-          >
-            <div class="gap-2 flex items-center">
-              <p
-                class="text-sm font-semibold text-gray-900 dark:text-white"
-              >
-                {{ session.userAgent || 'Unknown device' }}
-              </p>
-              @if (session.id === currentSessionId()) {
-                <span
-                  class="px-2 py-0.5 font-semibold inline-flex rounded-full bg-success-100 text-[10px] text-success-700 uppercase dark:bg-success-900/20 dark:text-success-300"
-                >
-                  Current
-                </span>
-              }
-            </div>
+          } @empty {
             <p
-              class="text-xs text-gray-600 dark:text-gray-400"
+              class="text-sm text-gray-600 dark:text-gray-400"
             >
-              Last activity:
-              {{
-                session.updatedAt
-                  | date: 'dd MMM yyyy, HH:mm'
-              }}
+              No active sessions found.
             </p>
-          </div>
-        } @empty {
-          <p
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
-            No active sessions found.
-          </p>
-        }
-      </div>
-    </section>
+          }
+        </div>
+      </section>
+    }
 
-    <section
-      class="rounded-xl border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-gray-900/60 border"
-    >
-      <h2
-        class="text-lg font-semibold text-gray-900 dark:text-white"
+    @if (isSecurityPanelActive('accounts')) {
+      <section
+        class="security-panel-card rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900/60 sm:p-5"
+        id="security-panel-accounts"
+        role="tabpanel"
+        aria-labelledby="security-tab-accounts"
       >
-        Connected Accounts
-      </h2>
-      <p
-        class="mt-1 text-sm text-gray-600 dark:text-gray-400"
-      >
-        Credential login appears here as a protected account
-        link and cannot be disconnected once set.
-      </p>
+        <h2
+          class="text-lg font-semibold text-gray-900 dark:text-white"
+        >
+          Connected Accounts
+        </h2>
+        <p
+          class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+        >
+          Credential login appears here as a protected account link and
+          cannot be disconnected once set.
+        </p>
 
-      <div class="mt-5 space-y-3">
-        @for (
-          provider of connectedProviders();
-          track provider.provider
-        ) {
-          <div
-            class="gap-3 rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 sm:flex-row sm:items-center sm:justify-between flex flex-col border"
-          >
-            <div class="gap-3 flex items-center">
-              <span
-                class="size-5"
-                [class]="provider.icon"
-              ></span>
+        <div class="mt-5 space-y-3">
+          @for (
+            provider of connectedProviders();
+            track provider.provider
+          ) {
+            <div
+              class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  class="size-5"
+                  [class]="provider.icon"
+                ></span>
+                <div>
+                  <p
+                    class="text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    {{ provider.label }}
+                  </p>
+                  <p
+                    class="text-xs"
+                    [class]="{
+                      'text-success-700 dark:text-success-300':
+                        provider.connected,
+                      'text-gray-600 dark:text-gray-400':
+                        !provider.connected,
+                    }"
+                  >
+                    {{
+                      provider.connected
+                        ? 'Connected'
+                        : 'Not connected'
+                    }}
+                  </p>
+                </div>
+              </div>
+
               <div>
-                <p
-                  class="text-sm font-semibold text-gray-900 dark:text-white"
-                >
-                  {{ provider.label }}
-                </p>
-                <p
-                  class="text-xs"
-                  [class]="{
-                    'text-success-700 dark:text-success-300':
-                      provider.connected,
-                    'text-gray-600 dark:text-gray-400':
-                      !provider.connected,
-                  }"
-                >
-                  {{
-                    provider.connected
-                      ? 'Connected'
-                      : 'Not connected'
-                  }}
-                </p>
+                @if (
+                  provider.connected && provider.canDisconnect
+                ) {
+                  <button
+                    class="text-sm font-semibold text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+                    type="button"
+                    (click)="
+                      requestDisconnectProvider(
+                        provider.provider
+                      )
+                    "
+                  >
+                    Disconnect
+                  </button>
+                } @else if (
+                  provider.connected &&
+                  !provider.canDisconnect
+                ) {
+                  <span
+                    class="text-xs font-semibold text-gray-500 dark:text-gray-400"
+                  >
+                    Protected link
+                  </span>
+                } @else {
+                  <button
+                    class="inline-flex items-center rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                    type="button"
+                    [disabled]="
+                      linkingProviderId() ===
+                      provider.provider
+                    "
+                    (click)="
+                      connectProvider(provider.provider)
+                    "
+                  >
+                    {{
+                      linkingProviderId() ===
+                      provider.provider
+                        ? 'Connecting...'
+                        : provider.provider === 'credential'
+                          ? 'Send Reset Password Link'
+                          : 'Connect'
+                    }}
+                  </button>
+                }
               </div>
             </div>
-
-            <div>
-              @if (
-                provider.connected && provider.canDisconnect
-              ) {
-                <button
-                  class="text-sm font-semibold text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
-                  type="button"
-                  (click)="
-                    requestDisconnectProvider(
-                      provider.provider
-                    )
-                  "
-                >
-                  Disconnect
-                </button>
-              } @else if (
-                provider.connected &&
-                !provider.canDisconnect
-              ) {
-                <span
-                  class="text-xs font-semibold text-gray-500 dark:text-gray-400"
-                >
-                  Protected link
-                </span>
-              } @else {
-                <button
-                  class="rounded-lg px-3 py-2 text-xs font-semibold text-white inline-flex items-center bg-primary-600 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-                  type="button"
-                  [disabled]="
-                    linkingProviderId() ===
-                    provider.provider
-                  "
-                  (click)="
-                    connectProvider(provider.provider)
-                  "
-                >
-                  {{
-                    linkingProviderId() ===
-                    provider.provider
-                      ? 'Connecting...'
-                      : provider.provider === 'credential'
-                        ? 'Send Reset Password Link'
-                        : 'Connect'
-                  }}
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    </section>
+          }
+        </div>
+      </section>
+    }
   }
 </div>

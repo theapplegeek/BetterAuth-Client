@@ -52,6 +52,18 @@ type ProviderCard = {
   connected: boolean;
   canDisconnect: boolean;
 };
+type SecurityPanelId =
+  | 'password'
+  | 'two-factor'
+  | 'passkeys'
+  | 'sessions'
+  | 'accounts';
+type SecurityPanelTab = {
+  id: SecurityPanelId;
+  label: string;
+  shortLabel: string;
+  icon: string;
+};
 
 @Component({
   selector: 'app-security-settings',
@@ -98,6 +110,40 @@ export class SecuritySettingsComponent {
   public readonly linkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
+  public readonly activeSecurityPanel: WritableSignal<SecurityPanelId> =
+    signal<SecurityPanelId>('password');
+  public readonly securityPanelTabs: SecurityPanelTab[] = [
+    {
+      id: 'password',
+      label: 'Password',
+      shortLabel: 'Password',
+      icon: 'icon-[heroicons--key]',
+    },
+    {
+      id: 'two-factor',
+      label: '2FA',
+      shortLabel: '2FA',
+      icon: 'icon-[heroicons--shield-check]',
+    },
+    {
+      id: 'passkeys',
+      label: 'Passkeys',
+      shortLabel: 'Passkeys',
+      icon: 'icon-[heroicons--finger-print]',
+    },
+    {
+      id: 'sessions',
+      label: 'Sessions',
+      shortLabel: 'Sessions',
+      icon: 'icon-[heroicons--computer-desktop]',
+    },
+    {
+      id: 'accounts',
+      label: 'Connected Accounts',
+      shortLabel: 'Accounts',
+      icon: 'icon-[heroicons--link]',
+    },
+  ];
 
   public readonly passkeys: WritableSignal<Passkey[]> =
     signal<Passkey[]>([]);
@@ -141,6 +187,18 @@ export class SecuritySettingsComponent {
 
   constructor() {
     this.loadSecurityState();
+  }
+
+  public setActiveSecurityPanel(
+    panelId: SecurityPanelId,
+  ): void {
+    this.activeSecurityPanel.set(panelId);
+  }
+
+  public isSecurityPanelActive(
+    panelId: SecurityPanelId,
+  ): boolean {
+    return this.activeSecurityPanel() === panelId;
   }
 
   public loadSecurityState(): void {
