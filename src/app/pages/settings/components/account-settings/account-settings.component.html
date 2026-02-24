@@ -57,20 +57,21 @@
           >
             Email Verification
           </dt>
-          <dd
-            class="mt-2 text-sm font-medium"
-            [class]="{
-              'text-success-700 dark:text-success-300':
-                user()?.emailVerified,
-              'text-warning-700 dark:text-warning-300':
-                !user()?.emailVerified,
-            }"
-          >
-            {{
-              user()?.emailVerified
-                ? 'Verified'
-                : 'Pending verification'
-            }}
+          <dd class="mt-2">
+            <span
+              class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+              [class]="
+                user()?.emailVerified
+                  ? 'bg-success-100 text-success-700 dark:bg-success-900/25 dark:text-success-300'
+                  : 'bg-warning-100 text-warning-700 dark:bg-warning-900/25 dark:text-warning-300'
+              "
+            >
+              {{
+                user()?.emailVerified
+                  ? 'Email Verified'
+                  : 'Email Pending'
+              }}
+            </span>
           </dd>
         </div>
 

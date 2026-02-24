@@ -211,14 +211,20 @@
                 <dt class="text-xs text-gray-500 dark:text-gray-400 uppercase">
                   Application Roles
                 </dt>
-                <dd
-                  class="mt-2 text-sm text-gray-900 dark:text-white"
-                >
-                  {{
-                    roles().length
-                      ? roles().join(', ')
-                      : 'No explicit roles assigned'
-                  }}
+                <dd class="mt-2 text-sm text-gray-900 dark:text-white">
+                  @if (roles().length) {
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (role of roles(); track role) {
+                        <span
+                          class="inline-flex rounded-full bg-gray-200 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                        >
+                          {{ role }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    No explicit roles assigned
+                  }
                 </dd>
               </div>
             </dl>
