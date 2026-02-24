@@ -52,18 +52,6 @@ type ProviderCard = {
   connected: boolean;
   canDisconnect: boolean;
 };
-type SecurityPanelId =
-  | 'password'
-  | 'two-factor'
-  | 'passkeys'
-  | 'sessions'
-  | 'accounts';
-type SecurityPanelTab = {
-  id: SecurityPanelId;
-  label: string;
-  shortLabel: string;
-  icon: string;
-};
 
 @Component({
   selector: 'app-security-settings',
@@ -110,40 +98,6 @@ export class SecuritySettingsComponent {
   public readonly linkingProviderId: WritableSignal<
     ProviderId | undefined
   > = signal<ProviderId | undefined>(undefined);
-  public readonly activeSecurityPanel: WritableSignal<SecurityPanelId> =
-    signal<SecurityPanelId>('password');
-  public readonly securityPanelTabs: SecurityPanelTab[] = [
-    {
-      id: 'password',
-      label: 'Password',
-      shortLabel: 'Password',
-      icon: 'icon-[heroicons--key]',
-    },
-    {
-      id: 'two-factor',
-      label: '2FA',
-      shortLabel: '2FA',
-      icon: 'icon-[heroicons--shield-check]',
-    },
-    {
-      id: 'passkeys',
-      label: 'Passkeys',
-      shortLabel: 'Passkeys',
-      icon: 'icon-[heroicons--finger-print]',
-    },
-    {
-      id: 'sessions',
-      label: 'Sessions',
-      shortLabel: 'Sessions',
-      icon: 'icon-[heroicons--computer-desktop]',
-    },
-    {
-      id: 'accounts',
-      label: 'Connected Accounts',
-      shortLabel: 'Accounts',
-      icon: 'icon-[heroicons--link]',
-    },
-  ];
 
   public readonly passkeys: WritableSignal<Passkey[]> =
     signal<Passkey[]>([]);
@@ -187,59 +141,6 @@ export class SecuritySettingsComponent {
 
   constructor() {
     this.loadSecurityState();
-  }
-
-  public setActiveSecurityPanel(
-    panelId: SecurityPanelId,
-  ): void {
-    this.activeSecurityPanel.set(panelId);
-  }
-
-  public isSecurityPanelActive(
-    panelId: SecurityPanelId,
-  ): boolean {
-    return this.activeSecurityPanel() === panelId;
-  }
-
-  public onSecurityTabKeydown(
-    event: KeyboardEvent,
-    panelId: SecurityPanelId,
-  ): void {
-    const panelIds: SecurityPanelId[] =
-      this.securityPanelTabs.map(
-        (panel: SecurityPanelTab): SecurityPanelId =>
-          panel.id,
-      );
-    const currentIndex: number =
-      panelIds.indexOf(panelId);
-
-    if (currentIndex < 0) return;
-
-    let nextIndex: number = currentIndex;
-    switch (event.key) {
-      case 'ArrowRight':
-      case 'ArrowDown':
-        nextIndex =
-          (currentIndex + 1) % panelIds.length;
-        break;
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        nextIndex =
-          (currentIndex - 1 + panelIds.length) %
-          panelIds.length;
-        break;
-      case 'Home':
-        nextIndex = 0;
-        break;
-      case 'End':
-        nextIndex = panelIds.length - 1;
-        break;
-      default:
-        return;
-    }
-
-    event.preventDefault();
-    this.activeSecurityPanel.set(panelIds[nextIndex]);
   }
 
   public loadSecurityState(): void {
