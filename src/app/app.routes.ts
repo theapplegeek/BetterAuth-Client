@@ -4,6 +4,7 @@ import { inject } from '@angular/core';
 import { authGuard } from './common/auth/guards/auth.guard';
 import { noAuthGuard } from './common/auth/guards/no-auth.guard';
 import { betterAuthAdminGuard } from './common/auth/guards/better-auth-admin.guard';
+import { requireUsernameGuard } from './common/auth/guards/require-username.guard';
 
 export const routes: Routes = [
   {
@@ -63,6 +64,24 @@ export const routes: Routes = [
     path: '',
     component: LayoutsComponent,
     canActivate: [authGuard],
+    data: {
+      layout: 'empty',
+    },
+    children: [
+      {
+        path: 'onboarding',
+        loadChildren: () =>
+          import('./pages/onboarding/onboarding.routes').then(
+            (m) => m.routes,
+          ),
+      },
+    ],
+  },
+  {
+    path: '',
+    component: LayoutsComponent,
+    canActivate: [authGuard],
+    canActivateChild: [requireUsernameGuard],
     data: {
       layout: 'sidebar',
     },
