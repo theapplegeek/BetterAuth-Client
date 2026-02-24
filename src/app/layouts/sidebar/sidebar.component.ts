@@ -1,12 +1,16 @@
 import {
   Component,
   computed,
+  DestroyRef,
+  ElementRef,
   inject,
   Signal,
   signal,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import {
+  NavigationEnd,
   RouterLink,
   RouterLinkActive,
   Router,
@@ -16,6 +20,8 @@ import { NavItem } from './models/sidebar-item.type';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { ProfileMenuComponent } from './components/profile-menu/profile-menu.component';
 import { UserService } from '../../common/user/user.service';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'sidebar-layout',
@@ -30,6 +36,8 @@ import { UserService } from '../../common/user/user.service';
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
+  private readonly _destroyRef: DestroyRef =
+    inject(DestroyRef);
   private readonly _userService: UserService =
     inject(UserService);
   private readonly _router: Router = inject(Router);
@@ -133,6 +141,24 @@ export class SidebarComponent {
   public openGroups: WritableSignal<
     Record<string, boolean>
   > = signal<Record<string, boolean>>({});
+  public readonly contentScrollContainer =
+    viewChild<ElementRef<HTMLElement>>(
+      'contentScrollContainer',
+    );
+
+  constructor() {
+    this._router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd =>
+            event instanceof NavigationEnd,
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((): void => {
+        this._scrollContentToTop();
+      });
+  }
 
   public closeSidebar(): void {
     this.sidebarVisible.set(false);
@@ -202,5 +228,16 @@ export class SidebarComponent {
     return requiredRoles.some((requiredRole: string) =>
       mergedRoles.includes(requiredRole),
     );
+  }
+
+  private _scrollContentToTop(): void {
+    const scrollContainer: HTMLElement | undefined =
+      this.contentScrollContainer()?.nativeElement;
+
+    if (!scrollContainer) return;
+    scrollContainer.scrollTo({
+      top: 0,
+      behavior: 'auto',
+    });
   }
 }
