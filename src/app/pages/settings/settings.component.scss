@@ -25,6 +25,11 @@
   background: rgb(241 245 249 / 0.8);
 }
 
+.settings-primary-tab:focus-visible {
+  outline: 2px solid rgb(109 40 217 / 0.45);
+  outline-offset: 2px;
+}
+
 .settings-primary-tab-active {
   border-color: rgb(196 181 253 / 0.85) !important;
   background: rgb(237 233 254 / 0.9) !important;

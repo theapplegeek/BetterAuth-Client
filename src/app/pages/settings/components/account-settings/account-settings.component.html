@@ -43,6 +43,9 @@
                   : -1
               "
               (click)="setActiveAccountPanel(panel.id)"
+              (keydown)="
+                onAccountTabKeydown($event, panel.id)
+              "
             >
               <span
                 class="size-4.5 sm:size-5"

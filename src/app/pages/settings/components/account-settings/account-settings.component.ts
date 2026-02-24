@@ -137,6 +137,47 @@ export class AccountSettingsComponent {
     return this.activeAccountPanel() === panelId;
   }
 
+  public onAccountTabKeydown(
+    event: KeyboardEvent,
+    panelId: AccountPanelId,
+  ): void {
+    const panelIds: AccountPanelId[] =
+      this.accountPanelTabs.map(
+        (panel: AccountPanelTab): AccountPanelId =>
+          panel.id,
+      );
+    const currentIndex: number =
+      panelIds.indexOf(panelId);
+
+    if (currentIndex < 0) return;
+
+    let nextIndex: number = currentIndex;
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex =
+          (currentIndex + 1) % panelIds.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex =
+          (currentIndex - 1 + panelIds.length) %
+          panelIds.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = panelIds.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.activeAccountPanel.set(panelIds[nextIndex]);
+  }
+
   public loadSession(): void {
     this.isLoadingSession.set(true);
 

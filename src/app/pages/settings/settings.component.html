@@ -47,6 +47,9 @@
               #linkState="routerLinkActive"
               role="tab"
               [attr.aria-selected]="linkState.isActive"
+              [attr.aria-current]="
+                linkState.isActive ? 'page' : null
+              "
             >
               <div class="flex items-center gap-2.5">
                 <span

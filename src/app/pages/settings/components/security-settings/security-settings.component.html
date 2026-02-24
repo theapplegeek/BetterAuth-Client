@@ -43,6 +43,9 @@
                   : -1
               "
               (click)="setActiveSecurityPanel(panel.id)"
+              (keydown)="
+                onSecurityTabKeydown($event, panel.id)
+              "
             >
               <span
                 class="size-4.5 sm:size-5"

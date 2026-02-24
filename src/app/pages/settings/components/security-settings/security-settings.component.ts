@@ -201,6 +201,47 @@ export class SecuritySettingsComponent {
     return this.activeSecurityPanel() === panelId;
   }
 
+  public onSecurityTabKeydown(
+    event: KeyboardEvent,
+    panelId: SecurityPanelId,
+  ): void {
+    const panelIds: SecurityPanelId[] =
+      this.securityPanelTabs.map(
+        (panel: SecurityPanelTab): SecurityPanelId =>
+          panel.id,
+      );
+    const currentIndex: number =
+      panelIds.indexOf(panelId);
+
+    if (currentIndex < 0) return;
+
+    let nextIndex: number = currentIndex;
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex =
+          (currentIndex + 1) % panelIds.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex =
+          (currentIndex - 1 + panelIds.length) %
+          panelIds.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = panelIds.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.activeSecurityPanel.set(panelIds[nextIndex]);
+  }
+
   public loadSecurityState(): void {
     this.isLoading.set(true);
     this._accountSecurityService
