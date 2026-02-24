@@ -27,6 +27,8 @@ import { trimControl } from '../../../../common/forms/input-normalizer.util';
   styleUrl: './account-settings.component.scss',
 })
 export class AccountSettingsComponent {
+  private readonly _usernamePattern: RegExp =
+    /^[A-Za-z0-9]{2,120}$/;
   private readonly _changeEmailNeutralMessage =
     'Check your current email inbox to confirm this change. If the request is valid, you will receive instructions there.';
   private readonly _destroyRef: DestroyRef =
@@ -57,6 +59,7 @@ export class AccountSettingsComponent {
         Validators.required,
         Validators.minLength(2),
         Validators.maxLength(120),
+        Validators.pattern(this._usernamePattern),
       ],
     }),
   });
