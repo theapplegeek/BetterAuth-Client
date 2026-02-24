@@ -46,7 +46,20 @@ export class ProfileMenuComponent {
   public themeMenu = viewChild<Menu<string>>('themeMenu');
 
   public username: Signal<string> = computed((): string => {
-    return this._userService.user()?.name ?? 'User';
+    const currentUser = this._userService.user();
+    if (!currentUser) return 'User';
+
+    const normalizedName: string = currentUser.name.trim();
+    if (normalizedName.length > 0) {
+      return normalizedName;
+    }
+
+    const normalizedEmail: string = currentUser.email.trim();
+    if (normalizedEmail.length > 0) {
+      return normalizedEmail;
+    }
+
+    return 'User';
   });
   public currentTheme: Signal<Theme> = computed(
     (): Theme => this._themeService.getTheme(),

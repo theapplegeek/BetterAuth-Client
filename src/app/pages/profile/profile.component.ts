@@ -108,16 +108,13 @@ export class ProfileComponent {
       const currentUser = this.user();
       if (!currentUser) return [];
 
-      const mergedRoles = [
-        currentUser.role,
-        ...currentUser.roles,
-      ].filter(
+      const normalizedRoles = currentUser.roles.filter(
         (value): value is string =>
           typeof value === 'string' &&
           value.trim().length > 0,
       );
 
-      return Array.from(new Set(mergedRoles));
+      return Array.from(new Set(normalizedRoles));
     },
   );
 

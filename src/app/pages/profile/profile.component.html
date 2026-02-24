@@ -180,7 +180,7 @@
                 class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
               >
                 <dt class="text-xs text-gray-500 dark:text-gray-400 uppercase">
-                  Member since
+                  Member Since
                 </dt>
                 <dd
                   class="mt-2 text-sm font-semibold text-gray-900 dark:text-white"
@@ -209,16 +209,16 @@
                 class="rounded-lg border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-gray-800/40 border"
               >
                 <dt class="text-xs text-gray-500 dark:text-gray-400 uppercase">
-                  Roles
+                  Application Roles
                 </dt>
-                <dd class="gap-2 mt-2 flex flex-wrap">
-                  @for (role of roles(); track role) {
-                    <span
-                      class="px-2 py-1 text-xs font-semibold rounded-md bg-primary-100 text-primary-700 uppercase dark:bg-primary-900/30 dark:text-primary-300"
-                    >
-                      {{ role }}
-                    </span>
-                  }
+                <dd
+                  class="mt-2 text-sm text-gray-900 dark:text-white"
+                >
+                  {{
+                    roles().length
+                      ? roles().join(', ')
+                      : 'No explicit roles assigned'
+                  }}
                 </dd>
               </div>
             </dl>
